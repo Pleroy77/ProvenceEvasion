@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S2 — Cours : Adressage IP complet et plan d'adressage global</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.choices{display:flex;gap:14px;flex-wrap:wrap;margin:4px 0 10px;}
+.choices label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;}
+.choices input{accent-color:var(--bleu);}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:120px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.0;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+/* Blocs spécifiques S2 */
+.calcul-demo{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;}
+.calcul-demo .cm-com{color:#8BC34A;}
+.calcul-demo .cm-val{color:#FFD54F;}
+.calcul-demo .cm-titre{color:#5BB8E8;font-weight:700;}
+.convention-box{background:#f0f4ff;border:2px solid var(--marine);border-radius:8px;padding:14px 18px;margin:12px 0 16px;font-size:12px;}
+.convention-box .conv-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);margin-bottom:10px;font-size:13px;}
+.conv-row{display:grid;grid-template-columns:60px 160px 1fr;gap:8px;padding:4px 0;border-bottom:1px dotted #c0d0e0;font-size:12px;align-items:center;}
+.conv-row:last-child{border-bottom:none;}
+.conv-id{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);font-size:14px;text-align:center;}
+.conv-label{font-weight:600;color:var(--marine);}
+.plan-global{width:100%;border-collapse:collapse;margin:12px 0 18px;font-size:12px;}
+.plan-global th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);text-align:left;}
+.plan-global td{border:1px solid #c0d0e0;padding:6px 10px;vertical-align:top;}
+.plan-global tr:nth-child(even) td{background:var(--ciel-bg);}
+.plan-global .td-site{font-weight:700;color:var(--marine);}
+.plan-global .td-vlan{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);}
+.badge-vlan{background:#e8f4fd;color:var(--bleu);border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;margin:1px 2px;}
+.badge-site{display:inline-block;background:var(--marine);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:1px 2px;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <svg width="110" height="44" viewBox="0 0 110 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="110" height="44" rx="4" fill="#1E3A5F"/>
+      <text x="8" y="17" font-family="Roboto,sans-serif" font-weight="700" font-size="13" fill="#8BC34A">BAC PRO</text>
+      <text x="8" y="32" font-family="Roboto,sans-serif" font-weight="700" font-size="15" fill="#fff">CIEL</text>
+      <text x="55" y="20" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Cybersécurité</text>
+      <text x="55" y="31" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Informatique</text>
+      <text x="55" y="42" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Électronique</text>
+    </svg>
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S2 – Cours : Adressage IP complet et plan d'adressage global</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 2h30 &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Rappels et approfondissement CIDR</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Mise en situation :</strong> La semaine dernière, vous avez posé les bases du projet Provence Évasion et calculé le plan d'adressage du site de Roussillon. Aujourd'hui, vous allez élargir ce travail aux trois autres sites (Apt, Saignon, Cucuron) et finaliser le plan d'adressage global des 4 sites. C'est la colonne vertébrale de toute l'infrastructure — un plan solide évite des heures de dépannage plus tard.
+</div>
+
+<h2>1.1 Rappel : qu'est-ce que le CIDR ?</h2>
+<p>Le <strong>CIDR</strong> (Classless Inter-Domain Routing) est une notation qui remplace les anciennes classes A/B/C. Au lieu d'une classe figée, on précise exactement combien de bits sont utilisés pour la partie réseau.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Notation CIDR</div>
+  <p>Une adresse IP en notation CIDR s'écrit : <strong>adresse_réseau / longueur_de_préfixe</strong></p>
+  <p>Exemple : <strong>192.168.10.0/24</strong> signifie que les 24 premiers bits (3 octets) identifient le réseau, et les 8 derniers bits (1 octet) identifient les hôtes.</p>
+  <ul>
+    <li>Nombre de bits pour les hôtes = 32 − longueur_préfixe</li>
+    <li>Nombre d'adresses total = 2<sup>bits_hôtes</sup></li>
+    <li>Nombre d'adresses utilisables = 2<sup>bits_hôtes</sup> − 2 (on retire l'adresse réseau et le broadcast)</li>
+  </ul>
+</div>
+
+<h2>1.2 Calculer les paramètres d'un sous-réseau</h2>
+<p>Pour chaque réseau CIDR, vous devez savoir calculer systématiquement :</p>
+
+<table class="data-table">
+  <tr>
+    <th>Paramètre</th><th>Définition</th><th>Méthode de calcul</th>
+  </tr>
+  <tr><td class="left"><strong>Adresse réseau</strong></td><td class="left">Première adresse, identifie le réseau</td><td class="left">Donnée (toujours fournie)</td></tr>
+  <tr><td class="left"><strong>Masque</strong></td><td class="left">Sépare la partie réseau de la partie hôte</td><td class="left">Préfixe → octets : /24 = 255.255.255.0</td></tr>
+  <tr><td class="left"><strong>Broadcast</strong></td><td class="left">Dernière adresse, non attribuable</td><td class="left">Adresse réseau + (2<sup>bits_hôtes</sup> − 1)</td></tr>
+  <tr><td class="left"><strong>1ère adresse utile</strong></td><td class="left">Première adresse attribuable</td><td class="left">Adresse réseau + 1</td></tr>
+  <tr><td class="left"><strong>Dernière adresse utile</strong></td><td class="left">Dernière adresse attribuable</td><td class="left">Broadcast − 1</td></tr>
+  <tr><td class="left"><strong>Nb hôtes utiles</strong></td><td class="left">Nombre d'équipements pouvant être configurés</td><td class="left">2<sup>bits_hôtes</sup> − 2</td></tr>
+</table>
+
+<h2>1.3 Exemple détaillé : 192.168.20.0/25</h2>
+
+<div class="calcul-demo">
+<span class="cm-titre">Réseau : 192.168.20.0/25</span>
+<br>
+<span class="cm-com">— Longueur de préfixe :</span>  <span class="cm-val">25 bits</span>
+<span class="cm-com">— Bits pour les hôtes :</span>   <span class="cm-val">32 − 25 = 7 bits</span>
+<span class="cm-com">— Nombre d'adresses totales :</span> <span class="cm-val">2⁷ = 128</span>
+<span class="cm-com">— Hôtes utilisables :</span>     <span class="cm-val">128 − 2 = 126</span>
+<span class="cm-com">— Masque :</span>                <span class="cm-val">255.255.255.128</span>
+<span class="cm-com">   (25 bits à 1 : 11111111.11111111.11111111.10000000)</span>
+<span class="cm-com">— Adresse réseau :</span>        <span class="cm-val">192.168.20.0</span>
+<span class="cm-com">— Broadcast :</span>             <span class="cm-val">192.168.20.127</span>
+<span class="cm-com">   (192.168.20.0 + 127 = 192.168.20.127)</span>
+<span class="cm-com">— 1ère adresse utile :</span>    <span class="cm-val">192.168.20.1</span>
+<span class="cm-com">— Dernière adresse utile :</span> <span class="cm-val">192.168.20.126</span>
+</div>
+
+<div class="attention">
+  <strong>⚠ Erreur fréquente :</strong> Le broadcast n'est PAS l'adresse réseau +127 dans tous les cas. Il faut toujours calculer 2<sup>bits_hôtes</sup> − 1, puis additionner ce résultat au dernier octet de l'adresse réseau (en tenant compte des retenues si nécessaire).
+</div>
+
+<h2>1.4 Table des masques CIDR courants</h2>
+<table class="data-table">
+  <tr>
+    <th>Préfixe</th><th>Masque</th><th>Hôtes utiles</th><th>Usage typique</th>
+  </tr>
+  <tr><td class="center">/24</td><td class="center">255.255.255.0</td><td class="center">254</td><td class="left">VLAN standard (jusqu'à 254 équipements)</td></tr>
+  <tr><td class="center">/25</td><td class="center">255.255.255.128</td><td class="center">126</td><td class="left">VLAN moyen (WiFi clients, caméras)</td></tr>
+  <tr><td class="center">/26</td><td class="center">255.255.255.192</td><td class="center">62</td><td class="left">VLAN restreint (personnel, serveurs)</td></tr>
+  <tr><td class="center">/27</td><td class="center">255.255.255.224</td><td class="center">30</td><td class="left">Petits VLANs (administration, IoT)</td></tr>
+  <tr><td class="center">/28</td><td class="center">255.255.255.240</td><td class="center">14</td><td class="left">Très petits VLANs (liaisons WAN, administration)</td></tr>
+  <tr><td class="center">/30</td><td class="center">255.255.255.252</td><td class="center">2</td><td class="left">Liaisons point à point (routeurs)</td></tr>
+</table>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Convention d'adressage du projet Provence Évasion</h1>
+
+<p>Pour garantir la cohérence et la lisibilité du réseau sur les 4 sites, Axentis Informatique a défini une convention d'adressage stricte. Tout le plan d'adressage s'appuie sur cette convention.</p>
+
+<div class="convention-box">
+  <div class="conv-titre">📐 Convention d'adressage — Projet Provence Évasion</div>
+  <p style="margin-bottom:10px;font-size:12px;">Format général : <strong>192.168.<span style="color:var(--orange)">S</span><span style="color:var(--bleu)">V</span>.0/xx</strong></p>
+  <div class="conv-row"><div class="conv-id" style="color:var(--orange)">S</div><div class="conv-label">Identifiant de site</div><div>Chiffre des dizaines — identifie le site géographique</div></div>
+  <div class="conv-row"><div class="conv-id" style="color:var(--bleu)">V</div><div class="conv-label">Identifiant de VLAN</div><div>Chiffre des unités — identifie le VLAN à l'intérieur du site</div></div>
+  <br>
+  <table class="data-table" style="margin-top:8px;">
+    <tr><th>Site</th><th>Identifiant S</th><th>Plage réservée</th></tr>
+    <tr><td class="left"><strong>Apt (siège)</strong></td><td class="center">1x</td><td class="center">192.168.10.0 → 192.168.19.0</td></tr>
+    <tr><td class="left"><strong>Roussillon</strong></td><td class="center">2x</td><td class="center">192.168.20.0 → 192.168.29.0</td></tr>
+    <tr><td class="left"><strong>Saignon</strong></td><td class="center">3x</td><td class="center">192.168.30.0 → 192.168.39.0</td></tr>
+    <tr><td class="left"><strong>Cucuron</strong></td><td class="center">4x</td><td class="center">192.168.40.0 → 192.168.49.0</td></tr>
+  </table>
+  <br>
+  <table class="data-table">
+    <tr><th>VLAN</th><th>Identifiant V</th><th>Description</th></tr>
+    <tr><td class="left"><strong>Personnel</strong></td><td class="center">1</td><td class="left">Postes du personnel, imprimantes</td></tr>
+    <tr><td class="left"><strong>Clients WiFi</strong></td><td class="center">2</td><td class="left">Accès Internet clients, isolé</td></tr>
+    <tr><td class="left"><strong>Caméras IP</strong></td><td class="center">3</td><td class="left">Surveillance vidéo, accès restreint</td></tr>
+    <tr><td class="left"><strong>Administration</strong></td><td class="center">4</td><td class="left">Équipements réseau (switches, routeurs)</td></tr>
+    <tr><td class="left"><strong>Serveurs</strong></td><td class="center">5</td><td class="left">Serveurs (siège Apt uniquement)</td></tr>
+    <tr><td class="left"><strong>Séminaires</strong></td><td class="center">6</td><td class="left">Salle séminaire (Saignon uniquement)</td></tr>
+  </table>
+  <p style="font-size:11px;color:#666;margin-top:8px;">Exemple de lecture : 192.168.<strong>21</strong>.0 → site <strong>2</strong> (Roussillon), VLAN <strong>1</strong> (Personnel)</p>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 1 — Décoder une adresse</div>
+  <label class="qlabel">Q1.1 — Sans calculer, quel site et quel VLAN correspond à l'adresse 192.168.32.0 ?</label>
+  <textarea class="rep rep-xs" id="ex1-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q1.2 — Et l'adresse 192.168.14.0 ?</label>
+  <textarea class="rep rep-xs" id="ex1-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q1.3 — Quelle adresse réseau utiliserez-vous pour le VLAN Caméras de Cucuron ?</label>
+  <textarea class="rep rep-xs" id="ex1-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Plan d'adressage complet des 4 sites</h1>
+
+<h2>3.1 Site de Roussillon (rappel S1)</h2>
+<p>Ce site a été traité en S1. Il dispose de 3 VLANs. Voici le résumé :</p>
+
+<table class="plan-global">
+  <tr>
+    <th>Site</th><th>VLAN</th><th>Réseau / CIDR</th><th>Masque</th><th>Hôtes utiles</th><th>Passerelle</th>
+  </tr>
+  <tr>
+    <td class="td-site" rowspan="3"><span class="badge-site">Roussillon</span></td>
+    <td><span class="badge-vlan">VLAN 21 — Personnel</span></td>
+    <td>192.168.21.0/26</td><td>255.255.255.192</td><td>62</td><td>192.168.21.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 22 — Clients WiFi</span></td>
+    <td>192.168.22.0/25</td><td>255.255.255.128</td><td>126</td><td>192.168.22.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 23 — Caméras IP</span></td>
+    <td>192.168.23.0/28</td><td>255.255.255.240</td><td>14</td><td>192.168.23.1</td>
+  </tr>
+</table>
+
+<h2>3.2 Site d'Apt — Siège administratif</h2>
+<p>Le siège héberge la direction, la comptabilité, le service RH et les serveurs centraux (DNS, fichiers, NVR caméras, VPN). C'est le site le plus critique.</p>
+<p><strong>Équipements :</strong> 15 postes fixes permanents, 1 serveur NAS, 1 serveur DNS/DHCP, enregistreur vidéo NVR, routeur principal, switch manageable 24 ports.</p>
+
+<table class="plan-global">
+  <tr>
+    <th>Site</th><th>VLAN</th><th>Réseau / CIDR</th><th>Masque</th><th>Hôtes utiles</th><th>Passerelle</th>
+  </tr>
+  <tr>
+    <td class="td-site" rowspan="4"><span class="badge-site">Apt (siège)</span></td>
+    <td><span class="badge-vlan">VLAN 11 — Personnel</span></td>
+    <td>192.168.11.0/26</td><td>255.255.255.192</td><td>62</td><td>192.168.11.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 14 — Administration</span></td>
+    <td>192.168.14.0/28</td><td>255.255.255.240</td><td>14</td><td>192.168.14.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 15 — Serveurs</span></td>
+    <td>192.168.15.0/28</td><td>255.255.255.240</td><td>14</td><td>192.168.15.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 13 — Caméras IP</span></td>
+    <td>192.168.13.0/28</td><td>255.255.255.240</td><td>14</td><td>192.168.13.1</td>
+  </tr>
+</table>
+
+<div class="attention">
+  <strong>⚠ Pourquoi /28 pour Serveurs et Administration ?</strong> Le siège n'a que quelques serveurs (5 max) et peu d'équipements d'administration. Un /28 (14 hôtes) est parfaitement dimensionné et évite le gaspillage d'adresses. Dimensionner juste est une bonne pratique professionnelle.
+</div>
+
+<h2>3.3 Site de Saignon — Domaine de Saignon</h2>
+<p>Le Domaine de Saignon est le plus grand site en capacité (90 personnes). Il dispose d'une salle de séminaires d'entreprise avec des besoins réseau spécifiques. C'est le seul site à avoir 4 VLANs.</p>
+<p><strong>Équipements :</strong> 10 postes personnel permanents, 25 appareils clients WiFi estimés en haute saison, 6 caméras IP, salle séminaire 20 postes, switch manageable 24 ports, 2 AP WiFi.</p>
+
+<table class="plan-global">
+  <tr>
+    <th>Site</th><th>VLAN</th><th>Réseau / CIDR</th><th>Masque</th><th>Hôtes utiles</th><th>Passerelle</th>
+  </tr>
+  <tr>
+    <td class="td-site" rowspan="4"><span class="badge-site">Saignon</span></td>
+    <td><span class="badge-vlan">VLAN 31 — Personnel</span></td>
+    <td>192.168.31.0/26</td><td>255.255.255.192</td><td>62</td><td>192.168.31.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 32 — Clients WiFi</span></td>
+    <td>192.168.32.0/25</td><td>255.255.255.128</td><td>126</td><td>192.168.32.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 33 — Caméras IP</span></td>
+    <td>192.168.33.0/28</td><td>255.255.255.240</td><td>14</td><td>192.168.33.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 36 — Séminaires</span></td>
+    <td>192.168.36.0/26</td><td>255.255.255.192</td><td>62</td><td>192.168.36.1</td>
+  </tr>
+</table>
+
+<h2>3.4 Site de Cucuron — Camping l'Étang</h2>
+<p>Le Camping l'Étang est un site de glamping haut de gamme plus compact. Il dispose de moins de personnel permanent mais accueille une clientèle importante en saison.</p>
+<p><strong>Équipements :</strong> 5 postes personnel permanents, 20 appareils clients WiFi estimés, 2 caméras IP, switch manageable 16 ports, 1 AP WiFi.</p>
+
+<table class="plan-global">
+  <tr>
+    <th>Site</th><th>VLAN</th><th>Réseau / CIDR</th><th>Masque</th><th>Hôtes utiles</th><th>Passerelle</th>
+  </tr>
+  <tr>
+    <td class="td-site" rowspan="3"><span class="badge-site">Cucuron</span></td>
+    <td><span class="badge-vlan">VLAN 41 — Personnel</span></td>
+    <td>192.168.41.0/26</td><td>255.255.255.192</td><td>62</td><td>192.168.41.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 42 — Clients WiFi</span></td>
+    <td>192.168.42.0/25</td><td>255.255.255.128</td><td>126</td><td>192.168.42.1</td>
+  </tr>
+  <tr>
+    <td><span class="badge-vlan">VLAN 43 — Caméras IP</span></td>
+    <td>192.168.43.0/28</td><td>255.255.255.240</td><td>14</td><td>192.168.43.1</td>
+  </tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 2 — Analyser les choix</div>
+  <label class="qlabel">Q2.1 — Pourquoi le VLAN Clients WiFi de Roussillon et Saignon utilise-t-il un /25 (126 hôtes) et pas un /24 (254 hôtes) ?</label>
+  <textarea class="rep rep-sm" id="ex2-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q2.2 — Apt n'a pas de VLAN Clients WiFi. Expliquez pourquoi, en vous appuyant sur le cahier des charges.</label>
+  <textarea class="rep rep-sm" id="ex2-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q2.3 — Le VLAN Séminaires de Saignon utilise un /26. Combien de postes peut-on y connecter ? Est-ce suffisant pour la salle séminaire de 20 postes ? Justifiez.</label>
+  <textarea class="rep rep-sm" id="ex2-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Adresses statiques réservées — Serveurs et équipements critiques</h1>
+
+<p>Les équipements d'infrastructure (serveurs, routeurs, switches manageables) ne peuvent pas utiliser DHCP : ils doivent avoir une adresse <strong>fixe et connue</strong> pour être administrés et joignables à tout moment.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Convention d'adressage statique</div>
+  <ul>
+    <li><strong>.1</strong> — Passerelle par défaut (interface du routeur côté VLAN)</li>
+    <li><strong>.2</strong> — Switch manageable (adresse d'administration)</li>
+    <li><strong>.3 à .9</strong> — Serveurs et équipements critiques (DNS, NAS, NVR…)</li>
+    <li><strong>.10 et au-delà</strong> — Plage DHCP dynamique (postes, PC portables, téléphones...)</li>
+  </ul>
+</div>
+
+<table class="plan-global">
+  <tr>
+    <th>Équipement</th><th>VLAN</th><th>Adresse IP statique</th><th>Rôle</th>
+  </tr>
+  <tr><td><strong>Routeur principal Apt</strong></td><td>VLAN 11, 13, 14, 15</td><td>192.168.1x.1 (par VLAN)</td><td>Passerelle de chaque VLAN</td></tr>
+  <tr><td><strong>Switch Apt</strong></td><td>VLAN 14 (Admin)</td><td>192.168.14.2</td><td>Administration switch</td></tr>
+  <tr><td><strong>Serveur DNS/DHCP</strong></td><td>VLAN 15 (Serveurs)</td><td>192.168.15.3</td><td>Résolution de noms + attribution DHCP</td></tr>
+  <tr><td><strong>Serveur NAS (fichiers)</strong></td><td>VLAN 15 (Serveurs)</td><td>192.168.15.4</td><td>Partages réseau</td></tr>
+  <tr><td><strong>Enregistreur NVR</strong></td><td>VLAN 13 (Caméras)</td><td>192.168.13.3</td><td>Enregistrement vidéo centralisé</td></tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 3 — Liaisons WAN</div>
+  <p style="font-size:12px;margin-bottom:10px;">Les 4 sites sont reliés entre eux par des liaisons WAN. Chaque liaison point-à-point entre deux routeurs utilise un /30 (2 hôtes utiles). Axentis a réservé la plage <strong>10.0.0.0/24</strong> pour les liaisons WAN inter-sites.</p>
+  <label class="qlabel">Q3.1 — Combien d'adresses utiles contient un réseau /30 ? Pourquoi est-ce exactement le bon choix pour une liaison point-à-point ?</label>
+  <textarea class="rep rep-sm" id="ex3-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q3.2 — Proposez une adresse réseau /30 pour chacune des 3 liaisons WAN suivantes (Apt↔Roussillon, Apt↔Saignon, Apt↔Cucuron), en utilisant la plage 10.0.0.0/24.</label>
+  <textarea class="rep rep-md" id="ex3-q2" placeholder="Ex : Apt ↔ Roussillon → 10.0.0.0/30 …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Synthèse de la séance</div>
+
+<div class="conclusion">
+  <p>Au terme de cette séance, complétez les phrases suivantes :</p>
+  <p>La notation CIDR /25 correspond au masque <input class="inline-field" id="synth-1" placeholder="..."> et permet d'adresser <input class="inline-field" id="synth-2" placeholder="..."> hôtes utiles.</p>
+  <p>Dans la convention Provence Évasion, le réseau 192.168.<strong>32</strong>.0 correspond au site de <input class="inline-field" id="synth-3" placeholder="..."> et au VLAN <input class="inline-field" id="synth-4" placeholder="...">.</p>
+  <p>Le siège d'Apt utilise un VLAN <input class="inline-field" id="synth-5" placeholder="..."> pour héberger ses serveurs, avec le réseau <input class="inline-field" id="synth-6" placeholder="192.168.1?.0/??">.</p>
+  <p>Un /30 est utilisé pour les liaisons WAN car il ne fournit que <input class="inline-field" id="synth-7" placeholder="..."> adresses utiles, ce qui suffit pour relier <input class="inline-field" id="synth-8" placeholder="..."> routeurs.</p>
+</div>
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+
+  <script>
+  const criteres = [
+    "Je sais calculer le masque à partir d'un préfixe CIDR",
+    "Je sais calculer l'adresse broadcast d'un réseau",
+    "Je sais déterminer la 1ère et la dernière adresse utile",
+    "Je comprends la convention d'adressage Provence Évasion",
+    "Je sais lire le plan d'adressage global des 4 sites",
+    "Je comprends pourquoi un /30 est utilisé pour les liaisons WAN"
+  ];
+  const niveaux = ['maitrise','en_cours','a_revoir','non_traite'];
+  const labels = ['★★★','★★☆','★☆☆','?'];
+  const ae = document.currentScript.closest('.autoeval');
+  criteres.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className = 'ae-row';
+    let html = `<div>${c}</div>`;
+    niveaux.forEach((n,j) => {
+      html += `<div style="text-align:center"><label style="cursor:pointer"><input type="radio" name="ae${i}" value="${n}" style="accent-color:var(--bleu)"> ${labels[j]}</label></div>`;
+    });
+    row.innerHTML = html;
+    ae.appendChild(row);
+  });
+  </script>
+</div>
+
+</div><!-- fin .content -->
+
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <span><strong style="color:var(--orange)">S2</strong> — Cours : Adressage IP complet et plan d'adressage global</span>
+  <span id="page-info">Projet Provence Évasion · Bac Pro CIEL · 2025-2026</span>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+function getAE() {
+  const result = {};
+  const criteres = [
+    "Calculer masque depuis préfixe CIDR",
+    "Calculer adresse broadcast",
+    "Déterminer 1ère et dernière adresse utile",
+    "Comprendre la convention d'adressage",
+    "Lire le plan d'adressage 4 sites",
+    "Comprendre l'usage du /30 pour WAN"
+  ];
+  criteres.forEach((c,i) => {
+    const sel = document.querySelector(`input[name="ae${i}"]:checked`);
+    result[`critere_${i+1}`] = { critere: c, niveau: sel ? sel.value : 'non_traite' };
+  });
+  return result;
+}
+
+function genererJSON() {
+  const v = id => (document.getElementById(id)||{value:''}).value;
+  const data = {
+    meta: {
+      devoir: "S2 – Cours : Adressage IP complet et plan d'adressage global",
+      eleve: { nom: v('eleve-nom'), prenom: v('eleve-prenom'), classe: v('eleve-classe') },
+      date: v('eleve-date'),
+      genere_le: new Date().toISOString()
+    },
+    exercice1: { q1: v('ex1-q1'), q2: v('ex1-q2'), q3: v('ex1-q3') },
+    exercice2: { q1: v('ex2-q1'), q2: v('ex2-q2'), q3: v('ex2-q3') },
+    exercice3: { q1: v('ex3-q1'), q2: v('ex3-q2') },
+    synthese: {
+      s1: v('synth-1'), s2: v('synth-2'), s3: v('synth-3'), s4: v('synth-4'),
+      s5: v('synth-5'), s6: v('synth-6'), s7: v('synth-7'), s8: v('synth-8')
+    },
+    auto_evaluation: getAE()
+  };
+  const nom = v('eleve-nom'), prenom = v('eleve-prenom');
+  const safeName = (nom+prenom).replace(/[^a-zA-Z0-9]/g,'') || 'Eleve';
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${safeName}_S2Cours.json`;
+  a.click();
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>

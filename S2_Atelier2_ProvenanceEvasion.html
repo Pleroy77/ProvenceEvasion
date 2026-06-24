@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S2 — Atelier 2 : Cohérence globale, optimisation et Packet Tracer</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.consigne{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.consigne strong{color:var(--orange);}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+/* Tableaux interactifs */
+.plan-inter{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:12px;}
+.plan-inter th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);text-align:center;}
+.plan-inter td{border:1px solid #c0d0e0;padding:4px 6px;vertical-align:middle;}
+.plan-inter tr:nth-child(even) td{background:var(--ciel-bg);}
+.plan-inter td.td-fixe{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);background:#f4f7fa;}
+.plan-inter td.td-vlan{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);}
+.plan-inter input[type=text]{width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:5px 7px;font-family:'Montserrat',sans-serif;font-size:11px;color:#222;}
+.plan-inter input[type=text]:focus{outline:none;border-color:var(--bleu);}
+.plan-inter select{width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:5px 4px;font-family:'Montserrat',sans-serif;font-size:11px;color:#222;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:140px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+/* Spécifiques Atelier 2 */
+.section-titre-site{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;background:var(--marine);padding:9px 16px;border-radius:6px;margin:20px 0 10px;display:flex;justify-content:space-between;align-items:center;}
+.section-titre-site .site-badge{background:var(--vert);color:#fff;font-size:11px;padding:2px 10px;border-radius:20px;}
+.calcul-demo{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:11px;padding:10px 14px;border-radius:6px;margin:8px 0 12px;line-height:1.9;}
+.calcul-demo .cm-com{color:#8BC34A;}.calcul-demo .cm-val{color:#FFD54F;}.calcul-demo .cm-titre{color:#5BB8E8;font-weight:700;}
+/* Dossier de déploiement */
+.dossier-section{background:#fff;border:2px solid var(--marine);border-radius:10px;padding:18px 22px;margin:20px 0;}
+.dossier-titre{font-family:'Roboto',sans-serif;font-weight:700;color:#fff;background:var(--marine);margin:-18px -22px 16px -22px;padding:12px 22px;border-radius:8px 8px 0 0;font-size:14px;display:flex;align-items:center;gap:10px;}
+.dossier-titre .dossier-num{background:var(--orange);color:#fff;font-size:11px;padding:2px 10px;border-radius:20px;font-weight:700;}
+.dossier-global{width:100%;border-collapse:collapse;margin:12px 0 16px;font-size:12px;}
+.dossier-global th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:8px 10px;border:1px solid var(--marine);text-align:left;}
+.dossier-global th.th-center{text-align:center;}
+.dossier-global td{border:1px solid #c0d0e0;padding:5px 8px;vertical-align:middle;}
+.dossier-global tr:nth-child(even) td{background:var(--ciel-bg);}
+.dossier-global td.td-site{font-weight:700;color:var(--marine);background:#f0f4fa;}
+.dossier-global td.td-vlan{font-family:'Roboto',sans-serif;font-weight:600;color:var(--bleu);}
+.dossier-global td.td-edit input{width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:4px 6px;font-family:'Montserrat',sans-serif;font-size:11px;}
+.dossier-global td.td-edit input:focus{outline:none;border-color:var(--bleu);}
+/* PT scenario */
+.pt-step{background:#f4f7fa;border-left:4px solid var(--bleu);border-radius:0 6px 6px 0;padding:10px 14px;margin:8px 0;font-size:12px;}
+.pt-step .pt-num{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-right:6px;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <svg width="110" height="44" viewBox="0 0 110 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="110" height="44" rx="4" fill="#1E3A5F"/>
+      <text x="8" y="17" font-family="Roboto,sans-serif" font-weight="700" font-size="13" fill="#8BC34A">BAC PRO</text>
+      <text x="8" y="32" font-family="Roboto,sans-serif" font-weight="700" font-size="15" fill="#fff">CIEL</text>
+      <text x="55" y="20" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Cybersécurité</text>
+      <text x="55" y="31" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Informatique</text>
+      <text x="55" y="42" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Électronique</text>
+    </svg>
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S2 – Atelier 2 : Cohérence globale, optimisation et Packet Tracer</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<div class="mise-en-situation">
+  <strong>📍 Contexte :</strong> L'Atelier 1 vous a permis de construire le plan d'adressage site par site. Dans cet atelier d'approfondissement, vous allez vérifier la <strong>cohérence globale</strong> du plan sur les 4 sites, analyser des cas d'erreurs typiques, traiter des scénarios de conflits d'adresses, puis démarrer la maquette Packet Tracer du site de Roussillon. Vous terminerez par la rédaction de la <strong>Section 3 du dossier de déploiement</strong>.
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Vérification de cohérence globale</h1>
+
+<h2>1.1 Inventaire des réseaux — plan global des 4 sites</h2>
+
+<div class="consigne">
+  <strong>📋 Consigne :</strong> Complétez le tableau de synthèse global ci-dessous en reprenant vos résultats de l'Atelier 1 (ou les valeurs corrigées). Ce tableau doit être cohérent et exempt de tout chevauchement.
+</div>
+
+<table class="plan-inter">
+  <tr>
+    <th>Site</th><th>VLAN</th><th>Adresse réseau / CIDR</th><th>Masque</th><th>Broadcast</th><th>Hôtes utiles</th><th>Passerelle</th>
+  </tr>
+  <!-- Apt -->
+  <tr>
+    <td class="td-fixe" rowspan="4">Apt (siège)</td>
+    <td class="td-vlan">VLAN 11 — Personnel</td>
+    <td><input type="text" id="g-apt11-net" placeholder="192.168.11.0/??"></td>
+    <td><input type="text" id="g-apt11-mask" placeholder="255.255.255.?"></td>
+    <td><input type="text" id="g-apt11-bcast"></td>
+    <td><input type="text" id="g-apt11-nb"></td>
+    <td><input type="text" id="g-apt11-gw" placeholder="192.168.11.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 13 — Caméras</td>
+    <td><input type="text" id="g-apt13-net" placeholder="192.168.13.0/??"></td>
+    <td><input type="text" id="g-apt13-mask"></td>
+    <td><input type="text" id="g-apt13-bcast"></td>
+    <td><input type="text" id="g-apt13-nb"></td>
+    <td><input type="text" id="g-apt13-gw" placeholder="192.168.13.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 14 — Administration</td>
+    <td><input type="text" id="g-apt14-net" placeholder="192.168.14.0/??"></td>
+    <td><input type="text" id="g-apt14-mask"></td>
+    <td><input type="text" id="g-apt14-bcast"></td>
+    <td><input type="text" id="g-apt14-nb"></td>
+    <td><input type="text" id="g-apt14-gw" placeholder="192.168.14.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 15 — Serveurs</td>
+    <td><input type="text" id="g-apt15-net" placeholder="192.168.15.0/??"></td>
+    <td><input type="text" id="g-apt15-mask"></td>
+    <td><input type="text" id="g-apt15-bcast"></td>
+    <td><input type="text" id="g-apt15-nb"></td>
+    <td><input type="text" id="g-apt15-gw" placeholder="192.168.15.1"></td>
+  </tr>
+  <!-- Roussillon -->
+  <tr>
+    <td class="td-fixe" rowspan="3">Roussillon</td>
+    <td class="td-vlan">VLAN 21 — Personnel</td>
+    <td><input type="text" id="g-rou21-net" placeholder="192.168.21.0/??"></td>
+    <td><input type="text" id="g-rou21-mask"></td>
+    <td><input type="text" id="g-rou21-bcast"></td>
+    <td><input type="text" id="g-rou21-nb"></td>
+    <td><input type="text" id="g-rou21-gw" placeholder="192.168.21.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 22 — Clients WiFi</td>
+    <td><input type="text" id="g-rou22-net" placeholder="192.168.22.0/??"></td>
+    <td><input type="text" id="g-rou22-mask"></td>
+    <td><input type="text" id="g-rou22-bcast"></td>
+    <td><input type="text" id="g-rou22-nb"></td>
+    <td><input type="text" id="g-rou22-gw" placeholder="192.168.22.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 23 — Caméras</td>
+    <td><input type="text" id="g-rou23-net" placeholder="192.168.23.0/??"></td>
+    <td><input type="text" id="g-rou23-mask"></td>
+    <td><input type="text" id="g-rou23-bcast"></td>
+    <td><input type="text" id="g-rou23-nb"></td>
+    <td><input type="text" id="g-rou23-gw" placeholder="192.168.23.1"></td>
+  </tr>
+  <!-- Saignon -->
+  <tr>
+    <td class="td-fixe" rowspan="4">Saignon</td>
+    <td class="td-vlan">VLAN 31 — Personnel</td>
+    <td><input type="text" id="g-sai31-net" placeholder="192.168.31.0/??"></td>
+    <td><input type="text" id="g-sai31-mask"></td>
+    <td><input type="text" id="g-sai31-bcast"></td>
+    <td><input type="text" id="g-sai31-nb"></td>
+    <td><input type="text" id="g-sai31-gw" placeholder="192.168.31.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 32 — Clients WiFi</td>
+    <td><input type="text" id="g-sai32-net" placeholder="192.168.32.0/??"></td>
+    <td><input type="text" id="g-sai32-mask"></td>
+    <td><input type="text" id="g-sai32-bcast"></td>
+    <td><input type="text" id="g-sai32-nb"></td>
+    <td><input type="text" id="g-sai32-gw" placeholder="192.168.32.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 33 — Caméras</td>
+    <td><input type="text" id="g-sai33-net" placeholder="192.168.33.0/??"></td>
+    <td><input type="text" id="g-sai33-mask"></td>
+    <td><input type="text" id="g-sai33-bcast"></td>
+    <td><input type="text" id="g-sai33-nb"></td>
+    <td><input type="text" id="g-sai33-gw" placeholder="192.168.33.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 36 — Séminaires</td>
+    <td><input type="text" id="g-sai36-net" placeholder="192.168.36.0/??"></td>
+    <td><input type="text" id="g-sai36-mask"></td>
+    <td><input type="text" id="g-sai36-bcast"></td>
+    <td><input type="text" id="g-sai36-nb"></td>
+    <td><input type="text" id="g-sai36-gw" placeholder="192.168.36.1"></td>
+  </tr>
+  <!-- Cucuron -->
+  <tr>
+    <td class="td-fixe" rowspan="3">Cucuron</td>
+    <td class="td-vlan">VLAN 41 — Personnel</td>
+    <td><input type="text" id="g-cuc41-net" placeholder="192.168.41.0/??"></td>
+    <td><input type="text" id="g-cuc41-mask"></td>
+    <td><input type="text" id="g-cuc41-bcast"></td>
+    <td><input type="text" id="g-cuc41-nb"></td>
+    <td><input type="text" id="g-cuc41-gw" placeholder="192.168.41.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 42 — Clients WiFi</td>
+    <td><input type="text" id="g-cuc42-net" placeholder="192.168.42.0/??"></td>
+    <td><input type="text" id="g-cuc42-mask"></td>
+    <td><input type="text" id="g-cuc42-bcast"></td>
+    <td><input type="text" id="g-cuc42-nb"></td>
+    <td><input type="text" id="g-cuc42-gw" placeholder="192.168.42.1"></td>
+  </tr>
+  <tr>
+    <td class="td-vlan">VLAN 43 — Caméras</td>
+    <td><input type="text" id="g-cuc43-net" placeholder="192.168.43.0/??"></td>
+    <td><input type="text" id="g-cuc43-mask"></td>
+    <td><input type="text" id="g-cuc43-bcast"></td>
+    <td><input type="text" id="g-cuc43-nb"></td>
+    <td><input type="text" id="g-cuc43-gw" placeholder="192.168.43.1"></td>
+  </tr>
+</table>
+
+<h2>1.2 Analyse des chevauchements</h2>
+<p>Un des risques majeurs d'un plan d'adressage mal construit est le <strong>chevauchement de plages</strong> : deux réseaux distincts qui partagent des adresses. Cela provoque des conflits de routage impossibles à diagnostiquer.</p>
+
+<div class="consigne">
+  <strong>📋 Consigne :</strong> Analysez les scénarios suivants. Pour chacun, indiquez si le plan est correct ou problématique, et justifiez.
+</div>
+
+<table class="plan-inter">
+  <tr><th>Scénario</th><th>Correct / Problématique ?</th><th>Explication</th></tr>
+  <tr>
+    <td class="td-fixe">VLAN 22 (Roussillon) : 192.168.22.0/25<br>VLAN 32 (Saignon) : 192.168.32.0/25</td>
+    <td>
+      <select id="chev-1-rep">
+        <option value="">-- Choisir --</option>
+        <option>Correct — pas de chevauchement</option>
+        <option>Problématique — chevauchement</option>
+      </select>
+    </td>
+    <td><input type="text" id="chev-1-exp" placeholder="Justification…"></td>
+  </tr>
+  <tr>
+    <td class="td-fixe">VLAN 11 (Apt) : 192.168.11.0/26 (plage .1 → .62)<br>VLAN 14 (Apt) : 192.168.14.0/28 (plage .1 → .14)</td>
+    <td>
+      <select id="chev-2-rep">
+        <option value="">-- Choisir --</option>
+        <option>Correct — pas de chevauchement</option>
+        <option>Problématique — chevauchement</option>
+      </select>
+    </td>
+    <td><input type="text" id="chev-2-exp" placeholder="Justification…"></td>
+  </tr>
+  <tr>
+    <td class="td-fixe">Serveur DNS : 192.168.15.3<br>Serveur NAS : 192.168.15.3</td>
+    <td>
+      <select id="chev-3-rep">
+        <option value="">-- Choisir --</option>
+        <option>Correct — pas de conflit</option>
+        <option>Problématique — conflit d'adresse</option>
+      </select>
+    </td>
+    <td><input type="text" id="chev-3-exp" placeholder="Justification…"></td>
+  </tr>
+  <tr>
+    <td class="td-fixe">Plage DHCP VLAN 22 : 192.168.22.10 → .126<br>Passerelle VLAN 22 : 192.168.22.1</td>
+    <td>
+      <select id="chev-4-rep">
+        <option value="">-- Choisir --</option>
+        <option>Correct — pas de conflit</option>
+        <option>Problématique — conflit d'adresse</option>
+      </select>
+    </td>
+    <td><input type="text" id="chev-4-exp" placeholder="Justification…"></td>
+  </tr>
+</table>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Scénarios d'évolution — dimensionnement futur</h1>
+
+<div class="consigne">
+  <strong>📋 Consigne :</strong> Provence Évasion envisage plusieurs évolutions dans les 3 ans. Pour chaque scénario, analysez si le plan d'adressage actuel peut absorber la croissance, ou s'il faut le modifier. Justifiez avec des chiffres.
+</div>
+
+<h2>2.1 Extension du Camping l'Étang (Cucuron)</h2>
+<p>Laurent Ferracci envisage d'ouvrir 30 emplacements supplémentaires à Cucuron, portant la capacité à 100 personnes. Le WiFi clients pourrait recevoir jusqu'à <strong>60 appareils simultanément</strong> en haute saison.</p>
+<label class="qlabel">Analyse : le VLAN 42 actuel peut-il absorber 60 appareils ? Que proposez-vous ?</label>
+<textarea class="rep rep-md" id="evol-1" placeholder="Calculez : combien d'hôtes utiles dans le VLAN 42 actuel ? Combien en faut-il ? Faut-il changer de préfixe ?"></textarea>
+
+<h2>2.2 Salle séminaire de Saignon — doublement de capacité</h2>
+<p>Le Domaine de Saignon reçoit des groupes de plus en plus grands. La salle séminaire sera agrandie pour accueillir <strong>45 postes</strong> (au lieu de 20 actuellement).</p>
+<label class="qlabel">Analyse : le VLAN 36 actuel suffit-il ? Si non, quel préfixe proposez-vous et quelle sera la nouvelle adresse réseau ?</label>
+<textarea class="rep rep-md" id="evol-2" placeholder="Calculez le besoin futur avec marge 50%…"></textarea>
+
+<h2>2.3 Déploiement d'un 5ème site — Gordes</h2>
+<p>À plus long terme, Provence Évasion envisage d'ouvrir un site à Gordes (Vaucluse). Ce site disposerait de 3 VLANs : Personnel (12 postes), Clients WiFi (50 appareils max), Caméras (5 caméras).</p>
+<label class="qlabel">Q1 — Quel identifiant de site (S) assigneriez-vous à Gordes, en respectant la convention ?</label>
+<textarea class="rep rep-xs" id="evol-3-q1" placeholder="S = ?  —  Justification…"></textarea>
+<label class="qlabel">Q2 — Proposez les adresses réseau et préfixes pour les 3 VLANs de Gordes :</label>
+<textarea class="rep rep-md" id="evol-3-q2" placeholder="VLAN Personnel : 192.168.??.0/?? …&#10;VLAN Clients WiFi : …&#10;VLAN Caméras : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Premiers pas Packet Tracer — Topologie Roussillon</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Objectif :</strong> Vous allez construire dans Packet Tracer la topologie réseau <strong>simplifiée du site de Roussillon</strong> : un switch, 3 PC représentant les 3 VLANs, et 1 routeur. Cette maquette sera enrichie en S3 (configuration VLANs) et en S4 (DHCP). Pour l'instant, l'objectif est de poser les équipements et de vérifier la connectivité basique sur un seul VLAN.
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📐 Topologie à reproduire dans Packet Tracer</div>
+  <p>Équipements à placer :</p>
+  <ul>
+    <li>1 × Cisco 2960 switch (ou équivalent)</li>
+    <li>1 × Cisco 1941 routeur (ou équivalent)</li>
+    <li>3 × PC génériques — un par VLAN (Personnel, Clients WiFi, Caméras)</li>
+  </ul>
+  <p>Connexions : chaque PC sur un port FastEthernet distinct du switch — routeur sur le port GigabitEthernet0/0 du switch.</p>
+</div>
+
+<h2>3.1 Étapes de construction</h2>
+
+<div class="pt-step"><span class="pt-num">Étape 1</span> Ouvrez Packet Tracer. Créez un nouveau fichier et sauvegardez-le sous <strong>PE_Roussillon_S2.pkt</strong>.</div>
+<div class="pt-step"><span class="pt-num">Étape 2</span> Placez les équipements : 1 switch 2960, 1 routeur 1941, 3 PC. Disposez-les clairement sur le canvas.</div>
+<div class="pt-step"><span class="pt-num">Étape 3</span> Connectez les équipements avec des câbles droits Copper Straight-Through (PC → switch) et un câble droit (switch → routeur, GigabitEthernet).</div>
+<div class="pt-step"><span class="pt-num">Étape 4</span> Configurez <strong>uniquement le VLAN 21 Personnel</strong> pour l'instant : affectez à PC0 l'adresse <strong>192.168.21.10</strong>, masque <strong>255.255.255.192</strong>, passerelle <strong>192.168.21.1</strong>.</div>
+<div class="pt-step"><span class="pt-num">Étape 5</span> Affectez à PC1 (futur VLAN 22) l'adresse <strong>192.168.22.10</strong> et au PC2 (futur VLAN 23) l'adresse <strong>192.168.23.10</strong> — masques et passerelles correspondants.</div>
+<div class="pt-step"><span class="pt-num">Étape 6</span> Testez la connectivité entre PC0 et PC1 avec la commande <strong>ping 192.168.22.10</strong> depuis PC0. Notez le résultat et expliquez pourquoi le ping réussit ou échoue à ce stade.</div>
+
+<h2>3.2 Questions Packet Tracer</h2>
+
+<label class="qlabel">Q3.1 — Résultat du ping entre PC0 (VLAN 21) et PC1 (VLAN 22) sans configuration VLAN : succès ou échec ? Pourquoi ?</label>
+<textarea class="rep rep-sm" id="pt-q1" placeholder="Résultat : … — Explication : …"></textarea>
+
+<label class="qlabel">Q3.2 — Dans Packet Tracer, quelle couleur indique qu'un lien est opérationnel ? Quelle couleur indique un problème ?</label>
+<textarea class="rep rep-xs" id="pt-q2" placeholder="Opérationnel : … — Problème : …"></textarea>
+
+<label class="qlabel">Q3.3 — Vous avez connecté le routeur avec un câble droit (pas croisé). Pourquoi cela fonctionne-t-il dans Packet Tracer, même entre deux équipements réseau ?</label>
+<textarea class="rep rep-sm" id="pt-q3" placeholder="Votre réponse…"></textarea>
+
+<label class="qlabel">Q3.4 — Quelle est la différence entre un port Access et un port Trunk sur un switch ? (En préparation de la S3)</label>
+<textarea class="rep rep-sm" id="pt-q4" placeholder="Port Access : … — Port Trunk : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 — DOSSIER DE DÉPLOIEMENT ══ -->
+<h1>4. Dossier de déploiement — Section 3</h1>
+
+<div class="consigne">
+  <strong>📋 Consigne :</strong> Vous devez rédiger la <strong>Section 3 du dossier de déploiement</strong> : le plan d'adressage IP global des 4 sites. Ce document sera remis à Provence Évasion à la fin du projet. Il doit être complet, lisible et professionnel. Complétez le tableau ci-dessous avec votre plan d'adressage validé, puis rédigez les commentaires justificatifs.
+</div>
+
+<div class="dossier-section">
+  <div class="dossier-titre">
+    <span>📄 Dossier de déploiement Provence Évasion</span>
+    <span class="dossier-num">Section 3</span>
+  </div>
+
+  <p style="font-size:12px;margin-bottom:12px;"><strong>Objet :</strong> Plan d'adressage IP global — 4 sites du groupe Provence Évasion<br>
+  <strong>Rédigé par :</strong> <input type="text" id="dos3-redacteur" style="border:none;border-bottom:1px solid #999;font-family:'Montserrat',sans-serif;font-size:12px;width:200px;padding:1px 4px;"> &nbsp;|&nbsp; <strong>Date :</strong> <input type="date" id="dos3-date" style="border:none;border-bottom:1px solid #999;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;"></p>
+
+  <h2>3.1 Plan d'adressage complet</h2>
+
+  <table class="dossier-global">
+    <tr>
+      <th>Site</th><th>VLAN #</th><th>Nom du VLAN</th><th>Réseau / CIDR</th><th>Masque</th><th>Passerelle</th><th>Plage DHCP</th><th>Adresses statiques</th>
+    </tr>
+    <!-- APT -->
+    <tr>
+      <td class="td-site" rowspan="4">Apt<br><small style="font-weight:400;color:#666;">Siège</small></td>
+      <td class="td-vlan">11</td><td class="td-fixe">Personnel</td>
+      <td><input type="text" id="d3-apt11-net" placeholder="192.168.11.0/??"></td>
+      <td><input type="text" id="d3-apt11-mask" placeholder="255.255.255.?"></td>
+      <td><input type="text" id="d3-apt11-gw" placeholder="192.168.11.1"></td>
+      <td><input type="text" id="d3-apt11-dhcp" placeholder=".10 → .??"></td>
+      <td><input type="text" id="d3-apt11-stat" placeholder=".1 routeur, .2 switch"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">13</td><td class="td-fixe">Caméras IP</td>
+      <td><input type="text" id="d3-apt13-net"></td>
+      <td><input type="text" id="d3-apt13-mask"></td>
+      <td><input type="text" id="d3-apt13-gw" placeholder="192.168.13.1"></td>
+      <td><input type="text" id="d3-apt13-dhcp" placeholder="non / statique"></td>
+      <td><input type="text" id="d3-apt13-stat" placeholder=".1 routeur, .3 NVR"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">14</td><td class="td-fixe">Administration</td>
+      <td><input type="text" id="d3-apt14-net"></td>
+      <td><input type="text" id="d3-apt14-mask"></td>
+      <td><input type="text" id="d3-apt14-gw" placeholder="192.168.14.1"></td>
+      <td><input type="text" id="d3-apt14-dhcp" placeholder="non / statique"></td>
+      <td><input type="text" id="d3-apt14-stat" placeholder=".1 routeur, .2 switch"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">15</td><td class="td-fixe">Serveurs</td>
+      <td><input type="text" id="d3-apt15-net"></td>
+      <td><input type="text" id="d3-apt15-mask"></td>
+      <td><input type="text" id="d3-apt15-gw" placeholder="192.168.15.1"></td>
+      <td><input type="text" id="d3-apt15-dhcp" placeholder="non / statique"></td>
+      <td><input type="text" id="d3-apt15-stat" placeholder=".3 DNS, .4 NAS, .5 …"></td>
+    </tr>
+    <!-- ROUSSILLON -->
+    <tr>
+      <td class="td-site" rowspan="3">Roussillon<br><small style="font-weight:400;color:#666;">Mas des Ocres</small></td>
+      <td class="td-vlan">21</td><td class="td-fixe">Personnel</td>
+      <td><input type="text" id="d3-rou21-net" placeholder="192.168.21.0/??"></td>
+      <td><input type="text" id="d3-rou21-mask"></td>
+      <td><input type="text" id="d3-rou21-gw" placeholder="192.168.21.1"></td>
+      <td><input type="text" id="d3-rou21-dhcp" placeholder=".10 → .??"></td>
+      <td><input type="text" id="d3-rou21-stat" placeholder=".1 routeur, .2 switch"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">22</td><td class="td-fixe">Clients WiFi</td>
+      <td><input type="text" id="d3-rou22-net"></td>
+      <td><input type="text" id="d3-rou22-mask"></td>
+      <td><input type="text" id="d3-rou22-gw" placeholder="192.168.22.1"></td>
+      <td><input type="text" id="d3-rou22-dhcp" placeholder=".10 → .??"></td>
+      <td><input type="text" id="d3-rou22-stat" placeholder=".1 routeur, .2 AP WiFi"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">23</td><td class="td-fixe">Caméras IP</td>
+      <td><input type="text" id="d3-rou23-net"></td>
+      <td><input type="text" id="d3-rou23-mask"></td>
+      <td><input type="text" id="d3-rou23-gw" placeholder="192.168.23.1"></td>
+      <td><input type="text" id="d3-rou23-dhcp" placeholder="non / statique"></td>
+      <td><input type="text" id="d3-rou23-stat" placeholder=".1 routeur, .3→.6 caméras"></td>
+    </tr>
+    <!-- SAIGNON -->
+    <tr>
+      <td class="td-site" rowspan="4">Saignon<br><small style="font-weight:400;color:#666;">Domaine</small></td>
+      <td class="td-vlan">31</td><td class="td-fixe">Personnel</td>
+      <td><input type="text" id="d3-sai31-net"></td>
+      <td><input type="text" id="d3-sai31-mask"></td>
+      <td><input type="text" id="d3-sai31-gw" placeholder="192.168.31.1"></td>
+      <td><input type="text" id="d3-sai31-dhcp"></td>
+      <td><input type="text" id="d3-sai31-stat"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">32</td><td class="td-fixe">Clients WiFi</td>
+      <td><input type="text" id="d3-sai32-net"></td>
+      <td><input type="text" id="d3-sai32-mask"></td>
+      <td><input type="text" id="d3-sai32-gw" placeholder="192.168.32.1"></td>
+      <td><input type="text" id="d3-sai32-dhcp"></td>
+      <td><input type="text" id="d3-sai32-stat"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">33</td><td class="td-fixe">Caméras IP</td>
+      <td><input type="text" id="d3-sai33-net"></td>
+      <td><input type="text" id="d3-sai33-mask"></td>
+      <td><input type="text" id="d3-sai33-gw" placeholder="192.168.33.1"></td>
+      <td><input type="text" id="d3-sai33-dhcp"></td>
+      <td><input type="text" id="d3-sai33-stat"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">36</td><td class="td-fixe">Séminaires</td>
+      <td><input type="text" id="d3-sai36-net"></td>
+      <td><input type="text" id="d3-sai36-mask"></td>
+      <td><input type="text" id="d3-sai36-gw" placeholder="192.168.36.1"></td>
+      <td><input type="text" id="d3-sai36-dhcp"></td>
+      <td><input type="text" id="d3-sai36-stat"></td>
+    </tr>
+    <!-- CUCURON -->
+    <tr>
+      <td class="td-site" rowspan="3">Cucuron<br><small style="font-weight:400;color:#666;">Camping</small></td>
+      <td class="td-vlan">41</td><td class="td-fixe">Personnel</td>
+      <td><input type="text" id="d3-cuc41-net"></td>
+      <td><input type="text" id="d3-cuc41-mask"></td>
+      <td><input type="text" id="d3-cuc41-gw" placeholder="192.168.41.1"></td>
+      <td><input type="text" id="d3-cuc41-dhcp"></td>
+      <td><input type="text" id="d3-cuc41-stat"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">42</td><td class="td-fixe">Clients WiFi</td>
+      <td><input type="text" id="d3-cuc42-net"></td>
+      <td><input type="text" id="d3-cuc42-mask"></td>
+      <td><input type="text" id="d3-cuc42-gw" placeholder="192.168.42.1"></td>
+      <td><input type="text" id="d3-cuc42-dhcp"></td>
+      <td><input type="text" id="d3-cuc42-stat"></td>
+    </tr>
+    <tr>
+      <td class="td-vlan">43</td><td class="td-fixe">Caméras IP</td>
+      <td><input type="text" id="d3-cuc43-net"></td>
+      <td><input type="text" id="d3-cuc43-mask"></td>
+      <td><input type="text" id="d3-cuc43-gw" placeholder="192.168.43.1"></td>
+      <td><input type="text" id="d3-cuc43-dhcp"></td>
+      <td><input type="text" id="d3-cuc43-stat"></td>
+    </tr>
+  </table>
+
+  <h2>3.2 Commentaires et justifications techniques</h2>
+
+  <label class="qlabel">Justification du choix de la plage 192.168.x.x pour l'ensemble du projet :</label>
+  <textarea class="rep rep-sm" id="d3-just1" placeholder="Pourquoi 192.168.x.x et pas une autre plage ? Quelle norme s'applique ici ?"></textarea>
+
+  <label class="qlabel">Explication de la convention d'adressage SV choisie par Axentis (192.168.SV.0) :</label>
+  <textarea class="rep rep-sm" id="d3-just2" placeholder="Décrivez la logique de cette convention et ses avantages pour la lisibilité et la maintenance…"></textarea>
+
+  <label class="qlabel">Justification du dimensionnement retenu pour les VLANs Clients WiFi (/25) :</label>
+  <textarea class="rep rep-sm" id="d3-just3" placeholder="Pourquoi /25 et pas /24 ? En quoi le surdimensionnement serait-il problématique ?"></textarea>
+
+  <label class="qlabel">Commentaire sur l'évolutivité du plan (que se passe-t-il si Provence Évasion ouvre un 5ème site ?) :</label>
+  <textarea class="rep rep-sm" id="d3-just4" placeholder="Le plan prévu permet-il facilement d'ajouter un nouveau site ? Comment ?"></textarea>
+
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Bilan de l'atelier 2</div>
+
+<div class="conclusion">
+  <p>Un chevauchement de plages d'adresses survient lorsque deux réseaux différents partagent <input class="inline-field" id="synth-1" placeholder="...">. La conséquence principale est <input class="inline-field" id="synth-2" placeholder="...">.</p>
+  <p>Le plan d'adressage global de Provence Évasion comporte au total <input class="inline-field" id="synth-3" placeholder="?"> VLANs répartis sur <input class="inline-field" id="synth-4" placeholder="?"> sites.</p>
+  <p>Saignon est le site le plus complexe car il dispose de <input class="inline-field" id="synth-5" placeholder="?"> VLANs, dont le VLAN <input class="inline-field" id="synth-6" placeholder="..."> qui est unique à ce site.</p>
+  <p>Dans Packet Tracer, un ping entre deux PC sur des VLANs différents sans configuration de routage inter-VLAN se solde par un <input class="inline-field" id="synth-7" placeholder="succès / échec">.</p>
+</div>
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <script>
+  const criteres = [
+    "Je sais vérifier la cohérence globale d'un plan d'adressage",
+    "Je détecte des chevauchements de plages d'adresses",
+    "J'analyse l'évolutivité d'un plan d'adressage",
+    "Je construis une topologie simple dans Packet Tracer",
+    "Je rédige la Section 3 du dossier de déploiement de façon professionnelle"
+  ];
+  const niveaux = ['maitrise','en_cours','a_revoir','non_traite'];
+  const labels = ['★★★','★★☆','★☆☆','?'];
+  const ae = document.currentScript.closest('.autoeval');
+  criteres.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className = 'ae-row';
+    let html = `<div>${c}</div>`;
+    niveaux.forEach((n,j) => {
+      html += `<div style="text-align:center"><label style="cursor:pointer"><input type="radio" name="ae${i}" value="${n}" style="accent-color:var(--bleu)"> ${labels[j]}</label></div>`;
+    });
+    row.innerHTML = html;
+    ae.appendChild(row);
+  });
+  </script>
+</div>
+
+</div><!-- fin .content -->
+
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <span><strong style="color:var(--orange)">S2</strong> — Atelier 2 : Cohérence globale, optimisation et Packet Tracer</span>
+  <span>Projet Provence Évasion · Bac Pro CIEL · 2025-2026</span>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+function v(id){ return (document.getElementById(id)||{value:''}).value; }
+function selVal(id){ const e=document.getElementById(id); return e ? e.options[e.selectedIndex]?.text||'' : ''; }
+
+function collectGlobal() {
+  const sites = ['apt','rou','sai','cuc'];
+  const vlans = {apt:['11','13','14','15'],rou:['21','22','23'],sai:['31','32','33','36'],cuc:['41','42','43']};
+  const result = {};
+  sites.forEach(s => {
+    result[s] = {};
+    vlans[s].forEach(vl => {
+      result[s][`vlan${vl}`] = {
+        reseau: v(`g-${s}${vl}-net`), masque: v(`g-${s}${vl}-mask`),
+        broadcast: v(`g-${s}${vl}-bcast`), hotes: v(`g-${s}${vl}-nb`),
+        passerelle: v(`g-${s}${vl}-gw`)
+      };
+    });
+  });
+  return result;
+}
+
+function collectDossier3() {
+  const sites = ['apt','rou','sai','cuc'];
+  const vlans = {apt:['11','13','14','15'],rou:['21','22','23'],sai:['31','32','33','36'],cuc:['41','42','43']};
+  const result = { redacteur: v('dos3-redacteur'), date: v('dos3-date'), plan: {} };
+  sites.forEach(s => {
+    result.plan[s] = {};
+    vlans[s].forEach(vl => {
+      result.plan[s][`vlan${vl}`] = {
+        reseau: v(`d3-${s}${vl}-net`), masque: v(`d3-${s}${vl}-mask`),
+        passerelle: v(`d3-${s}${vl}-gw`), plage_dhcp: v(`d3-${s}${vl}-dhcp`),
+        adresses_statiques: v(`d3-${s}${vl}-stat`)
+      };
+    });
+  });
+  result.justifications = {
+    choix_192168: v('d3-just1'),
+    convention_sv: v('d3-just2'),
+    dimensionnement_wifi: v('d3-just3'),
+    evolutivite: v('d3-just4')
+  };
+  return result;
+}
+
+function getAE() {
+  const result = {};
+  const criteres = [
+    "Vérifier cohérence globale plan adressage",
+    "Détecter chevauchements de plages",
+    "Analyser évolutivité plan adressage",
+    "Construire topologie Packet Tracer",
+    "Rédiger Section 3 dossier de déploiement"
+  ];
+  criteres.forEach((c,i) => {
+    const sel = document.querySelector(`input[name="ae${i}"]:checked`);
+    result[`critere_${i+1}`] = { critere: c, niveau: sel ? sel.value : 'non_traite' };
+  });
+  return result;
+}
+
+function genererJSON() {
+  const data = {
+    meta: {
+      devoir: "S2 – Atelier 2 : Cohérence globale, optimisation et Packet Tracer",
+      eleve: { nom: v('eleve-nom'), prenom: v('eleve-prenom'), classe: v('eleve-classe') },
+      date: v('eleve-date'),
+      genere_le: new Date().toISOString()
+    },
+    partie1_coherence: {
+      plan_global: collectGlobal(),
+      chevauchements: {
+        c1: { reponse: selVal('chev-1-rep'), explication: v('chev-1-exp') },
+        c2: { reponse: selVal('chev-2-rep'), explication: v('chev-2-exp') },
+        c3: { reponse: selVal('chev-3-rep'), explication: v('chev-3-exp') },
+        c4: { reponse: selVal('chev-4-rep'), explication: v('chev-4-exp') }
+      }
+    },
+    partie2_evolution: {
+      cucuron_extension: v('evol-1'),
+      saignon_seminaire: v('evol-2'),
+      gordes_q1: v('evol-3-q1'),
+      gordes_q2: v('evol-3-q2')
+    },
+    partie3_packet_tracer: {
+      q1_ping_result: v('pt-q1'),
+      q2_couleurs: v('pt-q2'),
+      q3_cable_droit: v('pt-q3'),
+      q4_access_trunk: v('pt-q4')
+    },
+    partie4_dossier_section3: collectDossier3(),
+    bilan: {
+      s1: v('synth-1'), s2: v('synth-2'), s3: v('synth-3'),
+      s4: v('synth-4'), s5: v('synth-5'), s6: v('synth-6'), s7: v('synth-7')
+    },
+    auto_evaluation: getAE()
+  };
+  const nom = v('eleve-nom'), prenom = v('eleve-prenom');
+  const safeName = (nom+prenom).replace(/[^a-zA-Z0-9]/g,'') || 'Eleve';
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${safeName}_S2Atelier2.json`;
+  a.click();
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S3 — Atelier 2 : Trunk, Router-on-a-Stick et inter-VLAN routing</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.consigne{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.dossier-section{background:#f0f4ff;border:2px solid var(--bleu);border-radius:8px;padding:16px 18px;margin:20px 0;}
+.dossier-titre{display:flex;justify-content:space-between;align-items:center;font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:12px;border-bottom:2px solid var(--bleu);padding-bottom:6px;}
+.dossier-num{background:var(--bleu);color:#fff;border-radius:4px;padding:2px 10px;font-size:11px;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:120px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.0;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.pt-step{background:var(--ciel-bg);border-left:4px solid var(--bleu);padding:10px 14px;margin:8px 0;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.pt-num{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-right:8px;}
+/* Tableau tests ping */
+.test-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:12px;}
+.test-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);text-align:left;}
+.test-table td{border:1px solid #c0d0e0;padding:6px 8px;vertical-align:middle;}
+.test-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.test-table td select,.test-table td input[type=text]{width:100%;border:1px solid #c8d8e8;border-radius:3px;padding:3px 6px;font-family:'Montserrat',sans-serif;font-size:11px;}
+/* Tableau dossier VLANs */
+.dossier-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.dossier-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);}
+.dossier-table td{border:1px solid #c0d0e0;padding:6px 8px;}
+.dossier-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.dossier-table td input[type=text],.dossier-table td textarea{width:100%;border:1px solid #c8d8e8;border-radius:3px;padding:3px 6px;font-family:'Montserrat',sans-serif;font-size:11px;}
+.dossier-table td.td-fixe{font-family:'Roboto',sans-serif;font-weight:600;color:var(--marine);}
+.badge-vlan{background:#e8f4fd;color:var(--bleu);border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;}
+/* Approfondissement */
+.approf{background:#fff8f0;border:2px solid var(--orange);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.approf-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S3 – Atelier 2 : Port Trunk, Router-on-a-Stick et routage inter-VLAN — Roussillon</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Contexte et objectifs de l'atelier</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Mise en situation :</strong> En Atelier 1, vous avez créé les VLANs sur le switch de Roussillon et affecté les ports Access. Les équipements d'un même VLAN peuvent se parler, mais pas ceux de VLANs différents. Aujourd'hui, vous allez franchir l'étape suivante : configurer le port Trunk entre le switch et le routeur, puis mettre en place le Router-on-a-Stick pour permettre un routage inter-VLAN contrôlé. En fin de séance, vous rédigerez la Section 4 du dossier de déploiement.
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">🎯 Objectifs de l'Atelier 2</div>
+  <ul>
+    <li>Ouvrir le fichier <strong>PE_Roussillon_S3_Atelier1.pkt</strong> et sauvegarder sous <strong>PE_Roussillon_S3_Atelier2.pkt</strong></li>
+    <li>Configurer le port Trunk (Gi0/1) sur le switch avec le bon VLAN natif</li>
+    <li>Configurer les sous-interfaces 802.1Q sur le routeur (Router-on-a-Stick)</li>
+    <li>Vérifier la table de routage du routeur</li>
+    <li>Tester le routage inter-VLAN (pings entre VLANs différents)</li>
+    <li>Analyser les traces de paquets dans Packet Tracer (simulation mode)</li>
+    <li>Rédiger la Section 4 du dossier de déploiement</li>
+  </ul>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Rappel de l'Atelier 1 — Vérification préalable</div>
+  <label class="qlabel">Q1.1 — Avant de commencer, vérifiez sur votre fichier Packet Tracer que les VLANs 21, 22, 23 et 24 existent sur le switch. Quelle commande utilisez-vous ? Notez le résultat ici.</label>
+  <textarea class="rep rep-sm" id="ex1-q1" placeholder="Commande : … — Résultat : …"></textarea>
+  <label class="qlabel">Q1.2 — Vérifiez que le port Fa0/1 est bien en mode Access, VLAN 21. Quelle commande utilisez-vous pour vérifier un port spécifique ?</label>
+  <textarea class="rep rep-sm" id="ex1-q2" placeholder="Commande : show interfaces Fa0/1 switchport — Résultat : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Configuration du port Trunk sur le switch</h1>
+
+<h2>2.1 Qu'est-ce qu'un trunk — rappel appliqué</h2>
+<p>Le port Gi0/1 du switch relie le switch au routeur. Il doit transporter les 4 VLANs du site (21, 22, 23, 24) sur un seul câble physique. Pour cela, on le passe en mode Trunk avec encapsulation 802.1Q.</p>
+
+<div class="schema-box">
+  <div class="sch-titre">Schéma Trunk — Switch ↔ Routeur (site Roussillon)</div>
+SWITCH (Gi0/1 Trunk)  ═══════════[câble 802.1Q]═══════════  ROUTEUR (Gi0/0)
+  │
+  ├── VLAN 21 (Personnel)   → Gi0/0.21 → 192.168.21.1
+  ├── VLAN 22 (WiFi Clients) → Gi0/0.22 → 192.168.22.1
+  ├── VLAN 23 (Caméras)      → Gi0/0.23 → 192.168.23.1
+  └── VLAN 24 (Admin)        → Gi0/0.24 → 192.168.24.1
+
+Chaque trame est étiquetée avec son VID 802.1Q sur le câble trunk.
+VLAN natif : 99 (inutilisé) — sécurité contre le VLAN hopping.
+</div>
+
+<div class="pt-step"><span class="pt-num">Étape 1</span> Sur le switch Cisco 2960, configurez le port <strong>GigabitEthernet0/1</strong> en mode Trunk. Autorisez uniquement les VLANs 21, 22, 23 et 24. Définissez le VLAN natif sur <strong>99</strong> (créez-le d'abord !).</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 À faire — Port Trunk sur le switch</div>
+  <label class="qlabel">Écrivez les commandes complètes pour configurer le port Trunk Gi0/1 (incluez la création du VLAN 99 natif) :</label>
+  <textarea class="rep rep-lg" id="ex2-cmd-trunk" placeholder="Switch(config)# vlan 99&#10;Switch(config-vlan)# name NATIF-inutilise&#10;Switch(config-vlan)# exit&#10;Switch(config)# interface GigabitEthernet0/1&#10;…"></textarea>
+  <label class="qlabel">Q2.1 — Après la commande <code>show interfaces trunk</code>, que voyez-vous ? Quel port est listé ? Quels VLANs sont autorisés ?</label>
+  <textarea class="rep rep-sm" id="ex2-q1" placeholder="Copie du résultat Packet Tracer…"></textarea>
+  <label class="qlabel">Q2.2 — Si vous ne limitez pas les VLANs autorisés sur le trunk (omission de la commande <code>allowed vlan</code>), que se passe-t-il par défaut ?</label>
+  <textarea class="rep rep-sm" id="ex2-q2" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Configuration du Router-on-a-Stick</h1>
+
+<h2>3.1 Activation de l'interface physique du routeur</h2>
+<p>Sur le routeur Cisco 1941, l'interface physique <strong>GigabitEthernet0/0</strong> (reliée au switch) doit être activée sans adresse IP — ce sont les sous-interfaces qui porteront les adresses. On active d'abord le "chassis" physique.</p>
+
+<div class="pt-step"><span class="pt-num">Étape 2</span> Sur le routeur, passez en mode de configuration. Accédez à l'interface Gi0/0 et activez-la (<code>no shutdown</code>). Ne lui attribuez aucune adresse IP.</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 À faire — Activation Gi0/0</div>
+  <label class="qlabel">Écrivez les commandes pour activer l'interface physique Gi0/0 du routeur :</label>
+  <textarea class="rep rep-sm" id="ex3-cmd-gi00" placeholder="Router(config)# interface GigabitEthernet0/0&#10;…"></textarea>
+  <label class="qlabel">Q3.1 — Que signifie "no shutdown" ? Quel est l'état par défaut d'une interface sur un routeur Cisco neuf (administrativement up ou down) ?</label>
+  <textarea class="rep rep-sm" id="ex3-q1" placeholder="Votre réponse…"></textarea>
+</div>
+
+<h2>3.2 Création des sous-interfaces 802.1Q</h2>
+<p>Pour chaque VLAN, on crée une sous-interface sur le routeur. La syntaxe est : <code>interface GigabitEthernet0/0.VID</code>. On y associe l'encapsulation 802.1Q et l'adresse IP de passerelle.</p>
+
+<div class="pt-step"><span class="pt-num">Étape 3</span> Créez les 4 sous-interfaces (Gi0/0.21, Gi0/0.22, Gi0/0.23, Gi0/0.24) avec les bonnes encapsulations et adresses IP.</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 À faire — 4 sous-interfaces Router-on-a-Stick</div>
+  <label class="qlabel">Écrivez la séquence complète de configuration des 4 sous-interfaces :</label>
+  <textarea class="rep rep-lg" id="ex3-cmd-roas" placeholder="Router(config)# interface GigabitEthernet0/0.21&#10;Router(config-subif)# encapsulation dot1Q 21&#10;Router(config-subif)# ip address 192.168.21.1 255.255.255.192&#10;Router(config-subif)# exit&#10;…&#10;(continuer pour .22, .23, .24)"></textarea>
+  <label class="qlabel">Q3.2 — Quelle adresse IP doit-on attribuer à la sous-interface Gi0/0.22 (VLAN 22 Clients WiFi, réseau 192.168.22.0/25) ?</label>
+  <textarea class="rep rep-xs" id="ex3-q2" placeholder="IP : … / Masque : …"></textarea>
+  <label class="qlabel">Q3.3 — Quelle adresse IP doit-on attribuer à la sous-interface Gi0/0.24 (VLAN 24 Administration, réseau 192.168.24.0/28) ?</label>
+  <textarea class="rep rep-xs" id="ex3-q3" placeholder="IP : … / Masque : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Vérification de la configuration</h1>
+
+<h2>4.1 Table de routage du routeur</h2>
+
+<div class="pt-step"><span class="pt-num">Étape 4</span> Sur le routeur, tapez <code>show ip interface brief</code> puis <code>show ip route</code>.</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🔍 Vérification — show ip interface brief</div>
+  <label class="qlabel">Q4.1 — Copiez le résultat de <code>show ip interface brief</code>. Combien de lignes apparaissent pour les sous-interfaces ? Quel est l'état (Status / Protocol) attendu pour chaque sous-interface ?</label>
+  <textarea class="rep rep-md" id="ex4-q1" placeholder="Gi0/0      unassigned   up/up&#10;Gi0/0.21   192.168.21.1   up/up&#10;…"></textarea>
+  <label class="qlabel">Q4.2 — Copiez le résultat de <code>show ip route</code>. Combien de routes "Connected" (marquées C) apparaissent ? À quoi correspondent-elles ?</label>
+  <textarea class="rep rep-md" id="ex4-q2" placeholder="C    192.168.21.0/26 is directly connected, Gi0/0.21&#10;…"></textarea>
+  <label class="qlabel">Q4.3 — Si une sous-interface apparaît "down/down" dans show ip interface brief, quelles en sont les causes possibles ?</label>
+  <textarea class="rep rep-sm" id="ex4-q3" placeholder="Cause 1 : … — Cause 2 : …"></textarea>
+</div>
+
+<h2>4.2 Vérification côté switch</h2>
+
+<div class="pt-step"><span class="pt-num">Étape 5</span> Sur le switch, tapez <code>show interfaces trunk</code> pour vérifier le trunk actif.</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🔍 Vérification — show interfaces trunk</div>
+  <label class="qlabel">Q4.4 — Dans le résultat de <code>show interfaces trunk</code>, quelles colonnes voyez-vous ? Quels VLANs sont "active in management domain" ?</label>
+  <textarea class="rep rep-sm" id="ex4-q4" placeholder="Colonnes : Port / Mode / Encapsulation / Status / Native vlan&#10;VLANs actifs : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. Tests de routage inter-VLAN</h1>
+
+<h2>5.1 Campagne de tests de ping</h2>
+<p>Le routage inter-VLAN est en place. Il est temps de vérifier que les communications autorisées fonctionnent. Effectuez les pings suivants depuis les PC de la topologie :</p>
+
+<div class="pt-step"><span class="pt-num">Étape 6</span> Ouvrez le PC-Personnel-1 (192.168.21.10) → Desktop → Command Prompt. Effectuez les pings du tableau.</div>
+
+<table class="test-table" id="tests-table">
+  <tr>
+    <th>#</th><th>Depuis (IP source)</th><th>Vers (IP destination)</th><th>VLAN cible</th><th>Résultat</th><th>Explication</th>
+  </tr>
+  <tr>
+    <td>1</td><td>PC-Personnel-1 (21.10)</td><td>PC-Personnel-2 (21.11)</td><td>VLAN 21</td>
+    <td><select id="t1-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option></select></td>
+    <td><input type="text" id="t1-exp" placeholder="Intra-VLAN, via switch…"></td>
+  </tr>
+  <tr>
+    <td>2</td><td>PC-Personnel-1 (21.10)</td><td>Passerelle VLAN 21 (.21.1)</td><td>Routeur</td>
+    <td><select id="t2-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option></select></td>
+    <td><input type="text" id="t2-exp" placeholder="Sous-interface du routeur…"></td>
+  </tr>
+  <tr>
+    <td>3</td><td>PC-Personnel-1 (21.10)</td><td>PC-WiFi-1 (22.10)</td><td>VLAN 22</td>
+    <td><select id="t3-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option></select></td>
+    <td><input type="text" id="t3-exp" placeholder="Inter-VLAN via routeur…"></td>
+  </tr>
+  <tr>
+    <td>4</td><td>PC-Personnel-1 (21.10)</td><td>PC-Camera-1 (23.10)</td><td>VLAN 23</td>
+    <td><select id="t4-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option></select></td>
+    <td><input type="text" id="t4-exp" placeholder="Inter-VLAN via routeur…"></td>
+  </tr>
+  <tr>
+    <td>5</td><td>PC-WiFi-1 (22.10)</td><td>PC-Camera-1 (23.10)</td><td>VLAN 23</td>
+    <td><select id="t5-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option></select></td>
+    <td><input type="text" id="t5-exp" placeholder="Inter-VLAN via routeur…"></td>
+  </tr>
+  <tr>
+    <td>6</td><td>PC-Admin-1 (24.10)</td><td>Switch SVI (24.2)</td><td>VLAN 24</td>
+    <td><select id="t6-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option></select></td>
+    <td><input type="text" id="t6-exp" placeholder="Gestion du switch…"></td>
+  </tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Analyse des résultats</div>
+  <label class="qlabel">Q5.1 — Comparez les résultats des pings avant (Atelier 1) et après (Atelier 2). Qu'est-ce qui a changé ? Quel équipement a rendu possible le routage inter-VLAN ?</label>
+  <textarea class="rep rep-sm" id="ex5-q1" placeholder="Avant : seulement intra-VLAN — Après : … — Grâce à : …"></textarea>
+  <label class="qlabel">Q5.2 — Pour le test n°3 (Personnel → WiFi), décrivez le chemin exact du paquet IP depuis PC-Personnel-1 jusqu'à PC-WiFi-1. Passez par chaque équipement et précisez le VLAN à chaque étape.</label>
+  <textarea class="rep rep-lg" id="ex5-q2" placeholder="1. PC-Personnel-1 envoie le paquet vers sa passerelle (192.168.21.1)&#10;2. Le switch aiguille la trame vers le port trunk (VLAN 21 tagged)&#10;3. Le routeur reçoit la trame sur Gi0/0.21…&#10;…"></textarea>
+</div>
+
+<h2>5.2 Analyse en mode Simulation Packet Tracer</h2>
+
+<div class="pt-step"><span class="pt-num">Étape 7</span> Passez Packet Tracer en mode <strong>Simulation</strong> (bouton en bas à droite). Lancez un ping depuis PC-Personnel-1 vers PC-WiFi-1 et observez les étapes du paquet.</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🔍 Observation en mode Simulation</div>
+  <label class="qlabel">Q5.3 — En mode Simulation, combien d'étapes (événements) observe-t-on pour un ping réussi entre deux VLANs différents ? Quels équipements sont impliqués dans chaque étape ?</label>
+  <textarea class="rep rep-md" id="ex5-q3" placeholder="Étape 1 : PC-Personnel-1 envoie ARP…&#10;Étape 2 : switch transfère…&#10;…"></textarea>
+  <label class="qlabel">Q5.4 — En cliquant sur l'enveloppe du paquet lors de son passage sur le trunk (entre switch et routeur), quels champs spécifiques voyez-vous dans les détails 802.1Q ? (Cherchez dans l'onglet PDU Details)</label>
+  <textarea class="rep rep-sm" id="ex5-q4" placeholder="Champ VLAN ID : … — Champ Type : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 6 ══ -->
+<h1>6. Approfondissement — Analyse et sécurité</h1>
+
+<div class="approf">
+  <div class="approf-titre">🔬 Approfondissement — Pour aller plus loin</div>
+  <p>Cette partie vous demande de réfléchir plus loin que la simple configuration. Elle prépare les notions de sécurité qui seront approfondies en S9 (ACL).</p>
+</div>
+
+<h2>6.1 Analyse de sécurité de la topologie</h2>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Questions d'analyse avancée</div>
+  <label class="qlabel">Q6.1 — Dans la configuration actuelle, un client WiFi (VLAN 22) peut-il pinger une caméra IP (VLAN 23) ? Est-ce souhaitable selon le cahier des charges de Provence Évasion ? Justifiez.</label>
+  <textarea class="rep rep-sm" id="ex6-q1" placeholder="Réponse technique : … — Réponse cahier des charges : … — Conclusion : …"></textarea>
+  <label class="qlabel">Q6.2 — Pour interdire les clients WiFi d'accéder aux caméras IP, quel type de mécanisme faudrait-il mettre en place sur le routeur ? (Répondez en termes généraux, sans les commandes — elles seront vues en S9)</label>
+  <textarea class="rep rep-sm" id="ex6-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q6.3 — Le VLAN 24 (Administration) est le VLAN de gestion du switch. Selon vous, est-il judicieux qu'un PC du VLAN 21 (Personnel) puisse atteindre ce VLAN d'administration via le routeur ? Proposez une mesure préventive.</label>
+  <textarea class="rep rep-sm" id="ex6-q3" placeholder="Oui / Non — Justification : … — Mesure : …"></textarea>
+</div>
+
+<h2>6.2 Scénario de dépannage</h2>
+
+<div class="exercice">
+  <div class="exercice-titre">🛠 Scénario de panne — Diagnostic</div>
+  <p style="font-size:12px;margin-bottom:10px;">Un collègue vous appelle : son PC (VLAN 21, 192.168.21.20) ne parvient plus à pinguer la passerelle (192.168.21.1). Les autres PC du VLAN 21 fonctionnent normalement. Voici les informations disponibles :</p>
+  <ul style="font-size:12px;margin-bottom:10px;">
+    <li>Le câble du PC est branché sur le port Fa0/8 du switch.</li>
+    <li><code>show vlan brief</code> montre que Fa0/8 n'apparaît dans aucun VLAN.</li>
+    <li>La LED du port Fa0/8 est verte (lien actif).</li>
+  </ul>
+  <label class="qlabel">Q6.4 — Quel est le problème ? Quelle commande permet de le résoudre ? Écrivez la commande correctrice.</label>
+  <textarea class="rep rep-sm" id="ex6-q4" placeholder="Problème : … — Commande : …"></textarea>
+  <label class="qlabel">Q6.5 — Un autre problème se présente : le routeur n'a plus de routes Connected pour le VLAN 23 après un redémarrage. <code>show interfaces GigabitEthernet0/0.23</code> montre "down/down". Quelles sont les étapes de diagnostic, dans l'ordre ?</label>
+  <textarea class="rep rep-md" id="ex6-q5" placeholder="1. Vérifier que l'interface physique Gi0/0 est up …&#10;2. …&#10;3. …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 7 ══ -->
+<h1>7. Dossier de déploiement — Section 4</h1>
+
+<div class="dossier-section">
+  <div class="dossier-titre">
+    <span>📄 Dossier de déploiement Provence Évasion</span>
+    <span class="dossier-num">Section 4</span>
+  </div>
+
+  <p style="font-size:12px;margin-bottom:12px;"><strong>Objet :</strong> Choix des VLANs — justification technique et plan de segmentation<br>
+  <strong>Rédigé par :</strong> <input type="text" id="dos4-redacteur" style="border:none;border-bottom:1px solid #999;font-family:'Montserrat',sans-serif;font-size:12px;width:200px;padding:1px 4px;"> &nbsp;|&nbsp; <strong>Date :</strong> <input type="date" id="dos4-date" style="border:none;border-bottom:1px solid #999;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;"></p>
+
+  <h2>4.1 Justification du choix de segmentation VLAN</h2>
+  <label class="qlabel">Rédigez en 4 à 6 phrases la justification technique de la segmentation VLAN choisie pour Provence Évasion. Expliquez pourquoi on a choisi ce nombre de VLANs, et quel est le bénéfice pour la sécurité et les performances :</label>
+  <textarea class="rep rep-lg" id="dos4-justif" placeholder="Le groupe Provence Évasion exploite 4 sites géographiquement distincts, chacun hébergeant différentes catégories d'utilisateurs et d'équipements…"></textarea>
+
+  <h2>4.2 Tableau des VLANs — plan de segmentation complet</h2>
+  <p style="font-size:12px;margin-bottom:8px;">Complétez le tableau ci-dessous pour l'ensemble des VLANs du projet :</p>
+
+  <table class="dossier-table">
+    <tr>
+      <th>Site</th><th>VLAN #</th><th>Nom du VLAN</th><th>Justification du besoin</th><th>Communications autorisées</th><th>Communications interdites</th>
+    </tr>
+    <!-- APT -->
+    <tr>
+      <td class="td-fixe" rowspan="4">Apt (Siège)</td>
+      <td class="td-fixe" style="text-align:center">11</td>
+      <td><input type="text" id="dos4-apt11-nom" value="Personnel"></td>
+      <td><textarea style="min-height:40px;" id="dos4-apt11-just" placeholder="Postes fixes du personnel…"></textarea></td>
+      <td><input type="text" id="dos4-apt11-ok" placeholder="→ VLAN 15 (serveurs)…"></td>
+      <td><input type="text" id="dos4-apt11-nok" placeholder="← VLAN 12 clients WiFi…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">13</td>
+      <td><input type="text" id="dos4-apt13-nom" value="Caméras IP"></td>
+      <td><textarea style="min-height:40px;" id="dos4-apt13-just" placeholder="Surveillance vidéo du siège…"></textarea></td>
+      <td><input type="text" id="dos4-apt13-ok" placeholder="→ VLAN 15 (NVR)…"></td>
+      <td><input type="text" id="dos4-apt13-nok" placeholder="Tout le reste…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">14</td>
+      <td><input type="text" id="dos4-apt14-nom" value="Administration"></td>
+      <td><textarea style="min-height:40px;" id="dos4-apt14-just" placeholder="Gestion des équipements réseau…"></textarea></td>
+      <td><input type="text" id="dos4-apt14-ok" placeholder="Technicien réseau uniquement…"></td>
+      <td><input type="text" id="dos4-apt14-nok" placeholder="Tout autre VLAN…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">15</td>
+      <td><input type="text" id="dos4-apt15-nom" value="Serveurs"></td>
+      <td><textarea style="min-height:40px;" id="dos4-apt15-just" placeholder="DNS, NAS, NVR centralisés…"></textarea></td>
+      <td><input type="text" id="dos4-apt15-ok" placeholder="← Personnel, ← Caméras…"></td>
+      <td><input type="text" id="dos4-apt15-nok" placeholder="← Clients WiFi…"></td>
+    </tr>
+    <!-- ROUSSILLON -->
+    <tr>
+      <td class="td-fixe" rowspan="3">Roussillon</td>
+      <td class="td-fixe" style="text-align:center">21</td>
+      <td><input type="text" id="dos4-rou21-nom" value="Personnel"></td>
+      <td><textarea style="min-height:40px;" id="dos4-rou21-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-rou21-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-rou21-nok" placeholder="…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">22</td>
+      <td><input type="text" id="dos4-rou22-nom" value="Clients WiFi"></td>
+      <td><textarea style="min-height:40px;" id="dos4-rou22-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-rou22-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-rou22-nok" placeholder="…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">23</td>
+      <td><input type="text" id="dos4-rou23-nom" value="Caméras IP"></td>
+      <td><textarea style="min-height:40px;" id="dos4-rou23-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-rou23-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-rou23-nok" placeholder="…"></td>
+    </tr>
+    <!-- SAIGNON -->
+    <tr>
+      <td class="td-fixe" rowspan="4">Saignon</td>
+      <td class="td-fixe" style="text-align:center">31</td>
+      <td><input type="text" id="dos4-sai31-nom" value="Personnel"></td>
+      <td><textarea style="min-height:40px;" id="dos4-sai31-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-sai31-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-sai31-nok" placeholder="…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">32</td>
+      <td><input type="text" id="dos4-sai32-nom" value="Clients WiFi"></td>
+      <td><textarea style="min-height:40px;" id="dos4-sai32-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-sai32-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-sai32-nok" placeholder="…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">33</td>
+      <td><input type="text" id="dos4-sai33-nom" value="Caméras IP"></td>
+      <td><textarea style="min-height:40px;" id="dos4-sai33-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-sai33-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-sai33-nok" placeholder="…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">36</td>
+      <td><input type="text" id="dos4-sai36-nom" value="Séminaires"></td>
+      <td><textarea style="min-height:40px;" id="dos4-sai36-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-sai36-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-sai36-nok" placeholder="…"></td>
+    </tr>
+    <!-- CUCURON -->
+    <tr>
+      <td class="td-fixe" rowspan="3">Cucuron</td>
+      <td class="td-fixe" style="text-align:center">41</td>
+      <td><input type="text" id="dos4-cuc41-nom" value="Personnel"></td>
+      <td><textarea style="min-height:40px;" id="dos4-cuc41-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-cuc41-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-cuc41-nok" placeholder="…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">42</td>
+      <td><input type="text" id="dos4-cuc42-nom" value="Clients WiFi"></td>
+      <td><textarea style="min-height:40px;" id="dos4-cuc42-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-cuc42-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-cuc42-nok" placeholder="…"></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" style="text-align:center">43</td>
+      <td><input type="text" id="dos4-cuc43-nom" value="Caméras IP"></td>
+      <td><textarea style="min-height:40px;" id="dos4-cuc43-just" placeholder="…"></textarea></td>
+      <td><input type="text" id="dos4-cuc43-ok" placeholder="…"></td>
+      <td><input type="text" id="dos4-cuc43-nok" placeholder="…"></td>
+    </tr>
+  </table>
+
+  <h2>4.3 Choix technique — Router-on-a-Stick</h2>
+  <label class="qlabel">Justifiez en 3 à 5 phrases le choix de la technique Router-on-a-Stick pour le routage inter-VLAN sur les sites de Provence Évasion (par rapport à un switch de niveau 3, par exemple) :</label>
+  <textarea class="rep rep-md" id="dos4-roas-justif" placeholder="La technique Router-on-a-Stick a été retenue car…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Synthèse de l'Atelier 2</div>
+
+<div class="conclusion">
+  <p>Le port <input class="inline-field" id="synth-1" placeholder="Gi0/1"> du switch a été configuré en mode <input class="inline-field" id="synth-2" placeholder="..."> pour transporter les VLANs <input class="inline-field" id="synth-3" style="width:160px" placeholder="21, 22, 23, 24">.</p>
+  <p>Le VLAN natif a été changé en VLAN <input class="inline-field" id="synth-4" placeholder="..."> pour éviter les attaques de type <input class="inline-field" id="synth-5" placeholder="...">.</p>
+  <p>Sur le routeur, <input class="inline-field" id="synth-6" placeholder="..."> sous-interfaces ont été créées. Chacune porte l'adresse IP de la <input class="inline-field" id="synth-7" placeholder="..."> du VLAN correspondant.</p>
+  <p>Après configuration, les pings inter-VLAN <input class="inline-field" id="synth-8" placeholder="réussissent / échouent"> car le routeur dispose maintenant de <input class="inline-field" id="synth-9" style="width:150px" placeholder="routes Connected">.</p>
+  <p>La Section 4 du dossier de déploiement décrit les <input class="inline-field" id="synth-10" placeholder="..."> du projet et justifie les choix de segmentation.</p>
+</div>
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <script>
+  const criteres = [
+    "Je sais configurer un port Trunk sur un switch Cisco (allowed vlan, native vlan)",
+    "Je comprends le rôle du VLAN natif et pourquoi il faut le changer",
+    "Je sais créer des sous-interfaces 802.1Q sur un routeur Cisco",
+    "Je sais vérifier l'état des sous-interfaces avec show ip interface brief",
+    "Je sais lire et interpréter la table de routage (show ip route)",
+    "Je comprends le chemin d'un paquet lors d'un routage inter-VLAN",
+    "Je sais utiliser le mode Simulation de Packet Tracer pour analyser les paquets",
+    "Je suis capable de rédiger une section de dossier de déploiement professionnelle"
+  ];
+  const niveaux = ['maitrise','en_cours','a_revoir','non_traite'];
+  const labels = ['★★★','★★☆','★☆☆','?'];
+  const cont = document.querySelector('.autoeval');
+  criteres.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className='ae-row';
+    let html=`<div>${c}</div>`;
+    niveaux.forEach((n,j)=>{
+      html+=`<div style="text-align:center"><label style="cursor:pointer"><input type="radio" name="ae-${i}" value="${n}" style="accent-color:var(--bleu);margin-right:4px">${labels[j]}</label></div>`;
+    });
+    row.innerHTML=html;
+    cont.appendChild(row);
+  });
+  </script>
+</div>
+
+</div><!-- /content -->
+
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <div><strong style="color:var(--orange)">S3</strong> — Atelier 2 : Trunk, Router-on-a-Stick, Dossier Section 4</div>
+  <div>Lycée Louis Lumière – Chelles · Bac Pro CIEL · 2025-2026</div>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+document.getElementById('dos4-date').valueAsDate = new Date();
+
+function genererJSON(){
+  const nom=document.getElementById('eleve-nom').value;
+  const prenom=document.getElementById('eleve-prenom').value;
+  const v=id=>{const el=document.getElementById(id);return el?el.value:''};
+  const ae={};
+  ["Je sais configurer un port Trunk sur un switch Cisco (allowed vlan, native vlan)","Je comprends le rôle du VLAN natif et pourquoi il faut le changer","Je sais créer des sous-interfaces 802.1Q sur un routeur Cisco","Je sais vérifier l'état des sous-interfaces avec show ip interface brief","Je sais lire et interpréter la table de routage (show ip route)","Je comprends le chemin d'un paquet lors d'un routage inter-VLAN","Je sais utiliser le mode Simulation de Packet Tracer pour analyser les paquets","Je suis capable de rédiger une section de dossier de déploiement professionnelle"].forEach((c,i)=>{
+    const r=document.querySelector(`input[name="ae-${i}"]:checked`);
+    ae[`critere_${i+1}`]={critere:c,niveau:r?r.value:'non_traite'};
+  });
+  const data={
+    meta:{devoir:"S3 – Atelier 2 : Trunk, Router-on-a-Stick, Dossier Section 4",eleve:{nom,prenom,classe:v('eleve-classe')},date:v('eleve-date'),genere_le:new Date().toISOString()},
+    partie1_verification:{q1:v('ex1-q1'),q2:v('ex1-q2')},
+    partie2_trunk:{commandes:v('ex2-cmd-trunk'),q1:v('ex2-q1'),q2:v('ex2-q2')},
+    partie3_roas:{cmd_gi00:v('ex3-cmd-gi00'),q1:v('ex3-q1'),cmd_roas:v('ex3-cmd-roas'),q2:v('ex3-q2'),q3:v('ex3-q3')},
+    partie4_verification:{q1:v('ex4-q1'),q2:v('ex4-q2'),q3:v('ex4-q3'),q4:v('ex4-q4')},
+    partie5_tests:{
+      t1:{res:v('t1-res'),exp:v('t1-exp')},t2:{res:v('t2-res'),exp:v('t2-exp')},
+      t3:{res:v('t3-res'),exp:v('t3-exp')},t4:{res:v('t4-res'),exp:v('t4-exp')},
+      t5:{res:v('t5-res'),exp:v('t5-exp')},t6:{res:v('t6-res'),exp:v('t6-exp')},
+      q1:v('ex5-q1'),q2:v('ex5-q2'),q3:v('ex5-q3'),q4:v('ex5-q4')
+    },
+    partie6_approfondissement:{q1:v('ex6-q1'),q2:v('ex6-q2'),q3:v('ex6-q3'),q4:v('ex6-q4'),q5:v('ex6-q5')},
+    dossier_section4:{
+      redacteur:v('dos4-redacteur'),date:v('dos4-date'),
+      justification_vlans:v('dos4-justif'),
+      justification_roas:v('dos4-roas-justif'),
+      vlans:{
+        apt11:{nom:v('dos4-apt11-nom'),just:v('dos4-apt11-just'),ok:v('dos4-apt11-ok'),nok:v('dos4-apt11-nok')},
+        apt13:{nom:v('dos4-apt13-nom'),just:v('dos4-apt13-just'),ok:v('dos4-apt13-ok'),nok:v('dos4-apt13-nok')},
+        apt14:{nom:v('dos4-apt14-nom'),just:v('dos4-apt14-just'),ok:v('dos4-apt14-ok'),nok:v('dos4-apt14-nok')},
+        apt15:{nom:v('dos4-apt15-nom'),just:v('dos4-apt15-just'),ok:v('dos4-apt15-ok'),nok:v('dos4-apt15-nok')},
+        rou21:{nom:v('dos4-rou21-nom'),just:v('dos4-rou21-just'),ok:v('dos4-rou21-ok'),nok:v('dos4-rou21-nok')},
+        rou22:{nom:v('dos4-rou22-nom'),just:v('dos4-rou22-just'),ok:v('dos4-rou22-ok'),nok:v('dos4-rou22-nok')},
+        rou23:{nom:v('dos4-rou23-nom'),just:v('dos4-rou23-just'),ok:v('dos4-rou23-ok'),nok:v('dos4-rou23-nok')},
+        sai31:{nom:v('dos4-sai31-nom'),just:v('dos4-sai31-just'),ok:v('dos4-sai31-ok'),nok:v('dos4-sai31-nok')},
+        sai32:{nom:v('dos4-sai32-nom'),just:v('dos4-sai32-just'),ok:v('dos4-sai32-ok'),nok:v('dos4-sai32-nok')},
+        sai33:{nom:v('dos4-sai33-nom'),just:v('dos4-sai33-just'),ok:v('dos4-sai33-ok'),nok:v('dos4-sai33-nok')},
+        sai36:{nom:v('dos4-sai36-nom'),just:v('dos4-sai36-just'),ok:v('dos4-sai36-ok'),nok:v('dos4-sai36-nok')},
+        cuc41:{nom:v('dos4-cuc41-nom'),just:v('dos4-cuc41-just'),ok:v('dos4-cuc41-ok'),nok:v('dos4-cuc41-nok')},
+        cuc42:{nom:v('dos4-cuc42-nom'),just:v('dos4-cuc42-just'),ok:v('dos4-cuc42-ok'),nok:v('dos4-cuc42-nok')},
+        cuc43:{nom:v('dos4-cuc43-nom'),just:v('dos4-cuc43-just'),ok:v('dos4-cuc43-ok'),nok:v('dos4-cuc43-nok')}
+      }
+    },
+    synthese:{s1:v('synth-1'),s2:v('synth-2'),s3:v('synth-3'),s4:v('synth-4'),s5:v('synth-5'),s6:v('synth-6'),s7:v('synth-7'),s8:v('synth-8'),s9:v('synth-9'),s10:v('synth-10')},
+    auto_evaluation:ae
+  };
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${safeName}_S3Atelier2.json`;
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

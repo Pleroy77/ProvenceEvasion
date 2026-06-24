@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S9 — Atelier 2 : ACL 4 sites + débogage avancé</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}ul,ol{margin:6px 0 10px 20px;line-height:1.8;}strong{font-weight:600;}
+.mes{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mes strong{color:#4a7a1a;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.c{text-align:center;}
+.ex{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.ex-t{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:38px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}.rep-xl{min-height:160px;}.rep-xxl{min-height:210px;}
+label.q{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.ifield{display:inline-block;border:none;border-bottom:1px solid #999;width:110px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.ifield:focus{outline:none;border-bottom-color:var(--bleu);}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.ssyn{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-hdr{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.sbar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.btn{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;}
+.btn:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .g{color:#8BC34A;}.cli .v{color:#FFD54F;}.cli .t{color:#5BB8E8;font-weight:700;}.cli .p{color:#FF5722;}
+.pts{background:#e8f4fd;border-left:4px solid var(--bleu);padding:8px 12px;margin:12px 0 8px;border-radius:0 6px 6px 0;font-size:12px;}
+.ptn{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-right:8px;}
+.chrono{background:#fff8f0;border:2px solid var(--orange);border-radius:8px;padding:10px 14px;margin:12px 0;font-size:12px;}
+.chrono-t{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:4px;}
+.dbg{background:#fdf0f0;border:2px solid #c62828;border-radius:8px;padding:12px 14px;margin:14px 0;font-size:12px;line-height:1.75;}
+.dbg-t{font-family:'Roboto',sans-serif;font-weight:700;color:#c62828;margin-bottom:6px;}
+.tt{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:11.5px;}
+.tt th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 8px;border:1px solid var(--marine);text-align:center;}
+.tt td{border:1px solid #c0d0e0;padding:5px 8px;vertical-align:middle;}
+.tt tr:nth-child(even) td{background:var(--ciel-bg);}
+.tt input[type=text]{width:100%;border:1px solid #d0d8e0;border-radius:3px;padding:3px 5px;font-size:11px;}
+.tt select{border:1px solid #d0d8e0;border-radius:3px;padding:2px 4px;font-size:11px;}
+.ok{color:#2e7d32;font-weight:700;}.ko{color:#c62828;font-weight:700;}
+.uz{border:2px dashed var(--bleu);border-radius:8px;padding:14px;text-align:center;cursor:pointer;background:var(--ciel-bg);margin:8px 0;}
+.uz:hover{border-color:var(--orange);}
+.uz input[type=file]{display:none;}
+.uz-t{font-weight:600;color:var(--bleu);margin-bottom:4px;}
+.uz-h{font-size:11px;color:#888;}
+</style>
+</head>
+<body>
+<div class="header">
+  <img src="data:image/jpeg;base64,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" alt="Logo CIEL" style="height:44px;width:auto;">
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S9 – Atelier 2 : ACL topologie 4 sites — Sécurité inter-sites &amp; débogage avancé</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Année 2025-2026</div>
+  <div class="eleve-box">
+    <input type="text" id="nom" placeholder="Nom">
+    <input type="text" id="prenom" placeholder="Prénom">
+    <input type="text" id="classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="dat">
+  </div>
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+  </table>
+</div>
+
+<div class="content">
+
+<div class="chrono">
+  <div class="chrono-t">⏱ Gestion du temps — 4 heures</div>
+  Partie 1 Analyse inter-sites : 30 min &nbsp;·&nbsp; Partie 2 ACL centralisée ROUTEUR-APT : 50 min &nbsp;·&nbsp; Partie 3 ACL locales (Saignon + Cucuron) : 35 min &nbsp;·&nbsp; Partie 4 Plan de recette 24 tests : 50 min &nbsp;·&nbsp; Partie 5 Débogage 7 scénarios : 1h05 &nbsp;·&nbsp; Partie 6 Dossier &amp; captures : 20 min
+</div>
+
+<!-- ═══════ PARTIE 1 ═══════ -->
+<h1>1. Analyse — Politique de sécurité inter-sites</h1>
+
+<div class="mes">
+  <strong>📍 Mise en situation :</strong> Les ACL du site de Roussillon (Atelier 1) sont opérationnelles. Mais Laurent Ferracci découvre un nouveau problème : <em>« Un client WiFi de notre bastide de Cucuron a réussi à accéder à nos serveurs internes depuis son smartphone ! »</em> La protection doit s'étendre aux 4 sites de manière cohérente. Vous devez déployer une ACL centralisée sur ROUTEUR-APT pour les flux inter-sites, et des ACL locales spécifiques sur Saignon (comptabilité sensible) et Cucuron.
+</div>
+
+<h2>1.1 Plan d'adressage complet — 4 sites</h2>
+<table class="data-table" style="font-size:11.5px;">
+  <tr><th>Site</th><th>VLAN</th><th>Nom</th><th>Réseau</th><th>Wildcard (à calculer)</th></tr>
+  <tr style="background:#e8f4fd"><td rowspan="4"><strong>Roussillon</strong><br><small>(ACL déployées A1)</small></td><td class="c">21</td><td>Personnel</td><td class="c">172.16.21.0/24</td><td><input type="text" id="wc21" class="ifield" placeholder="…"></td></tr>
+  <tr style="background:#e8f4fd"><td class="c">22</td><td>Direction</td><td class="c">172.16.22.0/24</td><td><input type="text" id="wc22" class="ifield" placeholder="…"></td></tr>
+  <tr style="background:#e8f4fd"><td class="c">23</td><td>Caméras</td><td class="c">172.16.23.0/24</td><td><input type="text" id="wc23" class="ifield" placeholder="…"></td></tr>
+  <tr style="background:#e8f4fd"><td class="c">24</td><td>WiFi clients</td><td class="c">172.16.24.0/24</td><td><input type="text" id="wc24" class="ifield" placeholder="…"></td></tr>
+  <tr><td rowspan="4"><strong>Saignon</strong><br><small>(Collines Sud)</small></td><td class="c">41</td><td>Personnel</td><td class="c">172.16.41.0/24</td><td><input type="text" id="wc41" class="ifield" placeholder="…"></td></tr>
+  <tr><td class="c" style="color:var(--orange);font-weight:700">42</td><td><strong>Comptabilité !</strong></td><td class="c">172.16.42.0/24</td><td><input type="text" id="wc42" class="ifield" placeholder="…"></td></tr>
+  <tr><td class="c">43</td><td>Caméras</td><td class="c">172.16.43.0/24</td><td><input type="text" id="wc43" class="ifield" placeholder="…"></td></tr>
+  <tr><td class="c">44</td><td>WiFi clients</td><td class="c">172.16.44.0/24</td><td><input type="text" id="wc44" class="ifield" placeholder="…"></td></tr>
+  <tr style="background:#f6fbed"><td rowspan="4"><strong>Cucuron</strong><br><small>(Bastide Est)</small></td><td class="c">61</td><td>Personnel</td><td class="c">172.16.61.0/24</td><td><input type="text" id="wc61" class="ifield" placeholder="…"></td></tr>
+  <tr style="background:#f6fbed"><td class="c">62</td><td>Direction</td><td class="c">172.16.62.0/24</td><td><input type="text" id="wc62" class="ifield" placeholder="…"></td></tr>
+  <tr style="background:#f6fbed"><td class="c">63</td><td>Caméras</td><td class="c">172.16.63.0/24</td><td><input type="text" id="wc63" class="ifield" placeholder="…"></td></tr>
+  <tr style="background:#f6fbed"><td class="c">64</td><td>WiFi clients</td><td class="c">172.16.64.0/24</td><td><input type="text" id="wc64" class="ifield" placeholder="…"></td></tr>
+  <tr style="background:#fffbf0"><td><strong>Apt (Siège)</strong></td><td class="c">10</td><td>Serveurs</td><td class="c">172.16.10.0/24</td><td><input type="text" id="wc10" class="ifield" placeholder="…"></td></tr>
+</table>
+
+<h2>1.2 Tableau d'analyse des flux inter-sites</h2>
+<table class="data-table" style="font-size:11px;">
+  <tr><th>#</th><th>Source</th><th>Destination</th><th>Proto</th><th>Décision</th><th>Routeur d'application</th><th>Justification</th></tr>
+  <tr><td>IS1</td><td>WiFi Roussillon (172.16.24.0/24)</td><td>Serveurs Apt</td><td>IP</td>
+    <td><select id="is1d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option>—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="is1r" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="ROUTEUR-APT / ROUTEUR-ROUSSILLON / …"></td>
+    <td><input type="text" id="is1j" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td>IS2</td><td>WiFi Saignon (172.16.44.0/24)</td><td>Serveurs Apt</td><td>IP</td>
+    <td><select id="is2d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option>—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="is2r" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td>
+    <td><input type="text" id="is2j" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td>IS3</td><td>WiFi Cucuron (172.16.64.0/24)</td><td>Serveurs Apt</td><td>IP</td>
+    <td><select id="is3d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option>—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="is3r" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td>
+    <td><input type="text" id="is3j" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td>IS4</td><td>Caméras Saignon (172.16.43.0/24)</td><td>Tout réseau interne</td><td>IP</td>
+    <td><select id="is4d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option>—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="is4r" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td>
+    <td><input type="text" id="is4j" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td>IS5</td><td>Caméras Cucuron (172.16.63.0/24)</td><td>Tout réseau interne</td><td>IP</td>
+    <td><select id="is5d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option>—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="is5r" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td>
+    <td><input type="text" id="is5j" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td>IS6</td><td>Comptabilité Saignon (172.16.42.0/24)</td><td>Serveurs Apt TCP 445 + DNS</td><td>TCP/UDP</td>
+    <td><select id="is6d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option>—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="is6r" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td>
+    <td><input type="text" id="is6j" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td>IS7</td><td>Personnel tous sites (172.16.x1.0/24)</td><td>Inter-sites légitimes</td><td>IP</td>
+    <td><select id="is7d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option>—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="is7r" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td>
+    <td><input type="text" id="is7j" style="width:100%;border:1px solid #c0d0e0;padding:2px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+</table>
+
+<div class="ex">
+  <div class="ex-t">📝 Questions d'analyse</div>
+  <label class="q">Q1.1 — Pourquoi les ACL créées sur ROUTEUR-ROUSSILLON en Atelier 1 ne protègent-elles pas contre les clients WiFi de Saignon et Cucuron ?</label>
+  <textarea class="rep rep-sm" id="q11" placeholder="Les ACL de Roussillon filtrent uniquement les paquets entrant sur les sous-interfaces locales (G0/0.21, .23, .24) de ROUTEUR-ROUSSILLON. Les paquets de Saignon arrivent depuis l'interface WAN … car …"></textarea>
+  <label class="q">Q1.2 — Comparez deux approches : (A) une ACL par routeur de site, (B) une seule ACL centralisée sur ROUTEUR-APT. Avantages, inconvénients de chacune :</label>
+  <textarea class="rep rep-xl" id="q12" placeholder="Approche A (ACL locales sur chaque routeur de site) :&#10;+ Avantages : …&#10;- Inconvénients : … (nombre total d'ACL à maintenir : 4 sites × … = …)&#10;&#10;Approche B (ACL centralisée sur ROUTEUR-APT) :&#10;+ Avantages : …&#10;- Inconvénients : …&#10;&#10;Choix retenu et justification : …"></textarea>
+  <label class="q">Q1.3 — Calculez le wildcard de chaque réseau source/destination cité dans INTER-SITES-SEC (formule : 255.255.255.255 − masque) :</label>
+  <textarea class="rep rep-xl" id="q13" placeholder="172.16.24.0/24 → 255.255.255.255 − 255.255.255.0 = ___.___.___.___ (wildcard)&#10;172.16.44.0/24 → …&#10;172.16.64.0/24 → …&#10;172.16.43.0/24 → …&#10;172.16.63.0/24 → …&#10;172.16.10.0/24 → …&#10;172.16.42.0/24 → …&#10;172.16.0.0/16  → 255.255.255.255 − 255.255.0.0 = ___.___.___.___  (couvre tout le 172.16.x.x)"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════ PARTIE 2 ═══════ -->
+<h1>2. ACL centralisée — ROUTEUR-APT : INTER-SITES-SEC</h1>
+
+<div class="chrono"><div class="chrono-t">⏱ ~50 min</div>Rédaction papier (15 min) · état initial PT (5 min) · saisie CLI (15 min) · vérifications (15 min)</div>
+
+<div class="pts"><span class="ptn">PT-1</span> Ouvrez <code>ProvenanceEvasion_S8.pkt</code>. Vérifiez que tous les sites communiquent avec les serveurs avant d'ajouter des ACL.</div>
+
+<div class="ex">
+  <div class="ex-t">📝 État initial — Pings de référence inter-sites</div>
+  <table class="tt">
+    <tr><th>Ping</th><th>Source</th><th>Destination</th><th>Résultat avant ACL</th><th>Attendu</th></tr>
+    <tr><td>PI-1</td><td>PC-WiFi Roussillon</td><td>172.16.10.50</td><td><input type="text" id="pi1" placeholder="…"></td><td class="ok" style="text-align:center">Succès (pb à corriger)</td></tr>
+    <tr><td>PI-2</td><td>PC-WiFi Saignon</td><td>172.16.10.50</td><td><input type="text" id="pi2" placeholder="…"></td><td class="ok" style="text-align:center">Succès (pb à corriger)</td></tr>
+    <tr><td>PI-3</td><td>PC-WiFi Cucuron</td><td>172.16.10.50</td><td><input type="text" id="pi3" placeholder="…"></td><td class="ok" style="text-align:center">Succès (pb à corriger)</td></tr>
+    <tr><td>PI-4</td><td>PC-Compta Saignon</td><td>172.16.10.50 TCP 445</td><td><input type="text" id="pi4" placeholder="…"></td><td class="ok" style="text-align:center">Succès (à maintenir)</td></tr>
+    <tr><td>PI-5</td><td>PC-Perso Roussillon</td><td>PC-Perso Saignon</td><td><input type="text" id="pi5" placeholder="…"></td><td class="ok" style="text-align:center">Succès (inter-sites légitimes)</td></tr>
+  </table>
+  <label class="q"><code>show ip route</code> sur ROUTEUR-APT — vérifiez que les routes vers les 3 sites distants existent :</label>
+  <textarea class="rep rep-lg" id="route-apt" placeholder="S    172.16.21.0/24 [1/0] via 10.0.0.1&#10;S    172.16.41.0/24 [1/0] via 10.0.0.5&#10;…"></textarea>
+</div>
+
+<div class="ex">
+  <div class="ex-t">📝 Rédaction des règles INTER-SITES-SEC sur papier</div>
+  <label class="q">Rédigez les 7 règles dans l'ordre optimal (deny WiFi×3, deny Caméras×2, permit Comptabilité, permit général). Wildcards calculés en Q1.3 :</label>
+  <textarea class="rep rep-xxl" id="is-papier" placeholder="ip access-list extended INTER-SITES-SEC&#10; ! R1 — deny WiFi Roussillon → serveurs Apt&#10; deny ip 172.16.24.0 ___.___.___.___  172.16.10.0 ___.___.___.___ &#10; ! R2 — deny WiFi Saignon → serveurs Apt&#10; deny ip 172.16.44.0 … &#10; ! R3 — deny WiFi Cucuron → serveurs Apt&#10; deny ip 172.16.64.0 … &#10; ! R4 — deny Caméras Saignon → tout réseau interne&#10; deny ip 172.16.43.0 … any&#10; ! R5 — deny Caméras Cucuron → tout réseau interne&#10; deny ip 172.16.63.0 … any&#10; ! R6 — permit Comptabilité Saignon → serveurs Apt TCP 445&#10; permit tcp 172.16.42.0 … 172.16.10.0 … eq 445&#10; ! R7 — permit tout le reste&#10; permit ip any any&#10;&#10;Justification de l'ordre : les deny WiFi sont en premier car …&#10;La règle permit Comptabilité doit être AVANT le permit général car sinon …"></textarea>
+</div>
+
+<div class="pts"><span class="ptn">PT-2</span> Saisissez INTER-SITES-SEC et appliquez-la sur les 3 interfaces WAN de ROUTEUR-APT :</div>
+<div class="cli"><span class="t">! ROUTEUR-APT</span>
+<span class="p">Router(config)#</span> ip access-list extended <span class="v">INTER-SITES-SEC</span>
+<span class="p">Router(config-ext-nacl)#</span> <span class="g">! vos règles ici</span>
+<span class="p">Router(config-ext-nacl)#</span> exit
+<span class="g">! Application sur les 3 interfaces WAN (adapter les noms selon votre topologie)</span>
+<span class="p">Router(config)#</span> interface Serial0/0/0  <span class="g">! vers Roussillon</span>
+<span class="p">Router(config-if)#</span>  ip access-group INTER-SITES-SEC in
+<span class="p">Router(config)#</span> interface Serial0/0/1  <span class="g">! vers Saignon</span>
+<span class="p">Router(config-if)#</span>  ip access-group INTER-SITES-SEC in
+<span class="p">Router(config)#</span> interface Serial0/1/0  <span class="g">! vers Cucuron</span>
+<span class="p">Router(config-if)#</span>  ip access-group INTER-SITES-SEC in</div>
+
+<div class="ex">
+  <div class="ex-t">📝 Saisie CLI + vérifications</div>
+  <label class="q">Commandes complètes saisies (copier depuis la CLI Packet Tracer) :</label>
+  <textarea class="rep rep-xxl" id="is-saisie" placeholder="Router(config)# ip access-list extended INTER-SITES-SEC&#10; deny ip …&#10;…&#10;interface Serial0/0/0&#10; ip access-group INTER-SITES-SEC in&#10;…"></textarea>
+  <label class="q">Résultat de <code>show access-lists INTER-SITES-SEC</code> :</label>
+  <textarea class="rep rep-xl" id="is-show" placeholder="Extended IP access list INTER-SITES-SEC&#10;  10 deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255&#10;  …&#10;  70 permit ip any any"></textarea>
+  <label class="q">Vérification : <code>show ip interface Serial0/0/0 | include access</code> (et les deux autres interfaces WAN) :</label>
+  <textarea class="rep rep-md" id="is-intf" placeholder="Serial0/0/0 : Inbound access list is INTER-SITES-SEC&#10;Serial0/0/1 : Inbound access list is …&#10;Serial0/1/0 : Inbound access list is …"></textarea>
+  <label class="q">Q2.1 — Tracez le chemin exact d'un paquet WiFi Cucuron (172.16.64.5) vers le serveur de fichiers (172.16.10.50). Sur quelle interface de quel routeur est-il bloqué et par quelle règle ?</label>
+  <textarea class="rep rep-md" id="q21" placeholder="1. PC-WiFi Cucuron (172.16.64.5) envoie vers 172.16.10.50&#10;2. Le paquet passe par ROUTEUR-CUCURON, sort par l'interface WAN (Serial0/0/0 vers Apt)&#10;3. Le paquet arrive sur ROUTEUR-APT, interface … sens IN&#10;4. L'ACL INTER-SITES-SEC évalue : règle R3 (deny ip 172.16.64.0 …) → correspond ? OUI/NON car …&#10;5. Action : …"></textarea>
+  <label class="q">Q2.2 — Serait-il possible de regrouper les 3 règles WiFi (R1, R2, R3) en une seule ? Testez : quel wildcard couvrirait 172.16.24.0, 172.16.44.0 ET 172.16.64.0 sans couvrir d'autres réseaux ?</label>
+  <textarea class="rep rep-md" id="q22" placeholder="Réseau commun : 172.16.0.0 ?&#10;Wildcard qui couvrirait ces 3 réseaux : …&#10;Problème : ce wildcard couvrirait aussi : 172.16.21.0, 172.16.22.0, … (les VLANs légitimes)&#10;Conclusion : OUI/NON possible car …&#10;Alternative : …"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════ PARTIE 3 ═══════ -->
+<h1>3. ACL locales — Saignon et Cucuron</h1>
+
+<div class="chrono"><div class="chrono-t">⏱ ~35 min — environ 18 min par site</div></div>
+
+<h2>3.1 ROUTEUR-SAIGNON — Protection de la comptabilité (COMPTA-PROTECTION)</h2>
+<p>Objectif : le Personnel de Saignon (VLAN 41) ne peut pas accéder en SSH aux équipements réseau. La Comptabilité (VLAN 42) peut joindre les serveurs Apt (SMB TCP 445 + DNS UDP 53). Tout autre flux depuis VLAN 42 est bloqué (pas d'internet direct, pas d'accès aux VLANs Personnel des autres sites).</p>
+
+<div class="ex">
+  <div class="ex-t">📝 ACL COMPTA-PROTECTION — Saignon</div>
+  <label class="q">Rédigez les règles, saisissez dans PT et vérifiez :</label>
+  <textarea class="rep rep-xxl" id="compta-saisie" placeholder="ip access-list extended COMPTA-PROTECTION&#10; ! Bloquer SSH depuis Personnel Saignon&#10; deny tcp 172.16.41.0 0.0.0.255 any eq 22&#10; ! Autoriser Comptabilité → serveurs Apt (SMB + DNS)&#10; permit tcp 172.16.42.0 0.0.0.255 172.16.10.0 0.0.0.255 eq 445&#10; permit udp 172.16.42.0 0.0.0.255 host 172.16.10.10 eq 53&#10; ! Bloquer Comptabilité → Internet et autres réseaux non autorisés&#10; deny ip 172.16.42.0 0.0.0.255 any&#10; ! Permit général&#10; permit ip any any&#10;&#10;interface GigabitEthernet0/0.41&#10; ip access-group COMPTA-PROTECTION in&#10; (ou appliquer sur G0/0.42 ? Justification : …)&#10;&#10;show access-lists COMPTA-PROTECTION :&#10;…"></textarea>
+  <label class="q">Q3.1 — Sur quelle(s) sous-interface(s) appliquer COMPTA-PROTECTION : G0/0.41 (Personnel) ou G0/0.42 (Comptabilité) ou les deux ? Expliquez votre raisonnement :</label>
+  <textarea class="rep rep-md" id="q31" placeholder="Si appliquée sur G0/0.41 uniquement : bloque le SSH du Personnel mais la Comptabilité (G0/0.42) n'est pas filtrée → …&#10;Si appliquée sur G0/0.42 uniquement : filtre la Comptabilité mais le Personnel peut toujours SSH → …&#10;Décision : appliquer sur … car …"></textarea>
+</div>
+
+<h2>3.2 ROUTEUR-CUCURON — Isolation WiFi locale (CUCURON-WIFI-ISO)</h2>
+<p>Par symétrie avec Roussillon, le WiFi de Cucuron (VLAN 64) ne doit pas accéder aux réseaux privés 172.16.0.0/16 ni aux liaisons WAN 10.0.0.0/8, mais peut accéder à Internet.</p>
+
+<div class="ex">
+  <div class="ex-t">📝 ACL CUCURON-WIFI-ISO — Cucuron</div>
+  <label class="q">Rédigez avec le wildcard 0.0.255.255 qui couvre tout le 172.16.x.x, saisissez et vérifiez :</label>
+  <textarea class="rep rep-xxl" id="cucuron-saisie" placeholder="ip access-list extended CUCURON-WIFI-ISO&#10; ! Bloquer WiFi → tout réseau privé 172.16.x.x&#10; deny ip 172.16.64.0 0.0.0.255 172.16.0.0 0.0.255.255&#10; ! Bloquer WiFi → liaisons WAN 10.x.x.x&#10; deny ip 172.16.64.0 0.0.0.255 10.0.0.0 0.255.255.255&#10; ! Autoriser Internet&#10; permit ip 172.16.64.0 0.0.0.255 any&#10;&#10;interface GigabitEthernet0/0.64&#10; ip access-group CUCURON-WIFI-ISO in&#10;&#10;show access-lists CUCURON-WIFI-ISO :&#10;…"></textarea>
+  <label class="q">Q3.2 — Expliquez précisément ce que couvre le wildcard 0.0.255.255 sur 172.16.0.0. Donnez la plage d'adresses correspondante :</label>
+  <textarea class="rep rep-sm" id="q32" placeholder="Wildcard 0.0.255.255 sur 172.16.0.0 : les octets 1 et 2 doivent correspondre exactement (172.16) car les bits wildcard sont 0. Les octets 3 et 4 sont libres (255 = ignorés).&#10;Cela couvre toutes les adresses de … à …&#10;En notation CIDR cela équivaut à …/16"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════ PARTIE 4 ═══════ -->
+<h1>4. Plan de recette complet — 24 tests inter-sites</h1>
+
+<div class="mes"><strong>🎯 Objectif :</strong> Valider la politique de sécurité complète des 4 sites. Testez chaque scénario dans Packet Tracer et indiquez le résultat réel.</div>
+
+<table class="tt">
+  <tr><th>N°</th><th>Source</th><th>Destination / Proto</th><th>Via</th><th>Attendu</th><th>Résultat PT</th><th>✓/✗</th><th>ACL déclenchée</th></tr>
+  <tr><td>T01</td><td>WiFi Roussillon (172.16.24.x)</td><td>172.16.10.50</td><td>WAN Rous.</td><td class="ko">Échec</td><td><input type="text" id="t01" placeholder="…"></td><td><select id="t01c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t01a" placeholder="…"></td></tr>
+  <tr><td>T02</td><td>WiFi Saignon (172.16.44.x)</td><td>172.16.10.50</td><td>WAN Saign.</td><td class="ko">Échec</td><td><input type="text" id="t02" placeholder="…"></td><td><select id="t02c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t02a" placeholder="…"></td></tr>
+  <tr><td>T03</td><td>WiFi Cucuron (172.16.64.x)</td><td>172.16.10.50</td><td>WAN Cucuron</td><td class="ko">Échec</td><td><input type="text" id="t03" placeholder="…"></td><td><select id="t03c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t03a" placeholder="…"></td></tr>
+  <tr><td>T04</td><td>WiFi Saignon (172.16.44.x)</td><td>172.16.10.10 DNS</td><td>WAN Saign.</td><td class="ko">Échec</td><td><input type="text" id="t04" placeholder="…"></td><td><select id="t04c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t04a" placeholder="…"></td></tr>
+  <tr><td>T05</td><td>Caméras Saignon (172.16.43.x)</td><td>172.16.10.20 TCP 8080</td><td>WAN Saign.</td><td class="ko">Échec (caméras isolées)</td><td><input type="text" id="t05" placeholder="…"></td><td><select id="t05c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t05a" placeholder="…"></td></tr>
+  <tr><td>T06</td><td>Caméras Cucuron (172.16.63.x)</td><td>172.16.21.x (Personnel Rous.)</td><td>WAN Cucuron</td><td class="ko">Échec</td><td><input type="text" id="t06" placeholder="…"></td><td><select id="t06c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t06a" placeholder="…"></td></tr>
+  <tr><td>T07</td><td>Comptabilité Saignon (172.16.42.x)</td><td>172.16.10.50 TCP 445</td><td>WAN Saign.</td><td class="ok">Succès</td><td><input type="text" id="t07" placeholder="…"></td><td><select id="t07c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t07a" placeholder="…"></td></tr>
+  <tr><td>T08</td><td>Comptabilité Saignon</td><td>172.16.10.10 DNS UDP 53</td><td>WAN Saign.</td><td class="ok">Succès</td><td><input type="text" id="t08" placeholder="…"></td><td><select id="t08c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t08a" placeholder="…"></td></tr>
+  <tr><td>T09</td><td>Comptabilité Saignon</td><td>8.8.8.8 (Internet)</td><td>WAN Saign.</td><td class="ko">Échec (Internet bloqué Compta)</td><td><input type="text" id="t09" placeholder="…"></td><td><select id="t09c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t09a" placeholder="…"></td></tr>
+  <tr><td>T10</td><td>Personnel Roussillon (172.16.21.x)</td><td>Personnel Saignon (172.16.41.x)</td><td>Inter-sites</td><td class="ok">Succès</td><td><input type="text" id="t10" placeholder="…"></td><td><select id="t10c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t10a" placeholder="…"></td></tr>
+  <tr><td>T11</td><td>Direction Roussillon (172.16.22.x)</td><td>172.16.10.50</td><td>WAN Rous.</td><td class="ok">Succès</td><td><input type="text" id="t11" placeholder="…"></td><td><select id="t11c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t11a" placeholder="…"></td></tr>
+  <tr><td>T12</td><td>WiFi Cucuron</td><td>172.16.61.x (Personnel Cucuron local)</td><td>Local Cucuron</td><td class="ko">Échec (CUCURON-WIFI-ISO)</td><td><input type="text" id="t12" placeholder="…"></td><td><select id="t12c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t12a" placeholder="…"></td></tr>
+  <tr><td>T13</td><td>WiFi Cucuron</td><td>172.16.41.x (Personnel Saignon)</td><td>WAN + local</td><td class="ko">Échec (CUCURON-WIFI-ISO + INTER-SITES-SEC)</td><td><input type="text" id="t13" placeholder="…"></td><td><select id="t13c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t13a" placeholder="…"></td></tr>
+  <tr><td>T14</td><td>WiFi Cucuron</td><td>8.8.8.8 (Internet)</td><td>WAN</td><td class="ok">Succès</td><td><input type="text" id="t14" placeholder="…"></td><td><select id="t14c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t14a" placeholder="…"></td></tr>
+  <tr><td>T15</td><td>Personnel Saignon (172.16.41.x)</td><td>SSH routeur Saignon TCP 22</td><td>Local Saign.</td><td class="ko">Échec (COMPTA-PROTECTION)</td><td><input type="text" id="t15" placeholder="…"></td><td><select id="t15c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t15a" placeholder="…"></td></tr>
+  <tr><td>T16</td><td>Comptabilité Saignon (172.16.42.x)</td><td>SSH routeur TCP 22</td><td>Local Saign.</td><td class="ok">Succès (Compta autorisée admin)</td><td><input type="text" id="t16" placeholder="…"></td><td><select id="t16c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t16a" placeholder="…"></td></tr>
+  <tr><td>T17</td><td>Personnel Cucuron (172.16.61.x)</td><td>172.16.10.50</td><td>WAN Cucuron</td><td class="ok">Succès</td><td><input type="text" id="t17" placeholder="…"></td><td><select id="t17c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t17a" placeholder="…"></td></tr>
+  <tr><td>T18</td><td>WiFi Roussillon (après A1+A2)</td><td>PC-Perso Saignon (172.16.41.x)</td><td>WAN Rous.</td><td class="ko">Échec (WIFI-RESTRICTION A1)</td><td><input type="text" id="t18" placeholder="…"></td><td><select id="t18c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t18a" placeholder="…"></td></tr>
+  <tr><td>T19</td><td>Direction Cucuron (172.16.62.x)</td><td>SSH routeur Cucuron TCP 22</td><td>Local Cucuron</td><td class="ok">Succès (Direction non filtrée)</td><td><input type="text" id="t19" placeholder="…"></td><td><select id="t19c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t19a" placeholder="…"></td></tr>
+  <tr><td>T20</td><td>Caméras Saignon (172.16.43.x)</td><td>172.16.41.x (Personnel Saignon local)</td><td>Local Saign.</td><td class="ko">Échec (INTER-SITES-SEC ou COMPTA-PROT.)</td><td><input type="text" id="t20" placeholder="…"></td><td><select id="t20c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t20a" placeholder="…"></td></tr>
+  <tr><td>T21</td><td>WiFi Saignon (172.16.44.x)</td><td>172.16.64.x (WiFi Cucuron)</td><td>Inter-sites</td><td class="ko">Échec</td><td><input type="text" id="t21" placeholder="…"></td><td><select id="t21c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t21a" placeholder="…"></td></tr>
+  <tr><td>T22</td><td>Personnel Roussillon</td><td>Personnel Cucuron (172.16.61.x)</td><td>Inter-sites</td><td class="ok">Succès</td><td><input type="text" id="t22" placeholder="…"></td><td><select id="t22c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t22a" placeholder="…"></td></tr>
+  <tr><td>T23</td><td>WiFi Cucuron</td><td>172.16.43.x (Caméras Saignon)</td><td>Inter-sites</td><td class="ko">Échec</td><td><input type="text" id="t23" placeholder="…"></td><td><select id="t23c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t23a" placeholder="…"></td></tr>
+  <tr><td>T24</td><td>Comptabilité Saignon</td><td>172.16.21.x (Personnel Roussillon)</td><td>WAN Saign.</td><td class="ko">Échec (deny ip 172.16.42.0 … any dans COMPTA-PROT.)</td><td><input type="text" id="t24" placeholder="…"></td><td><select id="t24c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="t24a" placeholder="…"></td></tr>
+</table>
+
+<div class="ex">
+  <div class="ex-t">📝 Analyse post-recette</div>
+  <label class="q">Taux de conformité : __ / 24. Non-conformités, causes et corrections :</label>
+  <textarea class="rep rep-xl" id="recette-bilan" placeholder="Conformes : __ / 24&#10;Non-conformités :&#10;T__ — Symptôme : … — Cause : … — Correction : …&#10;…&#10;Taux final après corrections : __ / 24"></textarea>
+  <label class="q">Résultat de <code>show access-lists INTER-SITES-SEC</code> après les 24 tests (avec compteurs matches) — Interprétez chaque compteur :</label>
+  <textarea class="rep rep-xl" id="show-is" placeholder="Extended IP access list INTER-SITES-SEC&#10;  10 deny ip 172.16.24.0 … (X matches) → correspond aux tests T__&#10;  20 deny ip 172.16.44.0 … (Y matches) → …&#10;  30 deny ip 172.16.64.0 … (Z matches) → …&#10;  …&#10;  70 permit ip any any (W matches) → …&#10;&#10;Interprétation : la règle avec le plus de matches est … car …"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════ PARTIE 5 ═══════ -->
+<h1>5. Débogage avancé — 7 scénarios inter-sites</h1>
+
+<div class="mes"><strong>🎯 Objectif :</strong> Ces scénarios se concentrent sur des erreurs spécifiques aux ACL inter-sites et aux interactions entre plusieurs ACL actives. Pour chaque scénario : analyse sur papier → saisie en PT → correction → vérification.</div>
+
+<h2>5.1 D1 — La Comptabilité ne peut plus accéder aux serveurs (règle deny parasite)</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 Symptôme : le chef comptable de Saignon ne peut plus ouvrir les fichiers partagés</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">ip access-list extended INTER-SITES-SEC
+ deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255
+ deny ip 172.16.44.0 0.0.0.255 172.16.10.0 0.0.0.255
+ deny ip 172.16.64.0 0.0.0.255 172.16.10.0 0.0.0.255
+ deny ip 172.16.43.0 0.0.0.255 any
+ deny ip 172.16.63.0 0.0.0.255 any
+ deny ip 172.16.42.0 0.0.0.255 any   ← ligne ajoutée par erreur
+ permit tcp 172.16.42.0 0.0.0.255 172.16.10.0 0.0.0.255 eq 445
+ permit ip any any</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D1</div>
+  <label class="q">D1.1 — Tracez le chemin de décision pour un paquet Comptabilité (172.16.42.x) → 172.16.10.50 TCP 445 :</label>
+  <textarea class="rep rep-md" id="d1-trace" placeholder="Règle 1 : deny ip 172.16.24.0 … → correspond ? NON car source 172.16.42.x ≠ 172.16.24.0&#10;Règle 2 : deny ip 172.16.44.0 … → correspond ? NON car …&#10;Règle 3 : deny ip 172.16.64.0 … → correspond ? NON car …&#10;Règle 4 : deny ip 172.16.43.0 … any → correspond ? NON car …&#10;Règle 5 : deny ip 172.16.63.0 … any → correspond ? NON car …&#10;Règle 6 : deny ip 172.16.42.0 … any → correspond ? OUI car source 172.16.42.x correspond&#10;Action : DENY → paquet bloqué (la règle permit tcp … eq 445 qui suit est donc jamais évaluée)"></textarea>
+  <label class="q">D1.2 — Supprimez la règle fautive par son numéro de séquence (sans réécrire toute l'ACL). Commandes + vérification :</label>
+  <textarea class="rep rep-md" id="d1-correc" placeholder="Router# show access-lists INTER-SITES-SEC → noter le numéro de séquence de la règle deny ip 172.16.42.0 … any&#10;Router(config)# ip access-list extended INTER-SITES-SEC&#10;Router(config-ext-nacl)# no ___ (numéro de séquence, ex : 60)&#10;Vérification : show access-lists INTER-SITES-SEC (la règle doit avoir disparu)&#10;Test : PC-Compta Saignon → 172.16.10.50 TCP 445 = …"></textarea>
+</div>
+
+<h2>5.2 D2 — L'ACL n'est pas appliquée : le compteur reste à zéro</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 Symptôme : les clients WiFi de Saignon accèdent encore aux serveurs malgré une ACL correcte</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">Router# show access-lists INTER-SITES-SEC
+Extended IP access list INTER-SITES-SEC
+  10 deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255
+  20 deny ip 172.16.44.0 0.0.0.255 172.16.10.0 0.0.0.255  ← 0 matches malgré les tests
+  30 permit ip any any (12 matches)
+
+Router# show ip interface Serial0/0/1
+  Inbound  access list is not set      ← clé du problème !</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D2</div>
+  <label class="q">D2.1 — La dernière ligne de show ip interface vous donne la cause directe. Expliquez ce que cela signifie et pourquoi tous les matches tombent sur la règle permit any any :</label>
+  <textarea class="rep rep-sm" id="d2-cause" placeholder="'Inbound access list is not set' signifie que l'ACL INTER-SITES-SEC a été créée mais pas appliquée sur Serial0/0/1. Les paquets entrant depuis Saignon traversent l'interface sans être filtrés. Le permit any any obtient 12 matches car …"></textarea>
+  <label class="q">D2.2 — Correction + vérification :</label>
+  <textarea class="rep rep-md" id="d2-correc" placeholder="Router(config)# interface Serial0/0/1&#10;Router(config-if)# ip access-group INTER-SITES-SEC in&#10;&#10;Vérification : show ip interface Serial0/0/1 | include access&#10;Résultat attendu : Inbound access list is INTER-SITES-SEC&#10;Test : ping WiFi Saignon → 172.16.10.50 = …&#10;show access-lists INTER-SITES-SEC : la règle 20 doit maintenant avoir des matches"></textarea>
+</div>
+
+<h2>5.3 D3 — Interaction entre deux ACL : le flux légitime est bloqué deux fois</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 Symptôme : le Personnel de Saignon ne peut plus ping le Personnel de Roussillon (flux inter-sites légitime)</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">! Sur ROUTEUR-SAIGNON :
+ip access-list extended COMPTA-PROTECTION
+ deny tcp 172.16.41.0 0.0.0.255 any eq 22
+ deny ip 172.16.41.0 0.0.0.255 any   ← trop large ! bloque tout le Personnel
+ permit tcp 172.16.42.0 0.0.0.255 172.16.10.0 0.0.0.255 eq 445
+ permit ip any any</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D3</div>
+  <label class="q">D3.1 — Tracez le chemin de décision pour un paquet ICMP du Personnel Saignon (172.16.41.5) vers le Personnel Roussillon (172.16.21.5) :</label>
+  <textarea class="rep rep-md" id="d3-trace" placeholder="Paquet ICMP 172.16.41.5 → 172.16.21.5 entre en IN sur G0/0.41 :&#10;Règle 1 : deny tcp … eq 22 → correspond ? NON car ICMP ≠ TCP&#10;Règle 2 : deny ip 172.16.41.0 … any → correspond ? OUI car source 172.16.41.5 correspond&#10;Action : DENY → flux inter-sites bloqué, bien que légitime&#10;La règle permit ip any any (règle 4) n'est jamais évaluée car …"></textarea>
+  <label class="q">D3.2 — Corriger l'ACL : il faut bloquer SSH mais autoriser le reste du trafic du Personnel (y compris inter-sites). Réécrivez la partie Personnel :</label>
+  <textarea class="rep rep-md" id="d3-correc" placeholder="Correction : supprimer la règle 'deny ip 172.16.41.0 … any' et garder uniquement le deny SSH&#10;&#10;ACL corrigée :&#10; deny tcp 172.16.41.0 0.0.0.255 any eq 22   ! SSH bloqué&#10; permit tcp 172.16.42.0 … eq 445             ! Compta SMB&#10; permit udp 172.16.42.0 … host 172.16.10.10 eq 53  ! Compta DNS&#10; deny ip 172.16.42.0 0.0.0.255 any           ! Compta bloquée pour le reste&#10; permit ip any any                            ! tout le reste passe (Personnel inclus)&#10;&#10;Test après correction : ping Personnel Saignon → Personnel Roussillon = …"></textarea>
+</div>
+
+<h2>5.4 D4 — Wildcard trop large : blocage d'un VLAN légitime</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 Symptôme : la Direction de Roussillon (172.16.22.x) ne peut plus accéder aux serveurs Apt</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">ip access-list extended INTER-SITES-SEC
+ deny ip 172.16.20.0 0.0.7.255 172.16.10.0 0.0.0.255   ← wildcard suspect
+ permit ip any any</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D4</div>
+  <label class="q">D4.1 — Calculez la plage d'adresses couverte par 172.16.20.0 wildcard 0.0.7.255. Quels VLANs sont bloqués ?</label>
+  <textarea class="rep rep-md" id="d4-calcul" placeholder="Wildcard 0.0.7.255 signifie : les octets 1 et 2 doivent correspondre (172.16), l'octet 3 peut varier dans … (car 7 en binaire = …), l'octet 4 est libre (255).&#10;Plage de l'octet 3 : de … à … (172.16.20.x jusqu'à 172.16.27.x)&#10;VLANs inclus accidentellement : 172.16.21.0 (Personnel), 172.16.22.0 (Direction), 172.16.23.0 (Caméras), 172.16.24.0 (WiFi), 172.16.25.0 à 172.16.27.0&#10;L'intention était de bloquer uniquement … mais on bloque en réalité …"></textarea>
+  <label class="q">D4.2 — Correction pour ne bloquer que 172.16.24.0 (WiFi Roussillon) :</label>
+  <textarea class="rep rep-md" id="d4-correc" placeholder="Wildcard correct pour cibler uniquement 172.16.24.0/24 : 0.0.0.255&#10;Règle corrigée : deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255&#10;Test : ping Direction Roussillon → 172.16.10.50 = …&#10;Test : ping WiFi Roussillon → 172.16.10.50 = …"></textarea>
+</div>
+
+<h2>5.5 D5 — ACL sur ROUTEUR-APT appliquée en OUT au lieu de IN</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 Symptôme : INTER-SITES-SEC existe mais les WiFi de tous les sites accèdent encore aux serveurs</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">! ACL INTER-SITES-SEC correctement écrite MAIS :
+interface Serial0/0/0
+ ip access-group INTER-SITES-SEC out    ← OUT au lieu de IN
+
+! Résultat show ip interface Serial0/0/0 :
+Inbound  access list is not set
+Outbound access list is INTER-SITES-SEC</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D5</div>
+  <label class="q">D5.1 — Expliquez pourquoi l'application OUT sur Serial0/0/0 (côté ROUTEUR-APT) ne bloque pas le WiFi de Roussillon :</label>
+  <textarea class="rep rep-md" id="d5-analyse" placeholder="Le trafic WiFi Roussillon → serveurs Apt circule ainsi :&#10;PC-WiFi → ROUTEUR-ROUSSILLON → [Serial0/0/0 côté Rous.] → WAN → [Serial0/0/0 côté APT] → ROUTEUR-APT → serveurs&#10;&#10;L'ACL OUT sur Serial0/0/0 de ROUTEUR-APT filtre les paquets qui SORTENT vers Roussillon (sens APT → Roussillon).&#10;Les paquets WiFi → serveurs entrent par Serial0/0/0 (sens IN) et ne sont jamais évalués par cette ACL OUT.&#10;&#10;Sur quelle interface et dans quel sens doit-elle être appliquée : …"></textarea>
+  <label class="q">D5.2 — Correction + vérification :</label>
+  <textarea class="rep rep-md" id="d5-correc" placeholder="Router(config)# interface Serial0/0/0&#10;Router(config-if)# no ip access-group INTER-SITES-SEC out&#10;Router(config-if)# ip access-group INTER-SITES-SEC in&#10;&#10;Vérification : show ip interface Serial0/0/0 | include access&#10;Inbound access list is : …&#10;Test : ping WiFi Roussillon → 172.16.10.50 = …"></textarea>
+</div>
+
+<h2>5.6 D6 — Suppression accidentelle d'une interface ACL (no ip access-group)</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 Symptôme : après une mise à jour du routeur, les WiFi de Cucuron accèdent à nouveau aux réseaux privés locaux</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">! show ip interface G0/0.64 :
+Inbound  access list is not set    ← CUCURON-WIFI-ISO a disparu !
+Outbound access list is not set
+
+! L'ACL existe toujours dans la config :
+Router# show access-lists CUCURON-WIFI-ISO
+Extended IP access list CUCURON-WIFI-ISO
+  10 deny ip 172.16.64.0 0.0.0.255 172.16.0.0 0.0.255.255
+  20 deny ip 172.16.64.0 0.0.0.255 10.0.0.0 0.255.255.255
+  30 permit ip 172.16.64.0 0.0.0.255 any</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D6</div>
+  <label class="q">D6.1 — Expliquez la différence entre « l'ACL est supprimée » et « l'ACL n'est plus appliquée sur l'interface ». Laquelle est la situation ici ?</label>
+  <textarea class="rep rep-sm" id="d6-diff" placeholder="show access-lists montre que l'ACL CUCURON-WIFI-ISO existe encore avec ses 3 règles → elle n'a PAS été supprimée.&#10;show ip interface G0/0.64 montre 'Inbound access list is not set' → le lien entre l'interface et l'ACL a été rompu (commande 'no ip access-group' exécutée sur l'interface, probablement accidentellement).&#10;L'ACL existe mais … ne filtre aucun trafic tant qu'elle n'est pas … à une interface."></textarea>
+  <label class="q">D6.2 — Ré-appliquez l'ACL et vérifiez :</label>
+  <textarea class="rep rep-md" id="d6-correc" placeholder="Router(config)# interface GigabitEthernet0/0.64&#10;Router(config-subif)# ip access-group CUCURON-WIFI-ISO in&#10;Vérification : show ip interface G0/0.64 | include access&#10;Résultat attendu : Inbound access list is CUCURON-WIFI-ISO&#10;Test T12 : WiFi Cucuron → 172.16.61.x = …  (doit redevenir Échec)"></textarea>
+</div>
+
+<h2>5.7 D7 — Conflit entre INTER-SITES-SEC et trafic retour : connexion TCP asymétrique</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 Symptôme : le SYN de Comptabilité Saignon → serveur TCP 445 passe, mais la session TCP ne s'établit jamais</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">! Observé en mode Simulation Packet Tracer :
+! SYN (172.16.42.x → 172.16.10.50 TCP 445) : FORWARDED sur ROUTEUR-APT Serial0/0/1
+! SYN-ACK retour (172.16.10.50 → 172.16.42.x) : DROPPED sur ROUTEUR-APT Serial0/0/1</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D7</div>
+  <label class="q">D7.1 — Activez le mode Simulation dans Packet Tracer et reproduisez ce comportement. Expliquez pourquoi le paquet SYN-ACK retour est bloqué par INTER-SITES-SEC :</label>
+  <textarea class="rep rep-md" id="d7-sim" placeholder="Mode Simulation : PDU Complex TCP depuis PC-Compta Saignon vers 172.16.10.50 port 445&#10;Observation :&#10;- SYN (source 172.16.42.x dest 172.16.10.50) : évalué par INTER-SITES-SEC en IN sur Serial0/0/1 → règle R6 permit tcp 172.16.42.0 … eq 445 → PERMIT&#10;- SYN-ACK retour (source 172.16.10.50 dest 172.16.42.x) : sort du serveur, entre en IN sur Serial0/0/1 (arrivant d'Apt ?) ou sort par …&#10;Attente : le SYN-ACK vient des serveurs, sort par l'interface LAN d'APT vers le WAN → règle évaluée sur le WAN en IN depuis Saignon → source = 172.16.10.50 → quelle règle correspond ?&#10;Résultat et cause du blocage : …"></textarea>
+  <label class="q">D7.2 — Pour corriger ce problème de trafic retour, ajoutez une règle permit pour le trafic établi/réponse. Commandes et vérification :</label>
+  <textarea class="rep rep-md" id="d7-correc" placeholder="Règle à ajouter (trafic retour depuis serveurs Apt vers Comptabilité) :&#10;permit tcp 172.16.10.0 0.0.0.255 172.16.42.0 0.0.0.255 established&#10;(ou : permit tcp host 172.16.10.50 172.16.42.0 0.0.0.255)&#10;&#10;Position dans l'ACL : avant les deny ? Après les deny ? Justification : …&#10;&#10;Vérification en mode Simulation : la session TCP s'établit maintenant car …&#10;Test fonctionnel : PC-Compta → partage SMB = …"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════ PARTIE 6 ═══════ -->
+<h1>6. Vérifications finales et dossier</h1>
+
+<div class="ex">
+  <div class="ex-t">📝 Vérifications globales</div>
+  <label class="q">Résultat de <code>show running-config | section access-list</code> sur ROUTEUR-APT :</label>
+  <textarea class="rep rep-xl" id="run-apt" placeholder="ip access-list extended INTER-SITES-SEC&#10; deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255&#10; …&#10; permit ip any any"></textarea>
+  <label class="q">Résultat de <code>show ip interface</code> sur les 3 interfaces WAN de ROUTEUR-APT (ligne « Inbound access list ») :</label>
+  <textarea class="rep rep-md" id="intf-apt" placeholder="Serial0/0/0 : Inbound access list is INTER-SITES-SEC&#10;Serial0/0/1 : Inbound access list is INTER-SITES-SEC&#10;Serial0/1/0 : Inbound access list is INTER-SITES-SEC"></textarea>
+</div>
+
+<div class="ex">
+  <div class="ex-t">📋 Section 10 finale — Politique de sécurité complète 4 sites</div>
+  <label class="q">Rédigez la section 10 consolidée (A1 + A2) : contexte, inventaire ACL par routeur, tableau de placement, résultats recette 24 tests, non-conformités corrigées, recommandations :</label>
+  <textarea class="rep rep-xxl" id="dossier" placeholder="Section 10 — Politique de sécurité réseau — Provence Évasion (4 sites)&#10;&#10;10.1 Contexte&#10;Suite à l'incident de Cucuron (client WiFi accédant aux serveurs internes via le WAN), Axentis déploie ce jour une politique de sécurité étendue aux 4 sites.&#10;&#10;10.2 Inventaire des ACL déployées&#10;ROUTEUR-ROUSSILLON :&#10;  WIFI-RESTRICTION (G0/0.24 IN) — …&#10;  CAMERAS-ISOLATION (G0/0.23 IN) — …&#10;  PERSONNEL-RESTRICTIONS (G0/0.21 IN) — …&#10;&#10;ROUTEUR-SAIGNON :&#10;  COMPTA-PROTECTION (G0/0.41+42 IN) — …&#10;&#10;ROUTEUR-CUCURON :&#10;  CUCURON-WIFI-ISO (G0/0.64 IN) — …&#10;&#10;ROUTEUR-APT :&#10;  INTER-SITES-SEC (Serial0/0/0, Serial0/0/1, Serial0/1/0 IN) — …&#10;&#10;10.3 Tableau de placement&#10;Interface | ACL | Sens | Effet attendu&#10;…&#10;&#10;10.4 Résultats plan de recette&#10;Date : … — 24/24 conformes (ou X non-conformités corrigées)&#10;…&#10;&#10;10.5 Recommandations d'évolution&#10;…"></textarea>
+</div>
+
+<div class="ex">
+  <div class="ex-t">📸 Captures Packet Tracer</div>
+  <label class="q">Capture 1 — Topologie 4 sites avec toutes les ACL actives :</label>
+  <div class="uz" onclick="document.getElementById('img1').click()">
+    <input type="file" id="img1" accept="image/*" onchange="compImg(this.files[0],'pv1','ph1',b=>imgD.c1=b)">
+    <div class="uz-t">📎 Topologie 4 sites + ACL</div>
+    <div class="uz-h" id="ph1">JPG / PNG</div>
+    <img id="pv1" style="display:none;max-width:100%;margin-top:10px;">
+  </div>
+  <label class="q">Capture 2 — show access-lists INTER-SITES-SEC (avec compteurs après les 24 tests) :</label>
+  <div class="uz" onclick="document.getElementById('img2').click()">
+    <input type="file" id="img2" accept="image/*" onchange="compImg(this.files[0],'pv2','ph2',b=>imgD.c2=b)">
+    <div class="uz-t">📎 show access-lists INTER-SITES-SEC</div>
+    <div class="uz-h" id="ph2">JPG / PNG</div>
+    <img id="pv2" style="display:none;max-width:100%;margin-top:10px;">
+  </div>
+  <label class="q">Capture 3 — Mode Simulation PT, paquet WiFi Cucuron bloqué en IN sur ROUTEUR-APT :</label>
+  <div class="uz" onclick="document.getElementById('img3').click()">
+    <input type="file" id="img3" accept="image/*" onchange="compImg(this.files[0],'pv3','ph3',b=>imgD.c3=b)">
+    <div class="uz-t">📎 Mode Simulation — paquet bloqué</div>
+    <div class="uz-h" id="ph3">JPG / PNG</div>
+    <img id="pv3" style="display:none;max-width:100%;margin-top:10px;">
+  </div>
+</div>
+
+<hr class="sep">
+<div class="ssyn">Auto-évaluation — Atelier 2 S9</div>
+<div style="margin:18px 0 10px;">
+  <div style="font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;">📊 Évaluez votre maîtrise</div>
+  <div class="ae-row ae-hdr"><span>Critère</span><span style="text-align:center">★★★ Maîtrisé</span><span style="text-align:center">★★☆ En cours</span><span style="text-align:center">★☆☆ À revoir</span><span style="text-align:center">? Non traité</span></div>
+  <div id="aec"></div>
+</div>
+
+</div>
+
+<div class="footer">
+  <span><strong style="color:var(--orange);">S9</strong> — Atelier 2 : ACL 4 sites + débogage avancé</span>
+  <span>Lycée Louis Lumière – Chelles | Bac Pro CIEL</span>
+</div>
+<div class="sbar">
+  <div style="font-size:11px;color:#666;">Remplissez tous les champs avant de générer.</div>
+  <button class="btn" onclick="dl()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé !</div>
+
+<script>
+document.getElementById('dat').valueAsDate=new Date();
+const imgD={c1:null,c2:null,c3:null};
+function compImg(file,pvId,phId,cb){const r=new FileReader();r.onload=ev=>{const i=new Image();i.onload=()=>{const M=900;let w=i.width,h=i.height;if(w>M||h>M){if(w>h){h=Math.round(h*M/w);w=M;}else{w=Math.round(w*M/h);h=M;}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);const b=c.toDataURL('image/jpeg',0.72);document.getElementById(pvId).src=b;document.getElementById(pvId).style.display='block';document.getElementById(phId).textContent=`${w}×${h}px`;cb(b);};i.src=ev.target.result;};r.readAsDataURL(file);}
+const crit=['J\'ai complété le tableau d\'analyse inter-sites (7 flux) et comparé les 2 approches','J\'ai calculé correctement tous les wildcards avant de coder','J\'ai créé INTER-SITES-SEC avec les 7 règles dans le bon ordre','J\'ai appliqué INTER-SITES-SEC sur les 3 interfaces WAN de ROUTEUR-APT','J\'ai créé COMPTA-PROTECTION sur ROUTEUR-SAIGNON','J\'ai créé CUCURON-WIFI-ISO avec le wildcard 0.0.255.255 et justifié son étendue','J\'ai réalisé le plan de recette complet (24 tests) avec résultats PT','J\'ai diagnostiqué et corrigé les 7 scénarios de débogage avancés','J\'ai utilisé le mode Simulation PT pour analyser un blocage de paquet (D7)','J\'ai rédigé la section 10 finale consolidée (A1+A2) du dossier'];
+const niv=[{l:'★★★ Maîtrisé',v:'maitrise'},{l:'★★☆ En cours',v:'en_cours'},{l:'★☆☆ À revoir',v:'a_revoir'},{l:'? Non traité',v:'non_traite'}];
+const ae={};const cont=document.getElementById('aec');
+crit.forEach((c,i)=>{ae['c'+(i+1)]={critere:c,niveau:'non_traite'};const row=document.createElement('div');row.className='ae-row';let h=`<span>${c}</span>`;niv.forEach(n=>{const id=`ae${i}-${n.v}`;h+=`<span style="text-align:center"><input type="radio" name="ae${i}" id="${id}" value="${n.v}" onchange="ae['c${i+1}'].niveau=this.value" style="display:none"><label for="${id}" style="cursor:pointer;font-size:11px;padding:3px 6px;border-radius:4px;border:1px solid #ddd;display:inline-block">${n.l}</label></span>`;});row.innerHTML=h;cont.appendChild(row);document.querySelectorAll(`input[name="ae${i}"]`).forEach(radio=>{radio.addEventListener('change',()=>{document.querySelectorAll(`input[name="ae${i}"]`).forEach(r2=>{const lb=document.querySelector(`label[for="${r2.id}"]`);lb.style.background=r2.checked?'var(--ciel)':'';lb.style.color=r2.checked?'#fff':'';lb.style.borderColor=r2.checked?'var(--bleu)':'#ddd';});});});});
+const g=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+const s=id=>{const e=document.getElementById(id);return e?e.value:'';};
+const tr=n=>({res:g(n),ok:s(n+'c'),acl:g(n+'a')});
+function dl(){
+  const data={
+    meta:{devoir:'S9 — Atelier 2 ACL 4 sites + débogage avancé',eleve:{nom:g('nom'),prenom:g('prenom'),classe:g('classe')},date:g('dat'),genere_le:new Date().toISOString()},
+    p1:{wildcards:{v21:g('wc21'),v22:g('wc22'),v23:g('wc23'),v24:g('wc24'),v41:g('wc41'),v42:g('wc42'),v43:g('wc43'),v44:g('wc44'),v61:g('wc61'),v62:g('wc62'),v63:g('wc63'),v64:g('wc64'),v10:g('wc10')},flux:{is1:{d:s('is1d'),r:document.getElementById('is1r')?.value.trim(),j:document.getElementById('is1j')?.value.trim()},is2:{d:s('is2d')},is3:{d:s('is3d')},is4:{d:s('is4d')},is5:{d:s('is5d')},is6:{d:s('is6d')},is7:{d:s('is7d')}},q11:g('q11'),q12:g('q12'),q13:g('q13')},
+    p2:{pings:{pi1:g('pi1'),pi2:g('pi2'),pi3:g('pi3'),pi4:g('pi4'),pi5:g('pi5')},route_apt:g('route-apt'),papier:g('is-papier'),saisie:g('is-saisie'),show:g('is-show'),intf:g('is-intf'),q21:g('q21'),q22:g('q22')},
+    p3:{compta:{saisie:g('compta-saisie'),q31:g('q31')},cucuron:{saisie:g('cucuron-saisie'),q32:g('q32')}},
+    p4:{tests:{t01:tr('t01'),t02:tr('t02'),t03:tr('t03'),t04:tr('t04'),t05:tr('t05'),t06:tr('t06'),t07:tr('t07'),t08:tr('t08'),t09:tr('t09'),t10:tr('t10'),t11:tr('t11'),t12:tr('t12'),t13:tr('t13'),t14:tr('t14'),t15:tr('t15'),t16:tr('t16'),t17:tr('t17'),t18:tr('t18'),t19:tr('t19'),t20:tr('t20'),t21:tr('t21'),t22:tr('t22'),t23:tr('t23'),t24:tr('t24')},bilan:g('recette-bilan'),show_is:g('show-is')},
+    p5:{d1:{trace:g('d1-trace'),correc:g('d1-correc')},d2:{cause:g('d2-cause'),correc:g('d2-correc')},d3:{trace:g('d3-trace'),correc:g('d3-correc')},d4:{calcul:g('d4-calcul'),correc:g('d4-correc')},d5:{analyse:g('d5-analyse'),correc:g('d5-correc')},d6:{diff:g('d6-diff'),correc:g('d6-correc')},d7:{sim:g('d7-sim'),correc:g('d7-correc')}},
+    p6:{run_apt:g('run-apt'),intf_apt:g('intf-apt'),dossier:g('dossier'),captures:{c1:imgD.c1?'présente':'absente',c2:imgD.c2?'présente':'absente',c3:imgD.c3?'présente':'absente'}},
+    auto_eval:ae
+  };
+  const fn=(g('nom')+g('prenom')).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${fn}_S9Atelier2.json`;a.click();
+  const t=document.getElementById('toast');t.style.display='block';setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S9 — Cours : Sécurité réseau — ACL et contrôle d'accès</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:120px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.0;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.cli .cm-prompt{color:#FF5722;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+/* Blocs spécifiques ACL */
+.acl-box{background:#fff8f0;border:2px solid var(--orange);border-radius:8px;padding:12px 16px;margin:12px 0 16px;font-size:12px;line-height:1.75;}
+.acl-box .acl-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);font-size:13px;margin-bottom:6px;}
+.acl-standard{border-color:#e67e22;}
+.acl-etendue{border-color:var(--orange);}
+.wildcard-box{background:#f0f4ff;border:2px solid var(--bleu);border-radius:8px;padding:12px 16px;margin:12px 0 16px;font-size:12px;line-height:1.75;}
+.wildcard-box .wc-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);font-size:13px;margin-bottom:6px;}
+.regle-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.regle-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);text-align:left;}
+.regle-table td{border:1px solid #c0d0e0;padding:7px 10px;vertical-align:top;}
+.regle-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.regle-table .td-permit{color:#2e7d32;font-weight:700;}
+.regle-table .td-deny{color:#c62828;font-weight:700;}
+.regle-table .td-code{font-family:'Courier New',monospace;color:var(--marine);font-size:11px;}
+.strategie-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 16px;}
+.strat-card{border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.75;}
+.strat-card.permit-all{background:#f0f9ff;border:2px solid var(--bleu);}
+.strat-card.deny-all{background:#fff8f0;border:2px solid var(--orange);}
+.strat-card .sc-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;margin-bottom:8px;}
+.strat-card.permit-all .sc-titre{color:var(--bleu);}
+.strat-card.deny-all .sc-titre{color:var(--orange);}
+.badge-permit{background:#e8f5e9;color:#2e7d32;border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;margin:1px 2px;}
+.badge-deny{background:#fce4ec;color:#c62828;border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;margin:1px 2px;}
+.badge-acl{display:inline-block;background:var(--marine);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:1px 2px;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQIAHAAcAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCABEAJYDAREAAhEBAxEB/8QAHAAAAQUBAQEAAAAAAAAAAAAABgABAwQFAgcI/8QAGgEAAgMBAQAAAAAAAAAAAAAAAAUBAgMEBv/aAAwDAQACEAMQAAAB+qQQIECBAgQIECBAgQIECBAgYjB7uHB7eCntjvcPeRcDCO1Rlits56EPAxxOzh7i4i1UsBUraKaka9j3FkFbTLy30nlyLgY1tcqG3OSrmeD3cBondV9M7uOwe2Ty11ob4FiproYdAU4RnyN/NW6CO1fOX/nNfl7Mzo5WmNrj7srp5PQkXoUFPXEKcJZa6ADxFdx39Z8v6kQapj5G/mrdAg8+e+ft5bSVnD7eE+RvwR2iN0zuvfO1nqINU81daWuReqbXMtQhwjLVbeWl9HDdyc7fmFmayWltbm69/h787fnGGSyznoSLmWJ28MlbhzZQiSZcylqUdsESZqHHcWz5iQgY1yI8tq4VZi/E9h0EYQEMFokStTbi00GTaDCl+gBb0gmGDuDKtEwb9bVSLBOHMOGHapnS4nem5WzhhTX2DLZwpEdBXkngcOJJoOAYIJL0SgYjOkvwdBnSa0T/AP/EACcQAAICAQMDBAIDAAAAAAAAAAMEAgUBAAY0ERITEBQVFiEzIjZA/9oACAEBAAEFAv8AHnPbg1yEei2rB9CsGA5DeY0BkbOGmxqRnez6gvMZyQ3aulayaYubOVWH7eXX28uqW2laxctpLMQl3w9GeNqtl3CND3zh15ryovxAs5vtgrABixUBLk44hQp+du7h7crVnFPgUNKogS1bc8P6fQke4aq8TaVXwFtCfad8ncasj0r6nnejnEp+du7iKjcnDwWmqrBI19tzw/p9WvJXu+T30f4mK3+W01/ApOM0GwWIDQZtgh0YsToU/O3dw9tPrqqfMpaXdA3m254rBfAvkVtYz1xp1OLgkl5ruB/UvW9G9NojcjKjNjIKPPWYMe2RqpqsXVZO0D9RPr6ifVJTEq5u1M2Wfgi6+CLqGO2GiPCE42wFRdK9r8ki8KbpLUAisXqq66FgKyEw8JUzrg69V2wEgke3WXesLhasnh4WXvso5tu3q6GkLlaxnDdSpcYz3Y1ZmGDc25DiMDc7yrlRE8Ud0lLFtjC4C19BZHdluAkRWe4CwfoNw2Kzu2bmujZX7qDUgD/uFGRiK15I2b+k8zt3twp4I4z19GEl29BUAtBesUUIymB2A1AiAZFZgIFxKjYUC3hdICmhVaYT+KGSkFA2PDDy5qEZZ9uLu8I/L8OjnWMdMf/EAC4RAAEDAgMFCAIDAAAAAAAAAAEAAgMEERIhMRAyM0FSBRMUFSBCUXEiI0BhYv/aAAgBAwEBPwH+Hon1kbdM06rlfk1MqJWc0yuHvCZI2QXaVLK2IXcjXnkEyuB3wnPswvChqjK/DZVdSaZgcBdebu6F5s7oVHVGqBJFrKarMT8NkDcX2ybh2Uxu0sabFPb38p7tSRujNnKh0cnF1RKmU0bBopKRj9Mk9oZCWj4VHxV2twm/a7Op4pYiXtvmvBU/Qo4Y4dwWVXximbo2uFwQoow+5doFGGSjDoQqd1n4DzVQ67sI0CpR+lxVJxRtm4blR8VdrcJv2oW1BH6r2/pd3W/6VNiETceqq+MUzdHolxU8pwrF34xt3wsnujl5lTcV32oY8EYanB1PL9JlRG8Xu2nP7R2bulkuZKhhe71r/AFLVAmneCKbRFTBIp6QKoiKiDIaEta9JaovWa+yJavSLkzer7OoWjj8wtp6pGLuhrK0fRgUF3/UtMFkCiesy9n8zJMbIaRnTf9wD6NPiOn3mQtaHiV+BKiaHMrerQ8dRTSKusUKWCVjFVtghsYqtsFNIq6xQpemkv0nJLl+k5On/xAAoEAEAAgEDAgYCAwEAAAAAAAABABEhMUFREGFxgZGhwfCx0SDh8UD/2gAIAQEAAT8Q/wCMJ6SVANVlYhxY918EztV5tPfV6VFTfLUsfPJ5S9Z3Wnqz7sqJDUEs0scmkHqeceGcd2MOG3p6VNLtrwPFZ9I/DhGhSZiB3D1KLiKNJ4CzePCfRPifYPiKKyDYGq4FA1Fi2H5jIgmQ2svqaJq/n9GOh78EzbatZj8A1oALwLML72JN1vCX0yXgBMyo2pcW4PAMvnK3Z1guw4CUqI0HcY2fCDKJjxZ8Z9RynvEGu5HEtVhN16MH5gizUrVeWezg++4dWFy+riSsFfuyUAP5mA+WQKKQ3lWzRxsYI7IysnIUkS0u7CyQe8/tZtm9Rzf++v1/Kfccp75A3zoiYzW1XVT778wgaKEuZ3Zvxns4PvuH8FtipQqXYcNOPKKtANZsDt3O8qONtGjDlhkIMDVbwsuUjzB715REBsJptvgkfdNjWeeviSjxhuQy7L7Qjr8TUyseEg+xunvEErnsZpX6j0eUXgMY6XPZwKitC4QXtP8AUf1GFpiG49L0l2nq4ezAFit2dy3IfpbIRVNQQtJ3uDoTKSvQDydozNrKvpT+YZ1DbbfZbT0hcQYNQS31iAhhWbK3I5qgKEsUUd592+J92+IRPWIUlzZ3hZ6qVigbHaf5X6z/ADv1jpBQpo0V0PAXYvOuzR4x0uk6A4o3VugMt1LREIzXTVewUXaM3IlBYDc3g7QtMQRBJW6sRxHkSghNxLgFWguOUkJaCliNI8Zg+1VgixbYOZaPF8rBgNdYkb4xmIO4iv0rYL7IqwOsTaEJVC0NAgrjJLOt2qpLsujiFfi7bE0kRWO1VkqePYRCoBsTGeI7Eb1mioVOLLJdRJ4gAwaRMO0IUBAaFl5NnoBrKM1xLAuVLhMOABtqRxmZL91IDlBFYADKIkt7RbRSjWtMrp1cW2YQsrS4oHg0AcwWyx4lR+ieDeQ0gNWkb56IOrKQMwOqFsDsblKOaj12WGrjaIK7MVmMoDWZduyB4lm8A3zqAnBRR4RjToGXCXuXFa5Gy94ml9Y9XIeRXaAMiQMlMoWqgKRLmTIh5ZEjUjoprAbGFFicnQS3IxF1CjV0ekUxdvqqsAOMZl0asumtgMPllBq8gHMbtCO4UhKpNcZhjHOQKBCgArE9jM2IARK6Ak3VANM2Lo0MusBdW68sRKCuJdWto4CqxcbTqBc1BTcMKrAdEcjtAeTlFRserLNaRsvH5S2q6mAATCWMElYIBRsQTgcmaXetts1H7FagrzBSCgFAGgT/2Q==" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S9 – Cours : Sécurité réseau — ACL et contrôle d'accès</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 2h30 &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Pourquoi sécuriser un réseau segmenté ?</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Mise en situation :</strong> Provence Évasion dispose désormais de son réseau complet — 4 sites interconnectés, VLANs opérationnels, DHCP, DNS et partages réseau en service. Laurent Ferracci, PDG, soulève une inquiétude légitime : <em>« Maintenant que tout est connecté, qui peut accéder à quoi ? Un client WiFi de l'hôtel de Roussillon peut-il atteindre les données comptables du siège d'Apt ? »</em><br>
+  Votre rôle chez Axentis Informatique : définir et implémenter la politique de sécurité réseau via des <strong>listes de contrôle d'accès (ACL)</strong>.
+</div>
+
+<p>Les VLANs séparent logiquement les équipements sur le même switch. Mais dès qu'il y a du routage inter-VLAN ou inter-sites, tous les flux sont théoriquement possibles. Sans contrôle, un client WiFi peut potentiellement atteindre le serveur comptable. Les <strong>ACL</strong> (Access Control Lists) sont la réponse à ce problème : elles filtrent les paquets IP en entrée ou en sortie d'une interface de routeur.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Définition ACL</div>
+  Une ACL est une liste ordonnée de règles (permit / deny) appliquée sur une interface de routeur. Chaque règle examine les paquets IP et décide de les <span class="badge-permit">autoriser</span> ou de les <span class="badge-deny">bloquer</span>. Le routeur parcourt les règles dans l'ordre et s'arrête à la première qui correspond (<strong>first match</strong>). Toute ACL Cisco se termine implicitement par un <strong>deny any</strong> (tout ce qui n'est pas autorisé explicitement est bloqué).
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. ACL standard vs ACL étendue</h1>
+
+<p>Cisco distingue deux grandes familles d'ACL :</p>
+
+<div class="strategie-grid">
+  <div class="strat-card permit-all">
+    <div class="sc-titre">🔵 ACL standard (1–99 ou 1300–1999)</div>
+    <ul>
+      <li>Filtre uniquement sur <strong>l'adresse IP source</strong></li>
+      <li>Syntaxe simple, peu de contrôle</li>
+      <li>À placer <strong>au plus près de la destination</strong></li>
+      <li>Usage : bloquer un hôte ou un réseau entier</li>
+    </ul>
+  </div>
+  <div class="strat-card deny-all">
+    <div class="sc-titre">🟠 ACL étendue (100–199 ou 2000–2699)</div>
+    <ul>
+      <li>Filtre sur <strong>IP source, IP destination, protocole, port</strong></li>
+      <li>Beaucoup plus précise et flexible</li>
+      <li>À placer <strong>au plus près de la source</strong></li>
+      <li>Usage : politique de sécurité fine (HTTP, DNS, Telnet…)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="attention">
+  <strong>⚠️ Règle de placement :</strong> Une ACL standard ne connaît pas la destination → placez-la près de la destination pour éviter de bloquer des flux légitimes. Une ACL étendue connaît tout → placez-la près de la source pour économiser de la bande passante.
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Le wildcard mask — masque inversé</h1>
+
+<p>Les ACL Cisco utilisent un <strong>wildcard mask</strong> (masque générique), différent du masque de sous-réseau. Il s'obtient en inversant bit à bit le masque habituel :</p>
+
+<div class="wildcard-box">
+  <div class="wc-titre">📐 Calcul du wildcard mask</div>
+  <p><strong>Règle :</strong> wildcard = 255.255.255.255 − masque de sous-réseau</p>
+  <table class="data-table">
+    <tr>
+      <th>Réseau / hôte</th><th>Masque</th><th>Wildcard</th><th>Signification</th>
+    </tr>
+    <tr><td class="left">Un hôte précis</td><td class="center">255.255.255.255</td><td class="center">0.0.0.0</td><td class="left">Correspond exactement à cet hôte</td></tr>
+    <tr><td class="left">192.168.10.0/24</td><td class="center">255.255.255.0</td><td class="center">0.0.0.255</td><td class="left">Tous les hôtes du /24</td></tr>
+    <tr><td class="left">10.0.0.0/8</td><td class="center">255.0.0.0</td><td class="center">0.255.255.255</td><td class="left">Toutes les adresses 10.x.x.x</td></tr>
+    <tr><td class="left">N'importe quelle adresse</td><td class="center">—</td><td class="center">255.255.255.255</td><td class="left">Équivaut au mot-clé <code>any</code></td></tr>
+    <tr><td class="left">Un hôte précis</td><td class="center">—</td><td class="center">0.0.0.0</td><td class="left">Équivaut au mot-clé <code>host</code></td></tr>
+  </table>
+</div>
+
+<h2>3.1 Application au plan d'adressage Provence Évasion</h2>
+
+<p>Rappel des sous-réseaux utilisés par Provence Évasion (site de Roussillon) :</p>
+
+<table class="data-table">
+  <tr><th>VLAN</th><th>Réseau</th><th>Masque</th><th>Wildcard</th><th>Usage</th></tr>
+  <tr><td class="center">VLAN 21</td><td class="center">172.16.21.0/24</td><td class="center">255.255.255.0</td><td class="center">0.0.0.255</td><td class="left">Personnel hôtel</td></tr>
+  <tr><td class="center">VLAN 22</td><td class="center">172.16.22.0/24</td><td class="center">255.255.255.0</td><td class="center">0.0.0.255</td><td class="left">Direction</td></tr>
+  <tr><td class="center">VLAN 23</td><td class="center">172.16.23.0/24</td><td class="center">255.255.255.0</td><td class="center">0.0.0.255</td><td class="left">Caméras IP</td></tr>
+  <tr><td class="center">VLAN 24</td><td class="center">172.16.24.0/24</td><td class="center">255.255.255.0</td><td class="center">0.0.0.255</td><td class="left">WiFi clients</td></tr>
+  <tr><td class="center">VLAN 10</td><td class="center">172.16.10.0/24</td><td class="center">255.255.255.0</td><td class="center">0.0.0.255</td><td class="left">Serveurs siège Apt</td></tr>
+</table>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Syntaxe des ACL Cisco IOS</h1>
+
+<h2>4.1 ACL standard nommée</h2>
+
+<div class="cli"><span class="cm-titre">! Créer une ACL standard nommée</span>
+<span class="cm-prompt">Router(config)#</span> ip access-list standard <span class="cm-val">NOM-ACL</span>
+<span class="cm-prompt">Router(config-std-nacl)#</span> <span class="cm-val">permit</span> 172.16.22.0 0.0.0.255   <span class="cm-com">! autoriser VLAN Direction</span>
+<span class="cm-prompt">Router(config-std-nacl)#</span> <span class="cm-val">deny</span>   172.16.24.0 0.0.0.255   <span class="cm-com">! bloquer VLAN WiFi clients</span>
+<span class="cm-prompt">Router(config-std-nacl)#</span> <span class="cm-val">permit</span> any                   <span class="cm-com">! autoriser le reste</span>
+
+<span class="cm-titre">! Appliquer sur une interface (sens IN = paquets entrant dans le routeur)</span>
+<span class="cm-prompt">Router(config)#</span> interface GigabitEthernet0/0.24
+<span class="cm-prompt">Router(config-subif)#</span> ip access-group <span class="cm-val">NOM-ACL</span> in</div>
+
+<h2>4.2 ACL étendue nommée</h2>
+
+<div class="cli"><span class="cm-titre">! Créer une ACL étendue nommée</span>
+<span class="cm-prompt">Router(config)#</span> ip access-list extended <span class="cm-val">NOM-ACL-EXT</span>
+<span class="cm-prompt">Router(config-ext-nacl)#</span> <span class="cm-val">deny</span> ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255
+                                                <span class="cm-com">! bloquer WiFi → serveurs</span>
+<span class="cm-prompt">Router(config-ext-nacl)#</span> <span class="cm-val">deny</span> ip 172.16.23.0 0.0.0.255 any
+                                                <span class="cm-com">! isoler caméras</span>
+<span class="cm-prompt">Router(config-ext-nacl)#</span> <span class="cm-val">permit</span> ip any any
+                                                <span class="cm-com">! autoriser tout le reste</span>
+
+<span class="cm-titre">! Appliquer sur l'interface source (sous-interface VLAN 24)</span>
+<span class="cm-prompt">Router(config)#</span> interface GigabitEthernet0/0.24
+<span class="cm-prompt">Router(config-subif)#</span> ip access-group <span class="cm-val">NOM-ACL-EXT</span> in</div>
+
+<h2>4.3 Vérification des ACL</h2>
+
+<div class="cli"><span class="cm-prompt">Router#</span> show access-lists                  <span class="cm-com">! liste toutes les ACL et compteurs</span>
+<span class="cm-prompt">Router#</span> show ip interface GigabitEthernet0/0.24  <span class="cm-com">! ACL appliquée ?</span>
+<span class="cm-prompt">Router#</span> show running-config | include access   <span class="cm-com">! config ACL dans la running</span></div>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Sens d'application (IN / OUT)</div>
+  <ul>
+    <li><strong>IN</strong> : le paquet est filtré <em>avant</em> d'entrer dans le routeur (il vient du réseau attaché à l'interface).</li>
+    <li><strong>OUT</strong> : le paquet est filtré <em>après</em> que le routeur l'ait routé, avant qu'il ressorte par l'interface.</li>
+    <li>Dans 90 % des cas, on applique les ACL en <strong>IN</strong> sur l'interface de la source → économie de ressources CPU.</li>
+  </ul>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. Ordre des règles et logique permit/deny</h1>
+
+<p>L'ordre des règles dans une ACL est <strong>critique</strong>. Le routeur teste chaque règle dans l'ordre, de la première à la dernière. Dès qu'une règle correspond, elle est appliquée et les règles suivantes sont ignorées.</p>
+
+<table class="regle-table">
+  <tr><th>#</th><th>Règle</th><th>Action</th><th>Commentaire</th></tr>
+  <tr><td class="center">1</td><td class="td-code">deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255</td><td class="td-deny">DENY</td><td>WiFi → Serveurs : bloqué</td></tr>
+  <tr><td class="center">2</td><td class="td-code">deny ip 172.16.23.0 0.0.0.255 any</td><td class="td-deny">DENY</td><td>Caméras → partout : isolées</td></tr>
+  <tr><td class="center">3</td><td class="td-code">permit ip any any</td><td class="td-permit">PERMIT</td><td>Tout le reste : autorisé</td></tr>
+  <tr><td class="center">—</td><td class="td-code">(implicit deny any any)</td><td class="td-deny">DENY</td><td>Ajouté automatiquement</td></tr>
+</table>
+
+<div class="attention">
+  <strong>⚠️ Piège classique :</strong> si vous mettez <code>permit ip any any</code> en premier, toutes les règles <code>deny</code> suivantes ne seront jamais évaluées. Placez toujours les règles les plus spécifiques (<code>deny</code> précis) <strong>avant</strong> les règles générales (<code>permit any any</code>).
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 6 ══ -->
+<h1>6. Stratégie de sécurité de Provence Évasion</h1>
+
+<div class="mise-en-situation">
+  <strong>📋 Cahier des charges sécurité — Laurent Ferracci :</strong>
+  <ul>
+    <li>Les <strong>clients WiFi</strong> (VLAN 24) ne doivent pas accéder aux serveurs internes (VLAN 10, siège Apt).</li>
+    <li>Les <strong>caméras IP</strong> (VLAN 23) doivent être totalement isolées — elles ne peuvent communiquer qu'avec le serveur de surveillance dédié.</li>
+    <li>La <strong>comptabilité</strong> (VLAN 22, direction) est accessible uniquement depuis le VLAN direction local et le siège.</li>
+    <li>Le personnel (VLAN 21) peut accéder aux services réseau normaux (fichiers, DNS, imprimantes).</li>
+  </ul>
+</div>
+
+<h2>6.1 Tableau récapitulatif des flux autorisés / bloqués</h2>
+
+<table class="regle-table">
+  <tr><th>Source</th><th>Destination</th><th>Protocole</th><th>Décision</th><th>Justification</th></tr>
+  <tr><td>VLAN 24 (WiFi)</td><td>VLAN 10 (Serveurs)</td><td>IP (tout)</td><td class="td-deny">DENY</td><td>Clients non autorisés sur le SI</td></tr>
+  <tr><td>VLAN 24 (WiFi)</td><td>Internet (passerelle)</td><td>IP (tout)</td><td class="td-permit">PERMIT</td><td>Navigation web des clients</td></tr>
+  <tr><td>VLAN 23 (Caméras)</td><td>Tout réseau interne</td><td>IP (tout)</td><td class="td-deny">DENY</td><td>Isolation des IoT non maîtrisés</td></tr>
+  <tr><td>VLAN 22 (Direction)</td><td>VLAN 10 (Serveurs)</td><td>IP (tout)</td><td class="td-permit">PERMIT</td><td>Accès légitimes direction</td></tr>
+  <tr><td>VLAN 21 (Personnel)</td><td>VLAN 10 (Serveurs)</td><td>TCP 445</td><td class="td-permit">PERMIT</td><td>Accès partages réseau SMB</td></tr>
+  <tr><td>VLAN 21 (Personnel)</td><td>VLAN 10 (Serveurs)</td><td>TCP 22</td><td class="td-deny">DENY</td><td>SSH réservé aux admins</td></tr>
+</table>
+
+<h2>6.2 Choix ACL standard ou étendue ?</h2>
+
+<p>Pour Provence Évasion, nous utiliserons principalement des <strong>ACL étendues nommées</strong>, car :</p>
+<ul>
+  <li>Les règles portent sur des paires source/destination précises (WiFi → Serveurs, Caméras → tout).</li>
+  <li>Certaines règles filtrent par protocole (TCP 22, TCP 445).</li>
+  <li>Les ACL étendues sont placées près de la source, ce qui optimise les performances du routeur.</li>
+</ul>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 7 ══ -->
+<h1>7. Exercices de compréhension</h1>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 1 — Wildcard mask</div>
+  <label class="qlabel">Q1.1 — Donnez le wildcard mask correspondant au réseau 172.16.21.0/24 :</label>
+  <textarea class="rep rep-xs" id="ex1-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q1.2 — Pour filtrer uniquement l'hôte 172.16.22.5 (le PC du directeur), quel wildcard utilisez-vous ? Et quelle syntaxe Cisco courte peut-on utiliser ?</label>
+  <textarea class="rep rep-sm" id="ex1-q2" placeholder="Wildcard : …  /  Syntaxe courte : …"></textarea>
+  <label class="qlabel">Q1.3 — Que signifie la règle <code>permit any</code> dans une ACL standard ? Quel wildcard cela implique-t-il ?</label>
+  <textarea class="rep rep-sm" id="ex1-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 2 — Ordre des règles</div>
+  <p>Voici une ACL étendue pour Roussillon. Deux règles sont dans le mauvais ordre.</p>
+  <div class="cli">ip access-list extended ROUSSILLON-SEC
+ permit ip any any
+ deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255
+ deny ip 172.16.23.0 0.0.0.255 any</div>
+  <label class="qlabel">Q2.1 — Quel est le problème avec cet ordre ? Que se passe-t-il en pratique ?</label>
+  <textarea class="rep rep-sm" id="ex2-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q2.2 — Réécrivez l'ACL avec le bon ordre des règles :</label>
+  <textarea class="rep rep-md" id="ex2-q2" placeholder="ip access-list extended ROUSSILLON-SEC&#10; …"></textarea>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 3 — ACL étendue et protocoles</div>
+  <label class="qlabel">Q3.1 — Écrivez la règle ACL étendue qui bloque tout accès SSH (TCP port 22) depuis le VLAN WiFi (172.16.24.0/24) vers n'importe quelle destination :</label>
+  <textarea class="rep rep-sm" id="ex3-q1" placeholder="deny tcp …"></textarea>
+  <label class="qlabel">Q3.2 — Écrivez la règle qui autorise le VLAN Direction (172.16.22.0/24) à accéder au serveur de fichiers (172.16.10.50) sur le port SMB (TCP 445) :</label>
+  <textarea class="rep rep-sm" id="ex3-q2" placeholder="permit tcp …"></textarea>
+  <label class="qlabel">Q3.3 — Sur quelle interface du routeur (et dans quel sens) appliqueriez-vous l'ACL étendue qui bloque les clients WiFi vers les serveurs ? Justifiez.</label>
+  <textarea class="rep rep-sm" id="ex3-q3" placeholder="Interface : …  Sens : IN / OUT  /  Justification : …"></textarea>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 4 — Analyse de politique</div>
+  <label class="qlabel">Q4.1 — Laurent Ferracci demande : « Je veux que mes caméras IP ne puissent envoyer des données qu'au serveur de vidéosurveillance (172.16.10.20), et à personne d'autre. » Rédigez les deux règles ACL nécessaires (dans le bon ordre) :</label>
+  <textarea class="rep rep-md" id="ex4-q1" placeholder="Règle 1 : permit …&#10;Règle 2 : deny …"></textarea>
+  <label class="qlabel">Q4.2 — Après avoir configuré une ACL, vous tapez <code>show access-lists</code> et vous voyez que tous les compteurs de paquets sont à 0. Qu'est-ce que cela signifie ? Deux hypothèses possibles ?</label>
+  <textarea class="rep rep-md" id="ex4-q2" placeholder="Hypothèse 1 : …&#10;Hypothèse 2 : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">Synthèse — S9 : ACL et contrôle d'accès</div>
+
+<div class="exercice-synth">
+  <div class="exercice-titre">🧩 Bilan à compléter</div>
+  <label class="qlabel">S1 — Une ACL est une liste ordonnée de règles qui filtre le trafic sur la base de :</label>
+  <textarea class="rep rep-xs" id="synth-1" placeholder="…"></textarea>
+  <label class="qlabel">S2 — La différence principale entre une ACL standard et étendue est :</label>
+  <textarea class="rep rep-sm" id="synth-2" placeholder="…"></textarea>
+  <label class="qlabel">S3 — Le wildcard mask 0.0.0.255 correspond à quels hôtes si l'adresse réseau est 192.168.1.0 ?</label>
+  <textarea class="rep rep-xs" id="synth-3" placeholder="…"></textarea>
+  <label class="qlabel">S4 — Que fait implicitement le routeur Cisco si un paquet ne correspond à aucune règle de l'ACL ?</label>
+  <textarea class="rep rep-xs" id="synth-4" placeholder="…"></textarea>
+  <label class="qlabel">S5 — Où doit-on appliquer une ACL étendue (proche de la source ou de la destination) ? Pourquoi ?</label>
+  <textarea class="rep rep-sm" id="synth-5" placeholder="…"></textarea>
+  <label class="qlabel">S6 — Commande pour vérifier quelles ACL sont appliquées sur une interface :</label>
+  <textarea class="rep rep-xs" id="synth-6" placeholder="…"></textarea>
+  <label class="qlabel">S7 — Dans le contexte Provence Évasion, pourquoi isole-t-on le VLAN 23 (caméras IP) ?</label>
+  <textarea class="rep rep-sm" id="synth-7" placeholder="…"></textarea>
+  <label class="qlabel">S8 — Si une règle <code>permit ip any any</code> est placée en premier dans une ACL, que se passe-t-il pour toutes les règles <code>deny</code> suivantes ?</label>
+  <textarea class="rep rep-xs" id="synth-8" placeholder="…"></textarea>
+  <label class="qlabel">S9 — Complétez : <code>ip access-group NOM-ACL ___</code> — quel mot-clé (in ou out) pour filtrer les paquets qui entrent depuis le réseau attaché à l'interface ?</label>
+  <textarea class="rep rep-xs" id="synth-9" placeholder="…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-title">📊 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <span>Critère</span><span style="text-align:center">★★★ Maîtrisé</span><span style="text-align:center">★★☆ En cours</span><span style="text-align:center">★☆☆ À revoir</span><span style="text-align:center">? Non traité</span>
+  </div>
+  <div id="ae-container"></div>
+</div>
+
+<div class="conclusion">
+  <strong>✅ Ce que vous savez faire après S9 :</strong><br>
+  • Expliquer la différence entre ACL standard et ACL étendue<br>
+  • Calculer un wildcard mask à partir d'un masque de sous-réseau<br>
+  • Construire une politique de sécurité (tableau flux permit/deny)<br>
+  • Rédiger des règles ACL Cisco IOS (syntaxe nommée)<br>
+  • Appliquer une ACL sur une interface dans le bon sens (IN/OUT)<br>
+  • Utiliser <code>show access-lists</code> pour vérifier l'application des règles
+</div>
+
+</div><!-- /content -->
+
+<div class="footer">
+  <span><strong style="color:var(--orange);">S9</strong> — Cours ACL et sécurité réseau</span>
+  <span>Lycée Louis Lumière – Chelles | Bac Pro CIEL</span>
+</div>
+
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+const criteresAE = [
+  "Je sais expliquer ce qu'est une ACL et à quoi elle sert",
+  "Je comprends la différence entre ACL standard et étendue",
+  "Je sais calculer un wildcard mask",
+  "Je comprends la logique d'ordre des règles (first match)",
+  "Je sais rédiger une règle ACL en syntaxe Cisco nommée",
+  "Je sais où appliquer une ACL (source vs destination, IN vs OUT)",
+  "Je sais vérifier une ACL avec show access-lists",
+  "Je peux construire une politique de sécurité pour Provence Évasion"
+];
+
+const niveaux = [
+  {label:'★★★ Maîtrisé', val:'maitrise'},
+  {label:'★★☆ En cours', val:'en_cours'},
+  {label:'★☆☆ À revoir', val:'a_revoir'},
+  {label:'? Non traité', val:'non_traite'}
+];
+
+const ae = {};
+const cont = document.getElementById('ae-container');
+criteresAE.forEach((c, i) => {
+  ae['critere_'+(i+1)] = {critere: c, niveau: 'non_traite'};
+  const row = document.createElement('div');
+  row.className = 'ae-row';
+  let html = `<span>${c}</span>`;
+  niveaux.forEach(n => {
+    const id = `ae-${i}-${n.val}`;
+    html += `<span style="text-align:center">
+      <input type="radio" name="ae-${i}" id="${id}" value="${n.val}" onchange="ae['critere_${i+1}'].niveau=this.value" style="display:none">
+      <label for="${id}" style="cursor:pointer;font-size:11px;padding:3px 6px;border-radius:4px;border:1px solid #ddd;display:inline-block;transition:background 0.15s" 
+        onmouseover="this.style.background='#e8f4fd'" onmouseout="updateAELabel(this,'${n.val}','${i}')">
+        ${n.label}
+      </label>
+    </span>`;
+  });
+  row.innerHTML = html;
+  cont.appendChild(row);
+  // Style update on click
+  document.querySelectorAll(`input[name="ae-${i}"]`).forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll(`input[name="ae-${i}"]`).forEach(r => {
+        const lbl = document.querySelector(`label[for="${r.id}"]`);
+        lbl.style.background = r.checked ? 'var(--ciel)' : '';
+        lbl.style.color = r.checked ? '#fff' : '';
+        lbl.style.borderColor = r.checked ? 'var(--bleu)' : '#ddd';
+      });
+    });
+  });
+});
+
+function updateAELabel(lbl, val, i) {
+  const radio = document.querySelector(`input[value="${val}"][name="ae-${i}"]`);
+  if (!radio || !radio.checked) lbl.style.background = '';
+}
+
+function v(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function genererJSON() {
+  const nom = v('eleve-nom'), prenom = v('eleve-prenom');
+  const data = {
+    meta: {
+      devoir: "S9 — Cours : Sécurité réseau — ACL et contrôle d'accès",
+      eleve: {nom, prenom, classe: v('eleve-classe')},
+      date: v('eleve-date'),
+      genere_le: new Date().toISOString()
+    },
+    exercice1_wildcard: {q1: v('ex1-q1'), q2: v('ex1-q2'), q3: v('ex1-q3')},
+    exercice2_ordre_regles: {q1: v('ex2-q1'), q2: v('ex2-q2')},
+    exercice3_acl_etendue: {q1: v('ex3-q1'), q2: v('ex3-q2'), q3: v('ex3-q3')},
+    exercice4_politique: {q1: v('ex4-q1'), q2: v('ex4-q2')},
+    synthese: {s1:v('synth-1'),s2:v('synth-2'),s3:v('synth-3'),s4:v('synth-4'),s5:v('synth-5'),s6:v('synth-6'),s7:v('synth-7'),s8:v('synth-8'),s9:v('synth-9')},
+    auto_evaluation: ae
+  };
+  const safeName = (nom + prenom).replace(/[^a-zA-Z0-9]/g, '') || 'Eleve';
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${safeName}_S9Cours.json`;
+  a.click();
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>

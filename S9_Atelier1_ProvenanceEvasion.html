@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S9 — Atelier 1 : Implémentation des ACL — Roussillon</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mes{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mes strong{color:#4a7a1a;}
+.att{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.att strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.c{text-align:center;}
+.ex{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.ex-t{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:38px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}.rep-xl{min-height:160px;}.rep-xxl{min-height:210px;}
+label.q{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.ifield{display:inline-block;border:none;border-bottom:1px solid #999;width:120px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.ifield:focus{outline:none;border-bottom-color:var(--bleu);}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.ssyn{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-hdr{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.sbar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.sbar-info{font-size:11px;color:#666;}
+.btn{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;}
+.btn:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .g{color:#8BC34A;}.cli .v{color:#FFD54F;}.cli .t{color:#5BB8E8;font-weight:700;}.cli .p{color:#FF5722;}
+.pts{background:#e8f4fd;border-left:4px solid var(--bleu);padding:8px 12px;margin:12px 0 8px;border-radius:0 6px 6px 0;font-size:12px;}
+.ptn{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-right:8px;}
+.chrono{background:#fff8f0;border:2px solid var(--orange);border-radius:8px;padding:10px 14px;margin:12px 0;font-size:12px;}
+.chrono-t{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:4px;}
+.dbg{background:#fdf0f0;border:2px solid #c62828;border-radius:8px;padding:12px 14px;margin:14px 0;font-size:12px;line-height:1.75;}
+.dbg-t{font-family:'Roboto',sans-serif;font-weight:700;color:#c62828;margin-bottom:6px;}
+.tt{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:11.5px;}
+.tt th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 8px;border:1px solid var(--marine);text-align:center;}
+.tt td{border:1px solid #c0d0e0;padding:5px 8px;vertical-align:middle;}
+.tt tr:nth-child(even) td{background:var(--ciel-bg);}
+.tt input[type=text]{width:100%;border:1px solid #d0d8e0;border-radius:3px;padding:3px 5px;font-size:11px;}
+.tt select{border:1px solid #d0d8e0;border-radius:3px;padding:2px 4px;font-size:11px;}
+.ok{color:#2e7d32;font-weight:700;}.ko{color:#c62828;font-weight:700;}
+.uz{border:2px dashed var(--bleu);border-radius:8px;padding:14px;text-align:center;cursor:pointer;background:var(--ciel-bg);margin:8px 0;}
+.uz:hover{border-color:var(--orange);}
+.uz input[type=file]{display:none;}
+.uz-t{font-weight:600;color:var(--bleu);margin-bottom:4px;}
+.uz-h{font-size:11px;color:#888;}
+</style>
+</head>
+<body>
+<div class="header">
+  <img src="data:image/jpeg;base64,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" alt="Logo CIEL" style="height:44px;width:auto;">
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S9 – Atelier 1 : Implémentation des ACL — Site de Roussillon (Mas des Ocres)</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Année 2025-2026</div>
+  <div class="eleve-box">
+    <input type="text" id="nom" placeholder="Nom">
+    <input type="text" id="prenom" placeholder="Prénom">
+    <input type="text" id="classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="dat">
+  </div>
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+  </table>
+</div>
+
+<div class="content">
+
+<div class="chrono">
+  <div class="chrono-t">⏱ Gestion du temps — 4 heures</div>
+  Partie 1 Analyse &amp; préparation : 35 min &nbsp;·&nbsp; Partie 2 Configuration des 3 ACL : 1h15 &nbsp;·&nbsp; Partie 3 Plan de recette 20 tests : 45 min &nbsp;·&nbsp; Partie 4 Débogage 6 scénarios : 1h &nbsp;·&nbsp; Partie 5 Vérifications &amp; dossier : 25 min
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1>1. Analyse préalable et préparation</h1>
+
+<div class="mes">
+  <strong>📍 Mise en situation :</strong> Vous êtes technicien chez Axentis Informatique. Les services réseau du site de Roussillon sont opérationnels depuis la S8. Laurent Ferracci (PDG) vous contacte : <em>« Un client connecté au WiFi de l'hôtel a pingé notre serveur de fichiers depuis son téléphone. C'est inacceptable. »</em> Votre mission : déployer une politique de sécurité complète par ACL sur le routeur de Roussillon, sans couper les flux légitimes. Vous avez 4 heures.
+</div>
+
+<h2>1.1 Plan d'adressage — Site Roussillon + serveurs Apt</h2>
+
+<table class="data-table">
+  <tr><th>VLAN</th><th>Nom</th><th>Réseau</th><th>Passerelle (sous-if)</th><th>Wildcard mask ▶ à calculer</th></tr>
+  <tr><td class="c">21</td><td>Personnel</td><td class="c">172.16.21.0/24</td><td class="c">G0/0.21 — 172.16.21.1</td>
+    <td><input type="text" id="wc21" class="ifield" placeholder="0.0.0.?"></td></tr>
+  <tr><td class="c">22</td><td>Direction</td><td class="c">172.16.22.0/24</td><td class="c">G0/0.22 — 172.16.22.1</td>
+    <td><input type="text" id="wc22" class="ifield" placeholder="0.0.0.?"></td></tr>
+  <tr><td class="c">23</td><td>Caméras IP</td><td class="c">172.16.23.0/24</td><td class="c">G0/0.23 — 172.16.23.1</td>
+    <td><input type="text" id="wc23" class="ifield" placeholder="0.0.0.?"></td></tr>
+  <tr><td class="c">24</td><td>WiFi clients</td><td class="c">172.16.24.0/24</td><td class="c">G0/0.24 — 172.16.24.1</td>
+    <td><input type="text" id="wc24" class="ifield" placeholder="0.0.0.?"></td></tr>
+  <tr style="background:#f6fbed"><td class="c">10</td><td>Serveurs Apt (siège)</td><td class="c">172.16.10.0/24</td><td class="c">ROUTEUR-APT</td>
+    <td><input type="text" id="wc10" class="ifield" placeholder="0.0.0.?"></td></tr>
+</table>
+
+<h2>1.2 Inventaire des serveurs du siège — Accès par service</h2>
+
+<table class="data-table">
+  <tr><th>IP</th><th>Rôle</th><th>Port(s)</th><th>VLANs autorisés à y accéder (à compléter)</th></tr>
+  <tr><td class="c">172.16.10.10</td><td>DNS interne</td><td class="c">UDP/TCP 53</td><td><input type="text" id="srv-dns" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:4px;" placeholder="Tous sauf WiFi / …"></td></tr>
+  <tr><td class="c">172.16.10.20</td><td>Vidéosurveillance (VMS)</td><td class="c">TCP 8080</td><td><input type="text" id="srv-vms" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:4px;" placeholder="Caméras VLAN 23 uniquement / …"></td></tr>
+  <tr><td class="c">172.16.10.30</td><td>DHCP secondaire</td><td class="c">UDP 67/68</td><td><input type="text" id="srv-dhcp" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:4px;" placeholder="…"></td></tr>
+  <tr><td class="c">172.16.10.50</td><td>Partages fichiers (SMB)</td><td class="c">TCP 445</td><td><input type="text" id="srv-smb" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:4px;" placeholder="Personnel, Direction / …"></td></tr>
+</table>
+
+<h2>1.3 Tableau d'analyse des flux — Politique de sécurité Ferracci</h2>
+<p>Complétez ce tableau <strong>avant toute manipulation Packet Tracer</strong>. Il est la base de toute configuration correcte.</p>
+
+<table class="data-table" style="font-size:11.5px;">
+  <tr><th>#</th><th>Source</th><th>Destination</th><th>Proto/Port</th><th>Décision</th><th>Justification</th></tr>
+  <tr><td class="c">F1</td><td>VLAN 24 – WiFi</td><td>Serveurs Apt 172.16.10.0/24</td><td>IP tout</td>
+    <td><select id="f1d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f1j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F2</td><td>VLAN 24 – WiFi</td><td>Internet (passerelle WAN)</td><td>IP tout</td>
+    <td><select id="f2d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f2j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F3</td><td>VLAN 23 – Caméras</td><td>Serveur VMS 172.16.10.20</td><td>TCP 8080</td>
+    <td><select id="f3d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f3j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F4</td><td>VLAN 23 – Caméras</td><td>Tout autre réseau interne</td><td>IP tout</td>
+    <td><select id="f4d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f4j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F5</td><td>VLAN 21 – Personnel</td><td>Fichiers Apt TCP 445</td><td>TCP 445</td>
+    <td><select id="f5d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f5j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F6</td><td>VLAN 21 – Personnel</td><td>DNS Apt 172.16.10.10 UDP 53</td><td>UDP 53</td>
+    <td><select id="f6d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f6j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F7</td><td>VLAN 21 – Personnel</td><td>SSH routeur (TCP 22)</td><td>TCP 22</td>
+    <td><select id="f7d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f7j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F8</td><td>VLAN 22 – Direction</td><td>Serveurs Apt (tout)</td><td>IP tout</td>
+    <td><select id="f8d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f8j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F9</td><td>VLAN 22 – Direction</td><td>SSH routeur (TCP 22)</td><td>TCP 22</td>
+    <td><select id="f9d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f9j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+  <tr><td class="c">F10</td><td>VLAN 21 – Personnel</td><td>VLAN 22 Direction (inter-VLAN)</td><td>IP tout</td>
+    <td><select id="f10d" style="font-size:11px;border:1px solid #c0d0e0;border-radius:3px;padding:2px;"><option value="">—</option><option>DENY</option><option>PERMIT</option></select></td>
+    <td><input type="text" id="f10j" style="width:100%;border:1px solid #c0d0e0;padding:3px;font-size:11px;border-radius:3px;" placeholder="…"></td></tr>
+</table>
+
+<div class="ex">
+  <div class="ex-t">📝 Bilan d'analyse préalable</div>
+  <label class="q">Q1.1 — Combien d'ACL allez-vous créer ? Donnez le nom, le rôle et l'interface d'application de chacune :</label>
+  <textarea class="rep rep-md" id="q11" placeholder="ACL 1 : WIFI-RESTRICTION → bloque … → appliquée sur G0/0.24 sens IN&#10;ACL 2 : CAMERAS-ISOLATION → …&#10;ACL 3 : PERSONNEL-RESTRICTIONS → …&#10;&#10;Nombre total de règles prévues : …"></textarea>
+  <label class="q">Q1.2 — Pourquoi applique-t-on les ACL étendues en IN (entrant) plutôt qu'en OUT (sortant) sur les sous-interfaces ? Illustrez avec un paquet WiFi vers les serveurs :</label>
+  <textarea class="rep rep-md" id="q12" placeholder="En appliquant IN sur G0/0.24, l'ACL évalue les paquets dès qu'ils entrent dans le routeur depuis le VLAN WiFi. Si on appliquait OUT sur l'interface vers les serveurs, le paquet aurait déjà traversé …&#10;Avantage de IN : …&#10;Trajet du paquet WiFi → serveur sans ACL : …"></textarea>
+  <label class="q">Q1.3 — Qu'est-ce qu'une ACL implicite deny all ? Pourquoi cela impose de toujours terminer par un permit explicite si on veut laisser passer du trafic légitime ?</label>
+  <textarea class="rep rep-sm" id="q13" placeholder="La règle implicite finale de toute ACL Cisco est … Elle s'applique quand …&#10;Conséquence si on oublie le permit : …"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1>2. Configuration des ACL dans Packet Tracer</h1>
+
+<div class="mes"><strong>📁 Fichier :</strong> Reprenez <code>Roussillon_S8.pkt</code>. Avant toute ACL, vérifiez que les 5 pings de référence ci-dessous réussissent tous. Si l'un échoue, corrigez la topologie avant de continuer.</div>
+
+<h2>2.0 État initial — pings de référence</h2>
+<table class="tt">
+  <tr><th>Ping</th><th>Source</th><th>Destination</th><th>Résultat avant ACL</th><th>Attendu</th></tr>
+  <tr><td>P0-1</td><td>PC-WiFi (172.16.24.x)</td><td>172.16.10.50 (fichiers)</td><td><input type="text" id="p01" placeholder="…"></td><td class="ok" style="text-align:center">Succès</td></tr>
+  <tr><td>P0-2</td><td>PC-Perso (172.16.21.x)</td><td>172.16.10.50</td><td><input type="text" id="p02" placeholder="…"></td><td class="ok" style="text-align:center">Succès</td></tr>
+  <tr><td>P0-3</td><td>Cam-IP (172.16.23.x)</td><td>172.16.10.20 (VMS)</td><td><input type="text" id="p03" placeholder="…"></td><td class="ok" style="text-align:center">Succès</td></tr>
+  <tr><td>P0-4</td><td>PC-Dir (172.16.22.x)</td><td>172.16.10.50</td><td><input type="text" id="p04" placeholder="…"></td><td class="ok" style="text-align:center">Succès</td></tr>
+  <tr><td>P0-5</td><td>PC-Perso</td><td>172.16.10.10 (DNS)</td><td><input type="text" id="p05" placeholder="…"></td><td class="ok" style="text-align:center">Succès</td></tr>
+</table>
+<div class="ex">
+  <div class="ex-t">📝 Table de routage initiale</div>
+  <label class="q">Copiez le résultat de <code>show ip route</code> sur ROUTEUR-ROUSSILLON :</label>
+  <textarea class="rep rep-lg" id="route-init" placeholder="S    172.16.10.0/24 [1/0] via …&#10;C    172.16.21.0/24 is directly connected, G0/0.21&#10;…"></textarea>
+</div>
+
+<h2>2.1 ACL n°1 — WIFI-RESTRICTION</h2>
+
+<div class="chrono"><div class="chrono-t">⏱ ~25 min</div>Calcul + rédaction papier (8 min) · saisie CLI (8 min) · vérifications + tests (9 min)</div>
+
+<div class="ex">
+  <div class="ex-t">📝 Rédaction sur papier avant saisie</div>
+  <label class="q">Rédigez les règles complètes de WIFI-RESTRICTION avec la syntaxe Cisco exacte (wildcards calculés en 1.1) :</label>
+  <textarea class="rep rep-lg" id="wifi-papier" placeholder="ip access-list extended WIFI-RESTRICTION&#10; deny ip 172.16.24.0 ___.___.___.___  172.16.10.0 ___.___.___.___ &#10; permit ip 172.16.24.0 ___.___.___.___  any&#10;&#10;Explication de l'ordre : la règle deny est placée avant car …"></textarea>
+  <label class="q">Q2.1 — Pourquoi une ACL standard (1-99) ne suffit pas ici ? Quelle information ne peut-elle pas filtrer ?</label>
+  <textarea class="rep rep-sm" id="q21" placeholder="Une ACL standard ne filtre que sur … elle ne peut pas distinguer …&#10;Ici on a besoin de filtrer aussi sur … donc on utilise une ACL …"></textarea>
+</div>
+
+<div class="pts"><span class="ptn">PT-1</span> Configurez WIFI-RESTRICTION sur ROUTEUR-ROUSSILLON :</div>
+<div class="cli"><span class="t">! ROUTEUR-ROUSSILLON</span>
+<span class="p">Router(config)#</span> ip access-list extended <span class="v">WIFI-RESTRICTION</span>
+<span class="p">Router(config-ext-nacl)#</span> <span class="g">! saisissez vos règles ici</span>
+<span class="p">Router(config-ext-nacl)#</span> exit
+<span class="p">Router(config)#</span> interface GigabitEthernet0/0.24
+<span class="p">Router(config-subif)#</span> ip access-group WIFI-RESTRICTION <span class="v">in</span>
+<span class="p">Router(config-subif)#</span> end
+<span class="p">Router#</span> show access-lists WIFI-RESTRICTION
+<span class="p">Router#</span> show ip interface GigabitEthernet0/0.24 | include access</div>
+
+<div class="ex">
+  <div class="ex-t">📝 Saisie et sorties CLI</div>
+  <label class="q">Commandes exactes saisies (avec prompts) :</label>
+  <textarea class="rep rep-xl" id="wifi-saisie" placeholder="Router(config)# ip access-list extended WIFI-RESTRICTION&#10; deny ip …&#10;…"></textarea>
+  <label class="q">Résultat de <code>show access-lists WIFI-RESTRICTION</code> :</label>
+  <textarea class="rep rep-md" id="wifi-show" placeholder="Extended IP access list WIFI-RESTRICTION&#10;  10 deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255&#10;  20 permit ip 172.16.24.0 0.0.0.255 any"></textarea>
+  <label class="q">Résultat de <code>show ip interface GigabitEthernet0/0.24 | include access</code> :</label>
+  <textarea class="rep rep-xs" id="wifi-intf" placeholder="Inbound access list is WIFI-RESTRICTION"></textarea>
+</div>
+
+<h2>2.2 ACL n°2 — CAMERAS-ISOLATION</h2>
+<div class="chrono"><div class="chrono-t">⏱ ~20 min</div></div>
+<p>Objectif : les caméras (VLAN 23) ne peuvent joindre <strong>que</strong> le serveur VMS 172.16.10.20 sur TCP 8080. Tout autre trafic est bloqué, y compris le ping.</p>
+
+<div class="ex">
+  <div class="ex-t">📝 Rédaction + saisie CAMERAS-ISOLATION</div>
+  <label class="q">Rédigez les règles (attention au piège de l'ordre : permit spécifique AVANT deny général) :</label>
+  <textarea class="rep rep-lg" id="cam-papier" placeholder="ip access-list extended CAMERAS-ISOLATION&#10; permit tcp 172.16.23.0 ___.___.___.___ host 172.16.10.20 eq 8080&#10; deny ip 172.16.23.0 ___.___.___.___ any&#10;&#10;Pourquoi permit en premier : …"></textarea>
+  <label class="q">Q2.2 — Si une caméra utilise aussi le ping ICMP pour tester la connexion au VMS avant d'envoyer le flux, sera-t-elle bloquée par cette ACL ? Justifiez et, si nécessaire, ajoutez la règle manquante :</label>
+  <textarea class="rep rep-md" id="q22" placeholder="ICMP n'est pas TCP donc …&#10;La règle permit tcp … eq 8080 ne couvre pas ICMP car …&#10;Si on veut autoriser le ping de test : permit icmp 172.16.23.0 0.0.0.255 host 172.16.10.20&#10;Décision retenue : …"></textarea>
+  <label class="q">Saisie CLI + résultat show access-lists CAMERAS-ISOLATION :</label>
+  <textarea class="rep rep-xl" id="cam-saisie" placeholder="ip access-list extended CAMERAS-ISOLATION&#10; …&#10;interface GigabitEthernet0/0.23&#10; ip access-group CAMERAS-ISOLATION in&#10;&#10;show access-lists CAMERAS-ISOLATION :&#10;…"></textarea>
+</div>
+
+<h2>2.3 ACL n°3 — PERSONNEL-RESTRICTIONS</h2>
+<div class="chrono"><div class="chrono-t">⏱ ~20 min</div></div>
+<p>Objectif : le personnel (VLAN 21) peut utiliser SMB (TCP 445) et DNS (UDP 53) vers Apt, mais <strong>pas</strong> SSH (TCP 22) ni HTTP (TCP 80) vers les équipements réseau. Tout autre trafic est autorisé.</p>
+
+<div class="ex">
+  <div class="ex-t">📝 Rédaction + saisie PERSONNEL-RESTRICTIONS</div>
+  <label class="q">Rédigez les règles dans l'ordre optimal. Justifiez pourquoi les deny sont placés avant le permit général :</label>
+  <textarea class="rep rep-xl" id="perso-papier" placeholder="ip access-list extended PERSONNEL-RESTRICTIONS&#10; deny tcp 172.16.21.0 0.0.0.255 any eq 22      ! bloquer SSH&#10; deny tcp 172.16.21.0 0.0.0.255 any eq 80      ! bloquer HTTP admin&#10; permit tcp 172.16.21.0 0.0.0.255 172.16.10.0 0.0.0.255 eq 445  ! SMB&#10; permit udp 172.16.21.0 0.0.0.255 host 172.16.10.10 eq 53       ! DNS&#10; permit ip 172.16.21.0 0.0.0.255 any           ! reste&#10;&#10;Justification de l'ordre :&#10;…"></textarea>
+  <label class="q">Q2.3 — La règle finale <code>permit ip 172.16.21.0 0.0.0.255 any</code> autorise-t-elle aussi le trafic vers d'autres sites (Saignon, Cucuron via le WAN) ? Expliquez pourquoi c'est correct ou non dans ce contexte :</label>
+  <textarea class="rep rep-md" id="q23" placeholder="Oui / Non — Cette règle permit ip … any autorise …&#10;Les paquets vers Saignon et Cucuron passeront par …&#10;C'est acceptable car la sécurité inter-sites sera gérée par … (ACL sur ROUTEUR-APT en A2)"></textarea>
+  <label class="q">Saisie CLI + show access-lists PERSONNEL-RESTRICTIONS :</label>
+  <textarea class="rep rep-xl" id="perso-saisie" placeholder="ip access-list extended PERSONNEL-RESTRICTIONS&#10; …&#10;interface GigabitEthernet0/0.21&#10; ip access-group PERSONNEL-RESTRICTIONS in&#10;&#10;show access-lists :&#10;…"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1>3. Plan de recette — 20 tests</h1>
+
+<div class="mes"><strong>🎯 Objectif :</strong> Valider que les 3 ACL fonctionnent correctement, ensemble et sans interférence. Effectuez chaque test dans Packet Tracer et notez le résultat réel. Un résultat différent de l'attendu = non-conformité à corriger.</div>
+
+<table class="tt">
+  <tr><th>N°</th><th>Source</th><th>Destination / Proto</th><th>Attendu</th><th>Résultat PT</th><th>✓/✗</th><th>ACL déclenchée</th></tr>
+  <tr><td>R01</td><td>PC-WiFi (172.16.24.x)</td><td>172.16.10.50 TCP 445</td><td class="ko">Échec</td><td><input type="text" id="r01" placeholder="…"></td><td><select id="r01c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r01a" placeholder="…"></td></tr>
+  <tr><td>R02</td><td>PC-WiFi</td><td>172.16.10.10 UDP 53</td><td class="ko">Échec</td><td><input type="text" id="r02" placeholder="…"></td><td><select id="r02c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r02a" placeholder="…"></td></tr>
+  <tr><td>R03</td><td>PC-WiFi</td><td>172.16.10.20 TCP 8080</td><td class="ko">Échec</td><td><input type="text" id="r03" placeholder="…"></td><td><select id="r03c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r03a" placeholder="…"></td></tr>
+  <tr><td>R04</td><td>PC-WiFi</td><td>172.16.24.1 (gateway locale)</td><td class="ok">Succès</td><td><input type="text" id="r04" placeholder="…"></td><td><select id="r04c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r04a" placeholder="…"></td></tr>
+  <tr><td>R05</td><td>PC-WiFi</td><td>172.16.21.x (PC-Perso)</td><td class="ko">Échec (Apt bloqué ≠ interne)</td><td><input type="text" id="r05" placeholder="…"></td><td><select id="r05c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r05a" placeholder="…"></td></tr>
+  <tr><td>R06</td><td>Cam-IP (172.16.23.x)</td><td>172.16.10.20 TCP 8080</td><td class="ok">Succès</td><td><input type="text" id="r06" placeholder="…"></td><td><select id="r06c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r06a" placeholder="…"></td></tr>
+  <tr><td>R07</td><td>Cam-IP</td><td>172.16.10.50 TCP 445</td><td class="ko">Échec</td><td><input type="text" id="r07" placeholder="…"></td><td><select id="r07c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r07a" placeholder="…"></td></tr>
+  <tr><td>R08</td><td>Cam-IP</td><td>172.16.21.x (PC-Perso)</td><td class="ko">Échec</td><td><input type="text" id="r08" placeholder="…"></td><td><select id="r08c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r08a" placeholder="…"></td></tr>
+  <tr><td>R09</td><td>Cam-IP</td><td>172.16.23.1 (gateway VLAN 23)</td><td class="ko">Échec (caméras isolées)</td><td><input type="text" id="r09" placeholder="…"></td><td><select id="r09c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r09a" placeholder="…"></td></tr>
+  <tr><td>R10</td><td>PC-Perso (172.16.21.x)</td><td>TCP 22 SSH routeur</td><td class="ko">Échec</td><td><input type="text" id="r10" placeholder="…"></td><td><select id="r10c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r10a" placeholder="…"></td></tr>
+  <tr><td>R11</td><td>PC-Perso</td><td>172.16.10.50 TCP 445 (SMB)</td><td class="ok">Succès</td><td><input type="text" id="r11" placeholder="…"></td><td><select id="r11c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r11a" placeholder="…"></td></tr>
+  <tr><td>R12</td><td>PC-Perso</td><td>172.16.10.10 UDP 53 (DNS)</td><td class="ok">Succès</td><td><input type="text" id="r12" placeholder="…"></td><td><select id="r12c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r12a" placeholder="…"></td></tr>
+  <tr><td>R13</td><td>PC-Perso</td><td>PC-Dir 172.16.22.x (inter-VLAN)</td><td class="ok">Succès</td><td><input type="text" id="r13" placeholder="…"></td><td><select id="r13c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r13a" placeholder="…"></td></tr>
+  <tr><td>R14</td><td>PC-Dir (172.16.22.x)</td><td>TCP 22 SSH routeur</td><td class="ok">Succès</td><td><input type="text" id="r14" placeholder="…"></td><td><select id="r14c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r14a" placeholder="…"></td></tr>
+  <tr><td>R15</td><td>PC-Dir</td><td>172.16.10.50 TCP 445</td><td class="ok">Succès</td><td><input type="text" id="r15" placeholder="…"></td><td><select id="r15c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r15a" placeholder="…"></td></tr>
+  <tr><td>R16</td><td>PC-Dir</td><td>172.16.10.20 TCP 8080</td><td class="ok">Succès</td><td><input type="text" id="r16" placeholder="…"></td><td><select id="r16c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r16a" placeholder="…"></td></tr>
+  <tr><td>R17</td><td>PC-WiFi</td><td>8.8.8.8 (Internet)</td><td class="ok">Succès</td><td><input type="text" id="r17" placeholder="…"></td><td><select id="r17c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r17a" placeholder="…"></td></tr>
+  <tr><td>R18</td><td>PC-Perso</td><td>TCP 80 HTTP routeur admin</td><td class="ko">Échec</td><td><input type="text" id="r18" placeholder="…"></td><td><select id="r18c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r18a" placeholder="…"></td></tr>
+  <tr><td>R19</td><td>PC-Perso</td><td>172.16.10.20 TCP 8080 (VMS)</td><td class="ok">Succès (Personnel autorisé)</td><td><input type="text" id="r19" placeholder="…"></td><td><select id="r19c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r19a" placeholder="…"></td></tr>
+  <tr><td>R20</td><td>PC-Dir</td><td>Cam-IP 172.16.23.x (ping)</td><td class="ok">Succès (Direction non filtrée)</td><td><input type="text" id="r20" placeholder="…"></td><td><select id="r20c"><option>—</option><option>✓</option><option>✗</option></select></td><td><input type="text" id="r20a" placeholder="…"></td></tr>
+</table>
+
+<div class="ex">
+  <div class="ex-t">📝 Analyse post-recette</div>
+  <label class="q">Taux de conformité : __ / 20. Pour chaque test non conforme, identifiez la cause et la correction apportée :</label>
+  <textarea class="rep rep-xl" id="recette-bilan" placeholder="Conformes : __ / 20&#10;&#10;Non-conformités :&#10;R__ — Symptôme : … — Cause : … — Correction : …&#10;R__ — …&#10;&#10;Après correction, résultat final : __ / 20"></textarea>
+  <label class="q">Résultat de <code>show access-lists</code> (les 3 ACL avec compteurs de matches) :</label>
+  <textarea class="rep rep-xl" id="show-all" placeholder="Extended IP access list CAMERAS-ISOLATION&#10; 10 permit tcp 172.16.23.0 0.0.0.255 host 172.16.10.20 eq 8080 (X matches)&#10; 20 deny ip 172.16.23.0 0.0.0.255 any (Y matches)&#10;&#10;Extended IP access list PERSONNEL-RESTRICTIONS&#10; 10 deny tcp … (Z matches)&#10;…&#10;&#10;Extended IP access list WIFI-RESTRICTION&#10;…"></textarea>
+  <label class="q">Q3.1 — Après avoir exécuté les 20 tests, quelle ACL a le plus grand nombre de matches total ? Pourquoi cela est-il cohérent avec la politique de sécurité ?</label>
+  <textarea class="rep rep-sm" id="q31" placeholder="L'ACL qui a le plus de matches est … avec … matches au total car …"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1>4. Débogage — 6 scénarios de configuration incorrecte</h1>
+
+<div class="mes"><strong>🎯 Objectif :</strong> Pour chaque scénario, analysez d'abord sur papier ce qui se passe, puis saisissez la configuration dans Packet Tracer, observez les symptômes, corrigez et vérifiez. Chaque scénario est indépendant et se fait sur une topologie simple (1 routeur, 2 VLANs).</div>
+
+<h2>4.1 Scénario D1 — Le permit any any en tête d'ACL</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 ACL-D1 — Configuration à analyser</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">ip access-list extended ACL-D1
+ permit ip any any
+ deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255
+ deny ip 172.16.23.0 0.0.0.255 any
+interface GigabitEthernet0/0.24
+ ip access-group ACL-D1 in</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D1</div>
+  <label class="q">D1.1 — Tracez le chemin de décision pour un paquet WiFi (172.16.24.5) vers le serveur (172.16.10.50) :</label>
+  <textarea class="rep rep-md" id="d1-trace" placeholder="Règle 1 : permit ip any any → le paquet 172.16.24.5 → 172.16.10.50 correspond-il ? OUI car …&#10;Action prise : PERMIT → paquet transmis&#10;Règles 2 et 3 : …&#10;Résultat : le WiFi accède aux serveurs malgré l'intention de blocage car …"></textarea>
+  <label class="q">D1.2 — Réécrivez l'ACL corrigée, saisissez dans PT et vérifiez avec show access-lists :</label>
+  <textarea class="rep rep-xl" id="d1-correc" placeholder="ACL corrigée :&#10;ip access-list extended ACL-D1-CORR&#10; deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255&#10; deny ip 172.16.23.0 0.0.0.255 any&#10; permit ip any any&#10;&#10;Résultat show access-lists après correction et tests :&#10;…&#10;&#10;Test ping WiFi → 172.16.10.50 : …"></textarea>
+</div>
+
+<h2>4.2 Scénario D2 — Wildcard incorrect (masque de sous-réseau inversé)</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 ACL-D2 — Wildcard erroné</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">ip access-list extended ACL-D2
+ deny ip 172.16.24.0 255.255.255.0 172.16.10.0 0.0.0.255
+ permit ip any any</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D2</div>
+  <label class="q">D2.1 — Identifiez précisément l'erreur. Que signifie le wildcard 255.255.255.0 pour Cisco IOS ? Quels hôtes cette règle deny correspond-elle réellement ?</label>
+  <textarea class="rep rep-md" id="d2-erreur" placeholder="L'erreur est sur le wildcard source : 255.255.255.0 est un masque de sous-réseau standard, mais en wildcard Cisco signifie …&#10;Bit à 1 dans le wildcard = bit … (ignoré/à vérifier)&#10;Donc 172.16.24.0 / wildcard 255.255.255.0 correspond aux adresses : …&#10;Conséquence : seule l'adresse … est bloquée au lieu de tout le réseau WiFi"></textarea>
+  <label class="q">D2.2 — Correction + test PT :</label>
+  <textarea class="rep rep-md" id="d2-correc" placeholder="Wildcard correct : 0.0.0.255&#10;Règle corrigée : deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255&#10;Test après correction : ping WiFi → serveur = …"></textarea>
+</div>
+
+<h2>4.3 Scénario D3 — ACL appliquée en OUT au lieu de IN</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 ACL-D3 — Sens d'application incorrect</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">ip access-list extended ACL-D3
+ deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255
+ permit ip any any
+interface GigabitEthernet0/0.24
+ ip access-group ACL-D3 out    ← OUT au lieu de IN</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D3</div>
+  <label class="q">D3.1 — Dessinez mentalement le trajet d'un paquet WiFi → serveur. Pourquoi le OUT sur G0/0.24 ne l'intercepte-t-il pas ?</label>
+  <textarea class="rep rep-md" id="d3-analyse" placeholder="Le paquet WiFi entre dans le routeur par G0/0.24 (sens entrant = IN)&#10;Une ACL OUT sur G0/0.24 filtre les paquets qui SORTENT par cette interface, c'est-à-dire …&#10;Le paquet WiFi → serveur ne sort jamais par G0/0.24 car il sort par … vers les serveurs&#10;Conclusion : l'ACL D3 ne bloque jamais le WiFi vers les serveurs car …"></textarea>
+  <label class="q">D3.2 — Correction (commandes de suppression de l'application OUT et ajout de IN) + test :</label>
+  <textarea class="rep rep-md" id="d3-correc" placeholder="Router(config)# interface GigabitEthernet0/0.24&#10;Router(config-subif)# no ip access-group ACL-D3 out&#10;Router(config-subif)# ip access-group ACL-D3 in&#10;Vérification : show ip interface G0/0.24 | include access&#10;Test : …"></textarea>
+</div>
+
+<h2>4.4 Scénario D4 — Règle deny trop large qui bloque les flux légitimes</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 ACL-D4 — Blocage collatéral inattendu</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">ip access-list extended ACL-D4
+ deny ip 172.16.23.0 0.0.0.255 172.16.10.0 0.0.0.255
+ permit tcp 172.16.23.0 0.0.0.255 host 172.16.10.20 eq 8080
+ deny ip 172.16.23.0 0.0.0.255 any
+interface GigabitEthernet0/0.23
+ ip access-group ACL-D4 in</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D4</div>
+  <label class="q">D4.1 — Les caméras tentent d'envoyer leur flux vidéo (TCP 8080) vers 172.16.10.20. Ce flux passe-t-il ? Tracez le chemin de décision :</label>
+  <textarea class="rep rep-md" id="d4-trace" placeholder="Paquet caméra 172.16.23.x → 172.16.10.20 TCP 8080 :&#10;Règle 1 : deny ip 172.16.23.0 0.0.0.255 172.16.10.0 0.0.0.255 → correspond ? OUI/NON car …&#10;Si oui → action : DENY → le paquet est …&#10;Règle 2 : permit tcp … eq 8080 → jamais évaluée car …&#10;Résultat : le flux VMS est bloqué bien que la règle permit existe, parce que …"></textarea>
+  <label class="q">D4.2 — Principe déduit : que faut-il toujours respecter dans l'ordre des règles d'une ACL Cisco ? Réécrivez l'ACL dans l'ordre correct :</label>
+  <textarea class="rep rep-md" id="d4-principe" placeholder="Principe (first-match) : Cisco évalue les règles … et s'arrête à la première qui …&#10;Règle d'or : les règles spécifiques (permit tcp … eq 8080) doivent toujours être placées … par rapport aux règles générales (deny ip … any)&#10;&#10;ACL corrigée :&#10; permit tcp 172.16.23.0 0.0.0.255 host 172.16.10.20 eq 8080&#10; deny ip 172.16.23.0 0.0.0.255 any"></textarea>
+</div>
+
+<h2>4.5 Scénario D5 — Oubli du permit final : deny all implicite bloque tout</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 ACL-D5 — La règle implicite qui coupe le réseau</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">ip access-list extended ACL-D5
+ deny tcp 172.16.21.0 0.0.0.255 any eq 22
+ deny tcp 172.16.21.0 0.0.0.255 any eq 80
+ permit tcp 172.16.21.0 0.0.0.255 172.16.10.0 0.0.0.255 eq 445
+ permit udp 172.16.21.0 0.0.0.255 host 172.16.10.10 eq 53
+ ! ← aucun permit général ici
+interface GigabitEthernet0/0.21
+ ip access-group ACL-D5 in</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D5</div>
+  <label class="q">D5.1 — Un PC du VLAN 21 tente de faire un ping vers un PC du VLAN 22 (172.16.22.x). Ce ping passe-t-il ? Expliquez le mécanisme en cause :</label>
+  <textarea class="rep rep-md" id="d5-trace" placeholder="Paquet ICMP PC-Perso → PC-Dir 172.16.22.x :&#10;Règle 1 : deny tcp … eq 22 → correspond ? NON car protocole ICMP ≠ TCP&#10;Règle 2 : deny tcp … eq 80 → correspond ? NON car …&#10;Règle 3 : permit tcp … eq 445 → correspond ? NON car …&#10;Règle 4 : permit udp … eq 53 → correspond ? NON car …&#10;Aucune règle ne correspond → la règle implicite finale s'applique : …&#10;Action : le ping est …"></textarea>
+  <label class="q">D5.2 — Ajoutez la règle manquante à la bonne place et vérifiez qu'un ping inter-VLAN fonctionne à nouveau :</label>
+  <textarea class="rep rep-md" id="d5-correc" placeholder="Règle à ajouter : permit ip 172.16.21.0 0.0.0.255 any&#10;Position : à la fin de l'ACL (après les deny spécifiques et les permit spécifiques)&#10;&#10;Vérification : ping PC-Perso → PC-Dir = …&#10;Vérification : ping PC-Perso → SSH routeur = toujours …"></textarea>
+</div>
+
+<h2>4.6 Scénario D6 — ACL sur la mauvaise sous-interface</h2>
+<div class="dbg">
+  <div class="dbg-t">🐛 ACL-D6 — Bonne ACL, mauvaise interface</div>
+<pre style="font-size:12px;background:none;border:none;padding:0;margin:0;">ip access-list extended WIFI-RESTRICTION
+ deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255
+ permit ip any any
+
+interface GigabitEthernet0/0.21   ← VLAN 21 Personnel, pas VLAN 24 WiFi !
+ ip access-group WIFI-RESTRICTION in</pre>
+</div>
+<div class="ex">
+  <div class="ex-t">📝 Analyse D6</div>
+  <label class="q">D6.1 — Symptôme observé : le WiFi atteint encore les serveurs. Mais quel autre problème inattendu apparaît ? Expliquez pourquoi :</label>
+  <textarea class="rep rep-md" id="d6-symptome" placeholder="Symptôme 1 : le WiFi (VLAN 24) atteint encore les serveurs car l'ACL est sur G0/0.21 donc …&#10;Symptôme 2 inattendu : le Personnel (VLAN 21) ne peut plus … car la règle deny ip 172.16.24.0 … est évaluée mais les paquets du Personnel ont pour source …&#10;Attendez : les paquets du Personnel ne correspondent pas à 172.16.24.0 donc … → le Personnel est bloqué ou non par la règle implicite ?&#10;Raisonnement complet : …"></textarea>
+  <label class="q">D6.2 — Diagnostic avec les commandes show + correction :</label>
+  <textarea class="rep rep-md" id="d6-correc" placeholder="Diagnostic :&#10;show ip interface G0/0.21 | include access → Inbound access list is WIFI-RESTRICTION&#10;show ip interface G0/0.24 | include access → Inbound access list is not set&#10;&#10;Correction :&#10;Router(config)# interface G0/0.21&#10;Router(config-subif)# no ip access-group WIFI-RESTRICTION in&#10;Router(config-subif)# exit&#10;Router(config)# interface G0/0.24&#10;Router(config-subif)# ip access-group WIFI-RESTRICTION in&#10;&#10;Vérification finale : …"></textarea>
+</div>
+
+<hr class="sep">
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h1>5. Vérification globale et section dossier</h1>
+
+<div class="ex">
+  <div class="ex-t">📝 Vérifications globales finales</div>
+  <label class="q">Résultat de <code>show running-config | section access-list</code> sur ROUTEUR-ROUSSILLON :</label>
+  <textarea class="rep rep-xl" id="run-acl" placeholder="ip access-list extended CAMERAS-ISOLATION&#10; permit tcp 172.16.23.0 0.0.0.255 host 172.16.10.20 eq 8080&#10; deny ip 172.16.23.0 0.0.0.255 any&#10;ip access-list extended PERSONNEL-RESTRICTIONS&#10;…"></textarea>
+  <label class="q">Résultat de <code>show ip interface</code> pour les 3 sous-interfaces (ligne « Inbound access list ») :</label>
+  <textarea class="rep rep-md" id="intf-acl" placeholder="GigabitEthernet0/0.21 : Inbound access list is PERSONNEL-RESTRICTIONS&#10;GigabitEthernet0/0.23 : Inbound access list is …&#10;GigabitEthernet0/0.24 : Inbound access list is …"></textarea>
+</div>
+
+<div class="ex">
+  <div class="ex-t">📋 Section 10 du dossier — Politique de sécurité Roussillon</div>
+  <label class="q">Rédigez la section 10 complète : contexte, inventaire des 3 ACL avec leurs règles, tableau de placement, résultats recette 20 tests, non-conformités corrigées, recommandations :</label>
+  <textarea class="rep rep-xxl" id="dossier" placeholder="Section 10 — Politique de sécurité réseau — Site de Roussillon&#10;&#10;10.1 Contexte&#10;Suite au déploiement des services (S4–S8), l'infrastructure de Roussillon est opérationnelle mais sans filtrage des flux inter-VLAN. Suite à l'incident signalé par M. Ferracci (client WiFi ayant accédé aux serveurs internes), Axentis Informatique déploie ce jour une politique de sécurité par ACL.&#10;&#10;10.2 ACL déployées&#10;WIFI-RESTRICTION (G0/0.24 IN) :&#10;  Règles : deny ip 172.16.24.0 0.0.0.255 172.16.10.0 0.0.0.255 / permit ip 172.16.24.0 0.0.0.255 any&#10;  Effet : bloque l'accès aux serveurs internes, autorise Internet&#10;&#10;CAMERAS-ISOLATION (G0/0.23 IN) :&#10;  Règles : …&#10;&#10;PERSONNEL-RESTRICTIONS (G0/0.21 IN) :&#10;  Règles : …&#10;&#10;10.3 Tableau de placement&#10;Interface | ACL | Sens | Effet attendu&#10;G0/0.24 | WIFI-RESTRICTION | IN | …&#10;…&#10;&#10;10.4 Résultats plan de recette&#10;Date : … — 20/20 conformes (ou X non-conformités corrigées)&#10;…&#10;&#10;10.5 Recommandations d'évolution&#10;…"></textarea>
+</div>
+
+<div class="ex">
+  <div class="ex-t">📸 Capture Packet Tracer</div>
+  <label class="q">Topologie Roussillon avec les 3 ACL actives + show access-lists complet :</label>
+  <div class="uz" onclick="document.getElementById('img1').click()">
+    <input type="file" id="img1" accept="image/*" onchange="compImg(this.files[0],'pv1','ph1',b=>imgD.c1=b)">
+    <div class="uz-t">📎 Topologie + show access-lists</div>
+    <div class="uz-h" id="ph1">JPG / PNG – compression auto</div>
+    <img id="pv1" style="display:none;max-width:100%;margin-top:10px;">
+  </div>
+</div>
+
+<hr class="sep">
+<div class="ssyn">Auto-évaluation — Atelier 1 S9</div>
+<div style="margin:18px 0 10px;">
+  <div style="font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;">📊 Évaluez votre niveau sur chaque critère</div>
+  <div class="ae-row ae-hdr"><span>Critère</span><span style="text-align:center">★★★ Maîtrisé</span><span style="text-align:center">★★☆ En cours</span><span style="text-align:center">★☆☆ À revoir</span><span style="text-align:center">? Non traité</span></div>
+  <div id="aec"></div>
+</div>
+
+</div>
+
+<div class="footer">
+  <span><strong style="color:var(--orange);">S9</strong> — Atelier 1 : ACL Roussillon</span>
+  <span>Lycée Louis Lumière – Chelles | Bac Pro CIEL</span>
+</div>
+<div class="sbar">
+  <div class="sbar-info">Remplissez tous les champs avant de générer.</div>
+  <button class="btn" onclick="dl()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé !</div>
+
+<script>
+document.getElementById('dat').valueAsDate=new Date();
+const imgD={c1:null};
+function compImg(file,pvId,phId,cb){const r=new FileReader();r.onload=ev=>{const i=new Image();i.onload=()=>{const M=900;let w=i.width,h=i.height;if(w>M||h>M){if(w>h){h=Math.round(h*M/w);w=M;}else{w=Math.round(w*M/h);h=M;}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);const b=c.toDataURL('image/jpeg',0.72);document.getElementById(pvId).src=b;document.getElementById(pvId).style.display='block';document.getElementById(phId).textContent=`${w}×${h}px`;cb(b);};i.src=ev.target.result;};r.readAsDataURL(file);}
+const crit=['Je comprends le rôle des ACL après déploiement VLANs et services','J\'ai rempli le tableau d\'analyse des 10 flux avant de coder','J\'ai créé WIFI-RESTRICTION (deny serveurs, permit Internet) dans le bon ordre','J\'ai créé CAMERAS-ISOLATION (permit VMS TCP 8080, deny tout)','J\'ai créé PERSONNEL-RESTRICTIONS (deny SSH/HTTP, permit SMB/DNS, permit général)','J\'ai appliqué chaque ACL sur la bonne interface dans le bon sens IN','J\'ai complété le plan de recette 20 tests avec résultats PT','J\'ai analysé et corrigé les 6 scénarios de débogage','J\'ai su utiliser show access-lists et interpréter les compteurs','J\'ai rédigé la section 10 complète du dossier de déploiement'];
+const niv=[{l:'★★★ Maîtrisé',v:'maitrise'},{l:'★★☆ En cours',v:'en_cours'},{l:'★☆☆ À revoir',v:'a_revoir'},{l:'? Non traité',v:'non_traite'}];
+const ae={};const cont=document.getElementById('aec');
+crit.forEach((c,i)=>{ae['c'+(i+1)]={critere:c,niveau:'non_traite'};const row=document.createElement('div');row.className='ae-row';let h=`<span>${c}</span>`;niv.forEach(n=>{const id=`ae${i}-${n.v}`;h+=`<span style="text-align:center"><input type="radio" name="ae${i}" id="${id}" value="${n.v}" onchange="ae['c${i+1}'].niveau=this.value" style="display:none"><label for="${id}" style="cursor:pointer;font-size:11px;padding:3px 6px;border-radius:4px;border:1px solid #ddd;display:inline-block">${n.l}</label></span>`;});row.innerHTML=h;cont.appendChild(row);document.querySelectorAll(`input[name="ae${i}"]`).forEach(radio=>{radio.addEventListener('change',()=>{document.querySelectorAll(`input[name="ae${i}"]`).forEach(r2=>{const lb=document.querySelector(`label[for="${r2.id}"]`);lb.style.background=r2.checked?'var(--ciel)':'';lb.style.color=r2.checked?'#fff':'';lb.style.borderColor=r2.checked?'var(--bleu)':'#ddd';});});});});
+const g=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+const s=id=>{const e=document.getElementById(id);return e?e.value:'';};
+const tr=n=>({res:g(n),ok:s(n+'c'),acl:g(n+'a')});
+function dl(){
+  const data={
+    meta:{devoir:'S9 — Atelier 1 ACL Roussillon',eleve:{nom:g('nom'),prenom:g('prenom'),classe:g('classe')},date:g('dat'),genere_le:new Date().toISOString()},
+    p1:{wildcards:{v21:g('wc21'),v22:g('wc22'),v23:g('wc23'),v24:g('wc24'),v10:g('wc10')},serveurs:{dns:g('srv-dns'),vms:g('srv-vms'),dhcp:g('srv-dhcp'),smb:g('srv-smb')},flux:{f1:{d:s('f1d'),j:document.getElementById('f1j')?.value.trim()},f2:{d:s('f2d'),j:document.getElementById('f2j')?.value.trim()},f3:{d:s('f3d'),j:document.getElementById('f3j')?.value.trim()},f4:{d:s('f4d'),j:document.getElementById('f4j')?.value.trim()},f5:{d:s('f5d'),j:document.getElementById('f5j')?.value.trim()},f6:{d:s('f6d'),j:document.getElementById('f6j')?.value.trim()},f7:{d:s('f7d'),j:document.getElementById('f7j')?.value.trim()},f8:{d:s('f8d'),j:document.getElementById('f8j')?.value.trim()},f9:{d:s('f9d'),j:document.getElementById('f9j')?.value.trim()},f10:{d:s('f10d'),j:document.getElementById('f10j')?.value.trim()}},q11:g('q11'),q12:g('q12'),q13:g('q13')},
+    p2:{etat_init:{r_init:g('route-init'),p01:g('p01'),p02:g('p02'),p03:g('p03'),p04:g('p04'),p05:g('p05')},wifi:{papier:g('wifi-papier'),q21:g('q21'),saisie:g('wifi-saisie'),show:g('wifi-show'),intf:g('wifi-intf')},cam:{papier:g('cam-papier'),q22:g('q22'),saisie:g('cam-saisie')},perso:{papier:g('perso-papier'),q23:g('q23'),saisie:g('perso-saisie')}},
+    p3:{tests:{r01:tr('r01'),r02:tr('r02'),r03:tr('r03'),r04:tr('r04'),r05:tr('r05'),r06:tr('r06'),r07:tr('r07'),r08:tr('r08'),r09:tr('r09'),r10:tr('r10'),r11:tr('r11'),r12:tr('r12'),r13:tr('r13'),r14:tr('r14'),r15:tr('r15'),r16:tr('r16'),r17:tr('r17'),r18:tr('r18'),r19:tr('r19'),r20:tr('r20')},bilan:g('recette-bilan'),show_all:g('show-all'),q31:g('q31')},
+    p4:{d1:{trace:g('d1-trace'),correc:g('d1-correc')},d2:{erreur:g('d2-erreur'),correc:g('d2-correc')},d3:{analyse:g('d3-analyse'),correc:g('d3-correc')},d4:{trace:g('d4-trace'),principe:g('d4-principe')},d5:{trace:g('d5-trace'),correc:g('d5-correc')},d6:{symptome:g('d6-symptome'),correc:g('d6-correc')}},
+    p5:{run_acl:g('run-acl'),intf_acl:g('intf-acl'),dossier:g('dossier'),capture:imgD.c1?'présente':'absente'},
+    auto_eval:ae
+  };
+  const fn=(g('nom')+g('prenom')).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${fn}_S9Atelier1.json`;a.click();
+  const t=document.getElementById('toast');t.style.display='block';setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

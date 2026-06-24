@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S5 – Cours : Routage inter-sites | Provence Évasion</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:11pt;color:#222;background:#fff;padding-bottom:80px;}
+/* EN-TÊTE */
+header{background:var(--marine);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
+.badge-ciel{background:var(--bleu);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13pt;padding:4px 14px;border-radius:4px;}
+.header-right{font-family:'Roboto',sans-serif;font-size:10pt;text-align:right;opacity:.9;}
+.header-line{height:3px;background:linear-gradient(90deg,var(--bleu),var(--ciel));}
+/* PAGE DE GARDE */
+.garde{padding:32px 40px 24px;border-bottom:2px solid var(--marine);}
+.titre-doc{font-family:'Roboto',sans-serif;font-weight:700;font-size:17pt;color:var(--vert);text-align:center;margin-bottom:6px;}
+.sous-titre{font-family:'Roboto',sans-serif;font-style:italic;font-size:13pt;color:var(--marine);text-align:center;margin-bottom:10px;}
+.infos-doc{text-align:center;color:var(--marine);font-size:10pt;margin-bottom:20px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--ciel-bg);border:1px solid var(--ciel);border-radius:6px;padding:16px;margin-bottom:20px;}
+.eleve-box input{border:1px solid var(--bleu);border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:10pt;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,87,34,.15);}
+/* COMPÉTENCES */
+.comp-table{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:4px;}
+.comp-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;text-align:left;}
+.comp-table .bloc-row{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:5px 10px;}
+.comp-table td{padding:5px 10px;border-bottom:1px solid #dde6f0;}
+.comp-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.ck{color:var(--bleu);font-weight:700;font-size:13pt;}
+.nck{color:#bbb;font-size:13pt;}
+/* CONTENU */
+.content{padding:24px 40px;}
+h1{font-family:'Roboto',sans-serif;font-weight:700;font-size:14pt;color:var(--bleu);margin:28px 0 10px;padding-bottom:4px;border-bottom:2px solid var(--bleu);}
+h2{font-family:'Roboto',sans-serif;font-style:italic;font-size:11pt;color:var(--bleu);margin:18px 0 8px;}
+h3{font-family:'Roboto',sans-serif;font-weight:700;font-size:11pt;color:var(--orange);margin:14px 0 6px;}
+p{margin-bottom:8px;line-height:1.6;}
+.sep{border:none;border-top:1px solid #c8dce8;margin:24px 0;}
+/* BLOCS SPÉCIAUX */
+.consigne{background:#fffbf0;border-left:4px solid var(--orange);padding:12px 16px;border-radius:0 6px 6px 0;margin:12px 0;}
+.consigne strong{color:var(--orange);}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:10pt;padding:14px 18px;border-radius:6px;margin:10px 0;line-height:1.7;white-space:pre-wrap;}
+.cli .comment{color:#7ec8e3;font-style:italic;}
+.info-box{background:var(--ciel-bg);border:1px solid var(--ciel);border-radius:6px;padding:12px 16px;margin:12px 0;}
+.warn-box{background:#fff8f0;border:1px solid var(--orange);border-radius:6px;padding:12px 16px;margin:12px 0;}
+/* TABLEAUX DE DONNÉES */
+.data-table{width:100%;border-collapse:collapse;font-size:10pt;margin:12px 0;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;text-align:left;}
+.data-table td{padding:6px 10px;border:1px solid #c8dce8;}
+.data-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.data-table .td-code{font-family:'Courier New',monospace;color:var(--marine);font-weight:600;}
+.badge-site{display:inline-block;background:var(--marine);color:#fff;font-size:9pt;padding:2px 8px;border-radius:10px;font-weight:600;}
+.badge-wan{display:inline-block;background:var(--orange);color:#fff;font-size:9pt;padding:2px 8px;border-radius:10px;font-weight:600;}
+/* ZONES RÉPONSE */
+.rep{width:100%;border:1px solid var(--bleu);border-radius:4px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:10pt;resize:vertical;color:var(--marine);}
+.rep:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,87,34,.15);}
+.rep-sm{min-height:60px;}
+.rep-md{min-height:90px;}
+.rep-lg{min-height:120px;}
+.qlabel{display:block;font-weight:600;color:var(--marine);margin:10px 0 4px;}
+.num-q{display:inline-block;background:var(--orange);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:9pt;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;margin-right:6px;}
+.inline-field{border:none;border-bottom:2px solid var(--bleu);background:transparent;font-family:'Montserrat',sans-serif;font-size:11pt;color:var(--marine);padding:2px 4px;width:160px;}
+.inline-field:focus{outline:none;border-bottom-color:var(--orange);}
+/* SCHÉMA TOPOLOGIE */
+.topo-container{background:var(--ciel-bg);border:2px solid var(--bleu);border-radius:8px;padding:20px;margin:16px 0;text-align:center;}
+.topo-svg{width:100%;max-width:640px;}
+/* AUTO-ÉVALUATION */
+.ae-table{width:100%;border-collapse:collapse;font-size:10pt;margin:12px 0;}
+.ae-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;text-align:left;}
+.ae-table td{padding:7px 10px;border-bottom:1px solid #dde6f0;vertical-align:middle;}
+.ae-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.stars label{cursor:pointer;font-size:16pt;color:#ddd;transition:color .15s;}
+.stars input[type=radio]{display:none;}
+.stars input[type=radio]:checked ~ label{color:#ddd;}
+.stars label:hover,.stars label:hover ~ label{color:#f0b400!important;}
+.stars input[type=radio]:checked + label{color:#f0b400;}
+.stars{display:flex;flex-direction:row-reverse;width:fit-content;}
+/* PIED DE PAGE */
+footer{background:var(--marine);color:#fff;padding:8px 24px;display:flex;justify-content:space-between;font-size:9pt;font-family:'Roboto',sans-serif;margin-top:32px;}
+/* BARRE STICKY */
+.send-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:3px solid var(--marine);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.1);}
+.send-info{font-size:10pt;color:var(--marine);}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11pt;border:none;border-radius:6px;padding:10px 28px;cursor:pointer;transition:background .2s;}
+.btn-send:hover{background:var(--bleu);}
+#toast{display:none;position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--marine);color:#fff;padding:10px 28px;border-radius:8px;font-family:'Roboto',sans-serif;font-weight:700;font-size:11pt;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:13pt;color:#fff;background:var(--marine);padding:10px 18px;border-radius:6px 6px 0 0;margin-top:24px;}
+.conclusion{background:var(--ciel-bg);border:1px solid var(--ciel);border-top:none;border-radius:0 0 6px 6px;padding:18px 20px;line-height:2.2;}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <img src="data:image/jpeg;base64,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" alt="CIEL" style="height:40px;width:auto;">
+    <span class="badge-ciel">BAC PRO CIEL</span>
+  </div>
+  <div class="header-right">Lycée Louis Lumière – Chelles<br>Année 2025–2026</div>
+</header>
+<div class="header-line"></div>
+
+<div class="garde">
+  <div class="titre-doc">S5 – Routage inter-sites</div>
+  <div class="sous-titre">Interconnecter les 4 sites Provence Évasion</div>
+  <div class="infos-doc">Terminale Bac Pro CIEL &nbsp;|&nbsp; Projet Provence Évasion &nbsp;|&nbsp; Cours (2h30)</div>
+
+  <div class="eleve-box">
+    <input id="eleve-nom" placeholder="Nom">
+    <input id="eleve-prenom" placeholder="Prénom">
+    <input id="eleve-classe" placeholder="Classe">
+    <input id="eleve-date" type="date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th>Code</th><th>Compétence</th><th>Mobilisée</th></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 1 — Conception &amp; réalisation</td></tr>
+    <tr><td>C03</td><td>Participer à un projet</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C07</td><td>Réaliser des maquettes et prototypes</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C11</td><td>Maintenir un système électronique ou réseau informatique</td><td><span class="nck">☐</span></td></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 2 — Installation &amp; exploitation</td></tr>
+    <tr><td>C06</td><td>Valider la conformité d'une installation</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C09</td><td>Installer les éléments d'un système informatique</td><td><span class="ck">☑</span></td></tr>
+    <tr><td>C10</td><td>Exploiter un réseau informatique</td><td><span class="ck">☑</span></td></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 3 — Communication &amp; analyse</td></tr>
+    <tr><td>C01</td><td>Communiquer en situation professionnelle</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C04</td><td>Analyser une structure matérielle et logicielle</td><td><span class="ck">☑</span></td></tr>
+    <tr><td>C08</td><td>Coder</td><td><span class="nck">☐</span></td></tr>
+  </table>
+</div>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>1. Pourquoi le routage ?</h1>
+
+<h2>1.1 La limite des switches</h2>
+<p>Un switch opère au niveau 2 (couche liaison) : il transfère les trames Ethernet en se basant sur les adresses MAC. Il est donc capable de faire communiquer des équipements appartenant au <strong>même réseau logique</strong> (même sous-réseau IP).</p>
+<p>Mais dès que deux équipements se trouvent sur des sous-réseaux différents — même s'ils sont reliés physiquement — le switch ne peut pas acheminer le trafic. Il faut un équipement de niveau 3 : le <strong>routeur</strong>.</p>
+
+<div class="consigne">
+  <strong>Rappel :</strong> Dans la S3 (VLANs), vous avez déjà utilisé du routage inter-VLAN via <em>Router-on-a-Stick</em> pour faire communiquer des VLANs différents sur un même site. Ici, nous allons étendre ce principe entre des sites géographiquement distants.
+</div>
+
+<h2>1.2 Le rôle du routeur</h2>
+<p>Le routeur opère au niveau 3 (couche réseau). Il analyse l'adresse IP de destination de chaque paquet et décide vers quelle interface (et donc quel réseau) le transmettre. Pour cela, il consulte sa <strong>table de routage</strong>.</p>
+
+<label class="qlabel"><span class="num-q">1</span>Pourquoi un switch seul ne suffit-il pas pour connecter deux sites distants ? Citez deux raisons.</label>
+<textarea class="rep rep-md" id="q1-1" placeholder="Raison 1 : …&#10;Raison 2 : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>2. La table de routage</h1>
+
+<h2>2.1 Principe général</h2>
+<p>La table de routage est une base de données interne au routeur. Elle associe un <strong>réseau de destination</strong> à un <strong>prochain saut</strong> (next-hop) ou à une interface de sortie. À la réception de chaque paquet, le routeur cherche l'entrée la plus précise correspondant à l'adresse IP de destination.</p>
+
+<div class="info-box">
+  <strong>Règle du chemin le plus spécifique (longest prefix match) :</strong><br>
+  Si plusieurs entrées correspondent à la destination, le routeur choisit celle avec le masque le plus long (le préfixe /30 est préféré à /24, qui est préféré à /0).
+</div>
+
+<h2>2.2 Types d'entrées dans la table</h2>
+<table class="data-table">
+  <tr><th>Type</th><th>Lettre (IOS)</th><th>Origine</th><th>Exemple</th></tr>
+  <tr><td><strong>Connected (C)</strong></td><td class="td-code">C</td><td>Automatique : interface configurée et active</td><td>192.168.11.0/26 via Gi0/0.11</td></tr>
+  <tr><td><strong>Statique (S)</strong></td><td class="td-code">S</td><td>Saisie manuelle par l'admin</td><td>192.168.21.0/26 via 10.0.0.2</td></tr>
+  <tr><td><strong>Route par défaut (S*)</strong></td><td class="td-code">S*</td><td>Route de dernier recours</td><td>0.0.0.0/0 via 10.0.0.1</td></tr>
+  <tr><td><strong>Dynamique (O, R, E…)</strong></td><td class="td-code">O</td><td>Protocole de routage (OSPF, RIP…)</td><td>Hors périmètre S5</td></tr>
+</table>
+
+<label class="qlabel"><span class="num-q">2</span>Quelle est la différence entre une route <em>Connected</em> et une route <em>statique</em> ? Laquelle nécessite une intervention de l'administrateur ?</label>
+<textarea class="rep rep-md" id="q2-1" placeholder="Votre réponse…"></textarea>
+
+<h2>2.3 Lire la table de routage sur un routeur Cisco</h2>
+<p>La commande <code>show ip route</code> affiche la table de routage. Voici un exemple simplifié pour Router-Apt :</p>
+
+<div class="cli">Router-Apt# <strong>show ip route</strong>
+Codes: C - connected, S - static, R - RIP, O - OSPF
+       * - candidate default, U - per-user static route
+
+Gateway of last resort is not set
+
+C    10.0.0.0/30 is directly connected, GigabitEthernet0/1
+C    10.0.0.4/30 is directly connected, GigabitEthernet0/2
+C    10.0.0.8/30 is directly connected, GigabitEthernet0/3
+C    192.168.11.0/24 is directly connected, GigabitEthernet0/0.11
+C    192.168.13.0/24 is directly connected, GigabitEthernet0/0.13
+C    192.168.14.0/24 is directly connected, GigabitEthernet0/0.14
+C    192.168.15.0/24 is directly connected, GigabitEthernet0/0.15
+<span class="comment">     &lt;-- Les routes statiques vers Roussillon, Saignon, Cucuron s'ajouteront ici --&gt;</span>
+S    192.168.21.0/26 [1/0] via 10.0.0.2
+S    192.168.22.0/25 [1/0] via 10.0.0.2
+S    192.168.23.0/28 [1/0] via 10.0.0.2
+S    192.168.24.0/29 [1/0] via 10.0.0.2</div>
+
+<label class="qlabel"><span class="num-q">3</span>Dans la table de routage ci-dessus, que signifie <code>[1/0]</code> après <code>S 192.168.21.0/26</code> ?</label>
+<textarea class="rep rep-sm" id="q2-2" placeholder="[distance administrative / métrique] — Expliquez chaque valeur…"></textarea>
+
+<label class="qlabel"><span class="num-q">4</span>Pour atteindre un PC à l'adresse 192.168.21.50 depuis Router-Apt, quelle entrée de la table sera utilisée ? Quel sera le prochain saut ?</label>
+<textarea class="rep rep-sm" id="q2-3" placeholder="Entrée : … — Prochain saut : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>3. La topologie WAN de Provence Évasion</h1>
+
+<h2>3.1 Architecture étoile centrée sur Apt</h2>
+<p>Le siège social d'Apt est le point central de l'infrastructure. Les trois sites secondaires (Roussillon, Saignon, Cucuron) se connectent chacun directement à Apt via une liaison WAN point-à-point. Il n'y a pas de liaison directe entre les sites secondaires.</p>
+
+<div class="topo-container">
+<svg class="topo-svg" viewBox="0 0 620 340" xmlns="http://www.w3.org/2000/svg">
+  <!-- Liaisons WAN -->
+  <line x1="310" y1="170" x2="140" y2="80" stroke="#FF5722" stroke-width="3" stroke-dasharray="8,4"/>
+  <line x1="310" y1="170" x2="480" y2="80" stroke="#FF5722" stroke-width="3" stroke-dasharray="8,4"/>
+  <line x1="310" y1="170" x2="310" y2="290" stroke="#FF5722" stroke-width="3" stroke-dasharray="8,4"/>
+  <!-- Labels WAN -->
+  <text x="195" y="118" font-family="Courier New" font-size="10" fill="#FF5722" font-weight="bold">10.0.0.0/30</text>
+  <text x="365" y="118" font-family="Courier New" font-size="10" fill="#FF5722" font-weight="bold">10.0.0.4/30</text>
+  <text x="318" y="235" font-family="Courier New" font-size="10" fill="#FF5722" font-weight="bold">10.0.0.8/30</text>
+  <!-- APT (centre) -->
+  <rect x="250" y="140" width="120" height="60" rx="8" fill="#1E3A5F"/>
+  <text x="310" y="164" font-family="Roboto,sans-serif" font-size="11" fill="white" font-weight="bold" text-anchor="middle">APT (Siège)</text>
+  <text x="310" y="180" font-family="Courier New" font-size="9" fill="#5BB8E8" text-anchor="middle">Router-Apt</text>
+  <text x="310" y="193" font-family="Courier New" font-size="8" fill="#8BC34A" text-anchor="middle">VLAN 11,13,14,15</text>
+  <!-- ROUSSILLON -->
+  <rect x="60" y="44" width="130" height="60" rx="8" fill="#029AED"/>
+  <text x="125" y="68" font-family="Roboto,sans-serif" font-size="11" fill="white" font-weight="bold" text-anchor="middle">ROUSSILLON</text>
+  <text x="125" y="84" font-family="Courier New" font-size="9" fill="#e0f8ff" text-anchor="middle">Router-Rous</text>
+  <text x="125" y="97" font-family="Courier New" font-size="8" fill="#e0f8ff" text-anchor="middle">VLAN 21,22,23,24</text>
+  <!-- SAIGNON -->
+  <rect x="400" y="44" width="120" height="60" rx="8" fill="#029AED"/>
+  <text x="460" y="68" font-family="Roboto,sans-serif" font-size="11" fill="white" font-weight="bold" text-anchor="middle">SAIGNON</text>
+  <text x="460" y="84" font-family="Courier New" font-size="9" fill="#e0f8ff" text-anchor="middle">Router-Saig</text>
+  <text x="460" y="97" font-family="Courier New" font-size="8" fill="#e0f8ff" text-anchor="middle">VLAN 31,32,33,34</text>
+  <!-- CUCURON -->
+  <rect x="240" y="294" width="140" height="38" rx="8" fill="#029AED"/>
+  <text x="310" y="316" font-family="Roboto,sans-serif" font-size="11" fill="white" font-weight="bold" text-anchor="middle">CUCURON</text>
+  <text x="310" y="328" font-family="Courier New" font-size="8" fill="#e0f8ff" text-anchor="middle">Router-Cuc | VLAN 41,42,43,44</text>
+  <!-- légende -->
+  <line x1="30" y1="330" x2="70" y2="330" stroke="#FF5722" stroke-width="3" stroke-dasharray="8,4"/>
+  <text x="78" y="334" font-family="Montserrat,sans-serif" font-size="9" fill="#555">Liaison WAN /30</text>
+</svg>
+</div>
+
+<h2>3.2 Plan d'adressage WAN</h2>
+<p>La plage WAN retenue par Axentis est <strong>10.0.0.0/24</strong>, découpée en sous-réseaux <strong>/30</strong> (4 adresses, 2 utilisables) pour chaque liaison point-à-point.</p>
+
+<table class="data-table">
+  <tr><th>Liaison</th><th>Réseau /30</th><th>Adresse Router-Apt</th><th>Adresse site secondaire</th><th>Interface Apt</th></tr>
+  <tr><td>Apt ↔ Roussillon</td><td class="td-code">10.0.0.0/30</td><td class="td-code">10.0.0.1</td><td class="td-code">10.0.0.2</td><td class="td-code">Gi0/1</td></tr>
+  <tr><td>Apt ↔ Saignon</td><td class="td-code">10.0.0.4/30</td><td class="td-code">10.0.0.5</td><td class="td-code">10.0.0.6</td><td class="td-code">Gi0/2</td></tr>
+  <tr><td>Apt ↔ Cucuron</td><td class="td-code">10.0.0.8/30</td><td class="td-code">10.0.0.9</td><td class="td-code">10.0.0.10</td><td class="td-code">Gi0/3</td></tr>
+</table>
+
+<label class="qlabel"><span class="num-q">5</span>Pourquoi utilise-t-on des sous-réseaux /30 pour les liaisons WAN plutôt que /24 ? Calculez le nombre d'adresses utilisables dans un /30.</label>
+<textarea class="rep rep-md" id="q3-1" placeholder="Justification du /30 :&#10;Calcul : 2^(32-30) = … adresses totales, dont … utilisables (… réseau, … broadcast)"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>4. Configuration des routes statiques</h1>
+
+<h2>4.1 Syntaxe Cisco IOS</h2>
+<p>La commande de configuration d'une route statique est :</p>
+<div class="cli">Router(config)# <strong>ip route</strong> &lt;réseau_dest&gt; &lt;masque&gt; &lt;next-hop_ou_interface&gt;</div>
+
+<p>Exemple : pour que Router-Apt atteigne le VLAN 21 de Roussillon (192.168.21.0/26) en passant par 10.0.0.2 :</p>
+<div class="cli">Router-Apt(config)# ip route 192.168.21.0 255.255.255.192 10.0.0.2</div>
+
+<h2>4.2 Routes statiques nécessaires sur Router-Apt</h2>
+<p>Router-Apt doit connaître tous les réseaux de tous les sites secondaires. Pour Roussillon (4 VLANs), Saignon (4 VLANs) et Cucuron (4 VLANs), cela fait <strong>12 routes statiques</strong> à saisir.</p>
+
+<table class="data-table">
+  <tr><th>Site</th><th>VLAN</th><th>Réseau</th><th>Masque</th><th>Next-hop</th></tr>
+  <tr><td rowspan="4"><span class="badge-site">Roussillon</span></td><td>21</td><td class="td-code">192.168.21.0</td><td class="td-code">255.255.255.192</td><td class="td-code">10.0.0.2</td></tr>
+  <tr><td>22</td><td class="td-code">192.168.22.0</td><td class="td-code">255.255.255.128</td><td class="td-code">10.0.0.2</td></tr>
+  <tr><td>23</td><td class="td-code">192.168.23.0</td><td class="td-code">255.255.255.240</td><td class="td-code">10.0.0.2</td></tr>
+  <tr><td>24</td><td class="td-code">192.168.24.0</td><td class="td-code">255.255.255.248</td><td class="td-code">10.0.0.2</td></tr>
+  <tr><td rowspan="4"><span class="badge-site">Saignon</span></td><td>31</td><td class="td-code">192.168.31.0</td><td class="td-code">255.255.255.192</td><td class="td-code">10.0.0.6</td></tr>
+  <tr><td>32</td><td class="td-code">192.168.32.0</td><td class="td-code">255.255.255.192</td><td class="td-code">10.0.0.6</td></tr>
+  <tr><td>33</td><td class="td-code">192.168.33.0</td><td class="td-code">255.255.255.240</td><td class="td-code">10.0.0.6</td></tr>
+  <tr><td>34</td><td class="td-code">192.168.34.0</td><td class="td-code">255.255.255.248</td><td class="td-code">10.0.0.6</td></tr>
+  <tr><td rowspan="4"><span class="badge-site">Cucuron</span></td><td>41</td><td class="td-code">192.168.41.0</td><td class="td-code">255.255.255.192</td><td class="td-code">10.0.0.10</td></tr>
+  <tr><td>42</td><td class="td-code">192.168.42.0</td><td class="td-code">255.255.255.128</td><td class="td-code">10.0.0.10</td></tr>
+  <tr><td>43</td><td class="td-code">192.168.43.0</td><td class="td-code">255.255.255.240</td><td class="td-code">10.0.0.10</td></tr>
+  <tr><td>44</td><td class="td-code">192.168.44.0</td><td class="td-code">255.255.255.248</td><td class="td-code">10.0.0.10</td></tr>
+</table>
+
+<label class="qlabel"><span class="num-q">6</span>Rédigez les 4 commandes ip route que Router-Roussillon doit appliquer pour atteindre les VLANs d'Apt (VLAN 11, 13, 14, 15).</label>
+<textarea class="rep rep-lg" id="q4-1" placeholder="ip route 192.168.11.0 … …&#10;ip route 192.168.13.0 … …&#10;ip route 192.168.14.0 … …&#10;ip route 192.168.15.0 … …"></textarea>
+
+<h2>4.3 Route par défaut sur les sites secondaires</h2>
+<p>Au lieu de saisir toutes les routes vers Apt ET les autres sites secondaires, les routeurs secondaires utilisent une <strong>route par défaut</strong> (default route) : tout trafic sans correspondance plus précise est envoyé vers Router-Apt, qui se chargera du routage final.</p>
+<div class="cli"><span class="comment">! Sur Router-Roussillon :</span>
+Router-Rous(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.1
+
+<span class="comment">! Sur Router-Saignon :</span>
+Router-Saig(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.5
+
+<span class="comment">! Sur Router-Cucuron :</span>
+Router-Cuc(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.9</div>
+
+<label class="qlabel"><span class="num-q">7</span>Pourquoi la route par défaut 0.0.0.0/0 est-elle appelée "route de dernier recours" ? Que se passerait-il si un routeur secondaire n'en avait pas ?</label>
+<textarea class="rep rep-md" id="q4-2" placeholder="Votre réponse…"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>5. Vérification du routage</h1>
+
+<h2>5.1 Commandes utiles</h2>
+<table class="data-table">
+  <tr><th>Commande</th><th>Usage</th><th>Ce qu'elle affiche</th></tr>
+  <tr><td class="td-code">show ip route</td><td>Vérifier la table de routage</td><td>Toutes les routes (C, S, S*…)</td></tr>
+  <tr><td class="td-code">show ip interface brief</td><td>État des interfaces</td><td>Statut up/down, adresse IP</td></tr>
+  <tr><td class="td-code">ping &lt;IP&gt;</td><td>Tester la connectivité</td><td>5 pings, taux de succès</td></tr>
+  <tr><td class="td-code">traceroute &lt;IP&gt;</td><td>Tracer le chemin</td><td>Liste des sauts intermédiaires</td></tr>
+  <tr><td class="td-code">show running-config</td><td>Voir la configuration active</td><td>Config complète du routeur</td></tr>
+</table>
+
+<h2>5.2 Exemple d'analyse — show ip interface brief</h2>
+<div class="cli">Router-Apt# <strong>show ip interface brief</strong>
+Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0    unassigned      YES unset  up                    up
+GigabitEthernet0/0.11 192.168.11.1   YES manual up                    up
+GigabitEthernet0/0.13 192.168.13.1   YES manual up                    up
+GigabitEthernet0/0.14 192.168.14.1   YES manual up                    up
+GigabitEthernet0/0.15 192.168.15.1   YES manual up                    up
+GigabitEthernet0/1    10.0.0.1       YES manual up                    up
+GigabitEthernet0/2    10.0.0.5       YES manual up                    up
+GigabitEthernet0/3    10.0.0.9       YES manual up                    up</div>
+
+<label class="qlabel"><span class="num-q">8</span>Dans la sortie ci-dessus, l'interface Gi0/3 est "up/up" mais vous n'arrivez pas à pinger 10.0.0.10 (Router-Cucuron). Citez au moins 3 causes possibles à investiguer.</label>
+<textarea class="rep rep-lg" id="q5-1" placeholder="Cause 1 : …&#10;Cause 2 : …&#10;Cause 3 : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>6. Trajet d'un paquet inter-sites — exercice de synthèse</h1>
+
+<h2>6.1 Scénario</h2>
+<p>Un PC du VLAN 21 de Roussillon (IP : <strong>192.168.21.10</strong>) veut envoyer un paquet à un serveur du VLAN 15 d'Apt (IP : <strong>192.168.15.20</strong>).</p>
+
+<div class="info-box">
+  <strong>Rappel topologique :</strong><br>
+  PC-Rous-1 (192.168.21.10) → SW-Rous → Router-Rous (10.0.0.2) → liaison WAN → Router-Apt (10.0.0.1) → SW-Apt → Serveur-Apt (192.168.15.20)
+</div>
+
+<label class="qlabel"><span class="num-q">9</span>Décrivez étape par étape le trajet complet du paquet, en précisant pour chaque étape : quel équipement prend la décision, quelle entrée de sa table de routage est utilisée, et vers quelle interface le paquet est envoyé.</label>
+<textarea class="rep rep-lg" id="q6-1" placeholder="Étape 1 — PC-Rous-1 : Le PC vérifie si 192.168.15.20 est sur son réseau local…&#10;Étape 2 — Router-Rous : Reçoit le paquet, consulte sa table…&#10;Étape 3 — Router-Apt : …&#10;Étape 4 — Arrivée : …"></textarea>
+
+<label class="qlabel"><span class="num-q">10</span>Quel chemin emprunte la réponse du serveur (192.168.15.20 → 192.168.21.10) ? Est-ce exactement l'inverse ? Expliquez.</label>
+<textarea class="rep rep-md" id="q6-2" placeholder="Votre réponse…"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<div class="section-synth-titre">🎯 Synthèse — Complétez les phrases clés</div>
+<div class="conclusion">
+  <p>Le routeur opère à la couche <input class="inline-field" id="synth-1" placeholder="?"> du modèle OSI et prend ses décisions en se basant sur les adresses <input class="inline-field" id="synth-2" placeholder="?">.</p>
+  <p>Une route <em>Connected</em> (C) apparaît automatiquement quand une interface est <input class="inline-field" id="synth-3" placeholder="?"> et <input class="inline-field" id="synth-4" placeholder="?">.</p>
+  <p>Pour Provence Évasion, Router-Apt doit posséder au total <input class="inline-field" id="synth-5" placeholder="?"> routes statiques vers les sites secondaires.</p>
+  <p>Les sous-réseaux /30 offrent exactement <input class="inline-field" id="synth-6" placeholder="?"> adresses utilisables, ce qui est suffisant pour une liaison <input class="inline-field" id="synth-7" placeholder="?">.</p>
+  <p>La route par défaut s'écrit <input class="inline-field" id="synth-8" placeholder="? / ?"> et est utilisée quand aucune autre route ne <input class="inline-field" id="synth-9" placeholder="?">.</p>
+</div>
+
+<hr class="sep">
+
+<!-- AUTO-ÉVALUATION -->
+<h1>Auto-évaluation</h1>
+<table class="ae-table" id="ae-table"></table>
+
+</div><!-- /content -->
+
+<footer>
+  <div>S5 – Cours Routage inter-sites | Provence Évasion</div>
+  <div>Lycée Louis Lumière – Chelles</div>
+</footer>
+
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div id="toast">✅ Fichier JSON téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+const AE_CRITERES = [
+  "J'explique le rôle d'un routeur et sa différence avec un switch",
+  "Je distingue routes Connected, statiques et route par défaut",
+  "Je lis et interprète une table de routage (show ip route)",
+  "Je justifie l'usage de sous-réseaux /30 pour les liaisons WAN",
+  "Je rédige des commandes ip route correctes",
+  "Je décris le trajet complet d'un paquet inter-sites"
+];
+
+function buildAE(){
+  const t = document.getElementById('ae-table');
+  t.innerHTML = '<tr><th>Critère</th><th>★★★ Maîtrisé</th><th>★★☆ En cours</th><th>★☆☆ À revoir</th><th>? Non traité</th></tr>';
+  AE_CRITERES.forEach((c,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c}</td>
+      ${['maitrise','en_cours','a_revoir','non_traite'].map((v,j)=>`
+      <td style="text-align:center">
+        <label style="cursor:pointer;font-size:${j<3?'16':'13'}pt;color:${j<3?'#f0b400':'#888'}">
+          <input type="radio" name="ae${i}" value="${v}" style="display:none">
+          ${['★★★','★★☆','★☆☆','?'][j]}
+        </label>
+      </td>`).join('')}`;
+    t.appendChild(tr);
+  });
+}
+buildAE();
+
+function getAE(){
+  const r={};
+  AE_CRITERES.forEach((c,i)=>{
+    const sel = document.querySelector(`input[name="ae${i}"]:checked`);
+    r[`critere_${i+1}`]={critere:c, niveau: sel?sel.value:'non_traite'};
+  });
+  return r;
+}
+
+function v(id){return (document.getElementById(id)||{value:''}).value;}
+
+function genererJSON(){
+  const data={
+    meta:{
+      devoir:"S5 – Cours : Routage inter-sites | Provence Évasion",
+      eleve:{nom:v('eleve-nom'),prenom:v('eleve-prenom'),classe:v('eleve-classe')},
+      date:v('eleve-date'),
+      genere_le:new Date().toISOString()
+    },
+    partie1_pourquoi_routage:{q1:v('q1-1')},
+    partie2_table_routage:{q2:v('q2-1'),q3:v('q2-2'),q4:v('q2-3')},
+    partie3_wan:{q5:v('q3-1')},
+    partie4_routes_statiques:{q6:v('q4-1'),q7:v('q4-2')},
+    partie5_verification:{q8:v('q5-1')},
+    partie6_synthese_trajet:{q9:v('q6-1'),q10:v('q6-2')},
+    synthese:{s1:v('synth-1'),s2:v('synth-2'),s3:v('synth-3'),s4:v('synth-4'),s5:v('synth-5'),s6:v('synth-6'),s7:v('synth-7'),s8:v('synth-8'),s9:v('synth-9')},
+    auto_evaluation:getAE()
+  };
+  const nom=v('eleve-nom'),prenom=v('eleve-prenom');
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${safeName}_S5Cours.json`;
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

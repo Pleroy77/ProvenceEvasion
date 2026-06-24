@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S5 – Atelier 1 : Construction topologie &amp; routage Apt↔Roussillon | Provence Évasion</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:11pt;color:#222;background:#fff;padding-bottom:80px;}
+header{background:var(--marine);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
+.badge-ciel{background:var(--bleu);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13pt;padding:4px 14px;border-radius:4px;}
+.header-right{font-family:'Roboto',sans-serif;font-size:10pt;text-align:right;opacity:.9;}
+.header-line{height:3px;background:linear-gradient(90deg,var(--orange),var(--vert));}
+.garde{padding:32px 40px 24px;border-bottom:2px solid var(--marine);}
+.titre-doc{font-family:'Roboto',sans-serif;font-weight:700;font-size:17pt;color:var(--vert);text-align:center;margin-bottom:6px;}
+.sous-titre{font-family:'Roboto',sans-serif;font-style:italic;font-size:13pt;color:var(--marine);text-align:center;margin-bottom:10px;}
+.infos-doc{text-align:center;color:var(--marine);font-size:10pt;margin-bottom:20px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--ciel-bg);border:1px solid var(--ciel);border-radius:6px;padding:16px;margin-bottom:20px;}
+.eleve-box input{border:1px solid var(--bleu);border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:10pt;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--orange);}
+.comp-table{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:4px;}
+.comp-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;text-align:left;}
+.comp-table .bloc-row{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:5px 10px;}
+.comp-table td{padding:5px 10px;border-bottom:1px solid #dde6f0;}
+.comp-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.ck{color:var(--bleu);font-weight:700;font-size:13pt;}
+.nck{color:#bbb;font-size:13pt;}
+.content{padding:24px 40px;}
+h1{font-family:'Roboto',sans-serif;font-weight:700;font-size:14pt;color:var(--bleu);margin:28px 0 10px;padding-bottom:4px;border-bottom:2px solid var(--bleu);}
+h2{font-family:'Roboto',sans-serif;font-style:italic;font-size:11pt;color:var(--bleu);margin:18px 0 8px;}
+h3{font-family:'Roboto',sans-serif;font-weight:700;font-size:11pt;color:var(--orange);margin:14px 0 6px;}
+p{margin-bottom:8px;line-height:1.6;}
+.sep{border:none;border-top:1px solid #c8dce8;margin:24px 0;}
+.consigne{background:#fffbf0;border-left:4px solid var(--orange);padding:12px 16px;border-radius:0 6px 6px 0;margin:12px 0;}
+.consigne strong{color:var(--orange);}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:10pt;padding:14px 18px;border-radius:6px;margin:10px 0;line-height:1.7;white-space:pre-wrap;}
+.cli .comment{color:#7ec8e3;font-style:italic;}
+.info-box{background:var(--ciel-bg);border:1px solid var(--ciel);border-radius:6px;padding:12px 16px;margin:12px 0;}
+.warn-box{background:#fff8f0;border:1px solid var(--orange);border-radius:6px;padding:12px 16px;margin:12px 0;}
+.data-table{width:100%;border-collapse:collapse;font-size:10pt;margin:12px 0;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;text-align:left;}
+.data-table td{padding:6px 10px;border:1px solid #c8dce8;}
+.data-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.data-table .td-code{font-family:'Courier New',monospace;color:var(--marine);font-weight:600;}
+.rep{width:100%;border:1px solid var(--bleu);border-radius:4px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:10pt;resize:vertical;color:var(--marine);}
+.rep:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,87,34,.15);}
+.rep-sm{min-height:60px;}
+.rep-md{min-height:90px;}
+.rep-lg{min-height:130px;}
+.rep-xl{min-height:180px;}
+.qlabel{display:block;font-weight:600;color:var(--marine);margin:10px 0 4px;}
+.num-q{display:inline-block;background:var(--orange);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:9pt;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;margin-right:6px;}
+.step-badge{display:inline-block;background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:10pt;padding:3px 12px;border-radius:12px;margin-right:8px;}
+.ping-table{width:100%;border-collapse:collapse;font-size:10pt;margin:12px 0;}
+.ping-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;text-align:left;}
+.ping-table td{padding:7px 10px;border-bottom:1px solid #dde6f0;vertical-align:middle;}
+.ping-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.ping-table select{border:1px solid var(--bleu);border-radius:4px;padding:4px 8px;font-family:'Montserrat',sans-serif;font-size:10pt;color:var(--marine);background:white;width:130px;}
+.upload-zone{border:2px dashed var(--bleu);border-radius:8px;padding:16px;text-align:center;cursor:pointer;background:var(--ciel-bg);margin:10px 0;transition:border-color .2s;}
+.upload-zone:hover{border-color:var(--orange);background:#fffbf0;}
+.upload-text{color:var(--marine);font-weight:600;font-size:11pt;margin-bottom:4px;}
+.upload-hint{color:#666;font-size:9pt;}
+.upload-zone input[type=file]{display:none;}
+.ae-table{width:100%;border-collapse:collapse;font-size:10pt;margin:12px 0;}
+.ae-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;text-align:left;}
+.ae-table td{padding:7px 10px;border-bottom:1px solid #dde6f0;vertical-align:middle;}
+.ae-table tr:nth-child(even) td{background:var(--ciel-bg);}
+footer{background:var(--marine);color:#fff;padding:8px 24px;display:flex;justify-content:space-between;font-size:9pt;font-family:'Roboto',sans-serif;margin-top:32px;}
+.send-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:3px solid var(--marine);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.1);}
+.send-info{font-size:10pt;color:var(--marine);}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11pt;border:none;border-radius:6px;padding:10px 28px;cursor:pointer;transition:background .2s;}
+.btn-send:hover{background:var(--bleu);}
+#toast{display:none;position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--marine);color:#fff;padding:10px 28px;border-radius:8px;font-family:'Roboto',sans-serif;font-weight:700;font-size:11pt;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:13pt;color:#fff;background:var(--marine);padding:10px 18px;border-radius:6px 6px 0 0;margin-top:24px;}
+.inline-field{border:none;border-bottom:2px solid var(--bleu);background:transparent;font-family:'Montserrat',sans-serif;font-size:11pt;color:var(--marine);padding:2px 4px;width:180px;}
+.inline-field:focus{outline:none;border-bottom-color:var(--orange);}
+.conclusion{background:var(--ciel-bg);border:1px solid var(--ciel);border-top:none;border-radius:0 0 6px 6px;padding:18px 20px;line-height:2.4;}
+.badge-apt{background:var(--marine);color:#fff;padding:2px 8px;border-radius:10px;font-size:9pt;font-weight:700;}
+.badge-rous{background:var(--bleu);color:#fff;padding:2px 8px;border-radius:10px;font-size:9pt;font-weight:700;}
+.inline-sel{border:1px solid var(--bleu);border-radius:4px;padding:4px 8px;font-family:'Montserrat',sans-serif;font-size:10pt;color:var(--marine);background:white;}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQIAHAAcAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCABEAJYDAREAAhEBAxEB/8QAHAAAAQUBAQEAAAAAAAAAAAAABgABAwQFAgcI/8QAGgEAAgMBAQAAAAAAAAAAAAAAAAUBAgMEBv/aAAwDAQACEAMQAAAB+qQQIECBAgQIECBAgQIECBAgYjB7uHB7eCntjvcPeRcDCO1Rlits56EPAxxOzh7i4i1UsBUraKaka9j3FkFbTLy30nlyLgY1tcqG3OSrmeD3cBondV9M7uOwe2Ty11ob4FiproYdAU4RnyN/NW6CO1fOX/nNfl7Mzo5WmNrj7srp5PQkXoUFPXEKcJZa6ADxFdx39Z8v6kQapj5G/mrdAg8+e+ft5bSVnD7eE+RvwR2iN0zuvfO1nqINU81daWuReqbXMtQhwjLVbeWl9HDdyc7fmFmayWltbm69/h787fnGGSyznoSLmWJ28MlbhzZQiSZcylqUdsESZqHHcWz5iQgY1yI8tq4VZi/E9h0EYQEMFokStTbi00GTaDCl+gBb0gmGDuDKtEwb9bVSLBOHMOGHapnS4nem5WzhhTX2DLZwpEdBXkngcOJJoOAYIJL0SgYjOkvwdBnSa0T/AP/EACcQAAICAQMDBAIDAAAAAAAAAAMEAgUBAAY0ERITEBQVFiEzIjZA/9oACAEBAAEFAv8AHnPbg1yEei2rB9CsGA5DeY0BkbOGmxqRnez6gvMZyQ3aulayaYubOVWH7eXX28uqW2laxctpLMQl3w9GeNqtl3CND3zh15ryovxAs5vtgrABixUBLk44hQp+du7h7crVnFPgUNKogS1bc8P6fQke4aq8TaVXwFtCfad8ncasj0r6nnejnEp+du7iKjcnDwWmqrBI19tzw/p9WvJXu+T30f4mK3+W01/ApOM0GwWIDQZtgh0YsToU/O3dw9tPrqqfMpaXdA3m254rBfAvkVtYz1xp1OLgkl5ruB/UvW9G9NojcjKjNjIKPPWYMe2RqpqsXVZO0D9RPr6ifVJTEq5u1M2Wfgi6+CLqGO2GiPCE42wFRdK9r8ki8KbpLUAisXqq66FgKyEw8JUzrg69V2wEgke3WXesLhasnh4WXvso5tu3q6GkLlaxnDdSpcYz3Y1ZmGDc25DiMDc7yrlRE8Ud0lLFtjC4C19BZHdluAkRWe4CwfoNw2Kzu2bmujZX7qDUgD/uFGRiK15I2b+k8zt3twp4I4z19GEl29BUAtBesUUIymB2A1AiAZFZgIFxKjYUC3hdICmhVaYT+KGSkFA2PDDy5qEZZ9uLu8I/L8OjnWMdMf/EAC4RAAEDAgMFCAIDAAAAAAAAAAEAAgMEERIhMRAyM0FSBRMUFSBCUXEiI0BhYv/aAAgBAwEBPwH+Hon1kbdM06rlfk1MqJWc0yuHvCZI2QXaVLK2IXcjXnkEyuB3wnPswvChqjK/DZVdSaZgcBdebu6F5s7oVHVGqBJFrKarMT8NkDcX2ybh2Uxu0sabFPb38p7tSRujNnKh0cnF1RKmU0bBopKRj9Mk9oZCWj4VHxV2twm/a7Op4pYiXtvmvBU/Qo4Y4dwWVXximbo2uFwQoow+5doFFGGSjDoQqd1n4DzVQ67sI0CpR+lxVJxRtm4blR8VdrcJv2oW1BH6r2/pd3W/6VNiETceqq+MUzdHolxU8pwrF34xt3wsnujl5lTcV32oY8EYanB1PL9JlRG8XupKtjNI09wfCXN+FR8VdrcJv2uzZo44iHutmvFwdYTJY5dw3VXxim1EWEfkvERdW2aETNsoI3Ry2cmbsX2o6a0hkdslhbMM0aF/IplD1lOZ+BY1QUron4iVWUxqWBoNl5S/qXlL+pUdI6lJub3U1I6V5cCvAO+V4F3ygLC2025pgY3IBX5K6uEDdXWivZXGiJAV+SxImyBusQ2neCcnHJe5fK5BNKdqE7MJxu1EXKIOpXuTb/KOoQzOabf02C12W9Fh6LDbbZ//xAAuEQABAwIDBQgCAwAAAAAAAAABAAIDBBESITEQMjNBUgUTFBUgI1FxIkJAYoH/2gAIAQIBAT8B/h6plI92uSbTRs3k6CN/JPoj+hT43R7yjidKbNQom8yn0RG4U1l3hpU1MImYrqkphUuLSbLypvUvKm9SrKUUxFje6ipRIzFdEWNtse+NlQLODnC4THdzGMaZI2QXCrdWpobBGn1Ejzqo6p7dc0xxdKCVV8JdlcR30u0KiWKQBhsvG1HUpJpJt83VLwgn7x2tNjdSSFtg3UqSQvjN+RU4u3GOSgbZuI81Un3mhVXCO2LiNVXwl2VxHfSldAD7tv8AVjo/6qpwmZ2DRUvCCfvH0R4Z4hiWHufwdulZsa+PkFFw2qV+OQuCBE8f2n08jDoo6V79ckxpZKAVV8JdlcR30u0YZJJAWNvkvCT9BT4ZIt8WVLwgnQSXOS7iXp2wypgqLnY2jeEZ0YQXH0B8K1sChJVkB0bG3Mbz0Y2fCDKJjxZ8Z9RynvEGu5HEtVhN16MH5gizUrVeWezg++4dWFy+riSsFfuyUAP5mA+WQKKQ3lWzRxsYI7IysnIUkS0u7CyQe8/tZtm9Rzf++v1/Kfccp75A3zoiYzW1XVT778wgaKEuZ3Zvxns4PvuH8FtipQqXYcNOPKKtANZsDt3O8qONtGjDlhkIMDVbwsuUjzB715REBsJptvgkfdNjWeeviSjxhuQy7L7Qjr8TUyseEg+xunvEErnsZpX6j0eUXgMY6XPZwKitC4QXtP8AUf1GFpiG49L0l2nq4ezAFit2dy3IfpbIRVNQQtJ3uDoTKSvQDydozNrKvpT+YZ1DbbfZbT0hcQYNQS31iAhhWbK3I5qgKEsUUd592+J92+IRPWIUlzZ3hZ6qVigbHaf5X6z/ADv1jpBQpo0V0PAXYvOuzR4x0uk6A4o3VugMt1LREIzXTVewUXaM3IlBYDc3g7QtMQRBJW6sRxHkSghNxLgFWguOUkJaCliNI8Zg+1VgixbYOZaPF8rBgNdYkb4xmIO4iv0rYL7IqwOsTaEJVC0NAgrjJLOt2qpLsujiFfi7bE0kRWO1VkqePYRCoBsTGeI7Eb1mioVOLLJdRJ4gAwaRMO0IUBAaFl5NnoBrKM1xLAuVLhMOABtqRxmZL91IDlBFYADKIkt7RbRSjWtMrp1cW2YQsrS4oHg0AcwWyx4lR+ieDeQ0gNWkb56IOrKQMwOqFsDsblKOaj12WGrjaIK7MVmMoDWZduyB4lm8A3zqAnBRR4RjToGXCXuXFa5Gy94ml9Y9XIeRXaAMiQMlMoWqgKRLmTIh5ZEjUjoprAbGFFicnQS3IxF1CjV0ekUxdvqqsAOMZl0asumtgMPllBq8gHMbtCO4UhKpNcZhjHOQKBCgArE9jM2IARK6Ak3VANM2Lo0MusBdW68sRKCuJdWto4CqxcbTqBc1BTcMKrAdEcjtAeTlFRserLNaRsvH5S2q6mAATCWMElYIBRsQTgcmaXetts1H7FagrzBSCgFAGgT/2Q==" alt="CIEL" style="height:40px;width:auto;">
+    <span class="badge-ciel">BAC PRO CIEL</span>
+  </div>
+  <div class="header-right">Lycée Louis Lumière – Chelles<br>Année 2025–2026</div>
+</header>
+<div class="header-line"></div>
+
+<div class="garde">
+  <div class="titre-doc">S5 – Atelier 1</div>
+  <div class="sous-titre">Construction topologie 4 sites &amp; routage Apt ↔ Roussillon</div>
+  <div class="infos-doc">Terminale Bac Pro CIEL &nbsp;|&nbsp; Projet Provence Évasion &nbsp;|&nbsp; Atelier (4h)</div>
+
+  <div class="eleve-box">
+    <input id="eleve-nom" placeholder="Nom">
+    <input id="eleve-prenom" placeholder="Prénom">
+    <input id="eleve-classe" placeholder="Classe">
+    <input id="eleve-date" type="date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th>Code</th><th>Compétence</th><th>Mobilisée</th></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 1</td></tr>
+    <tr><td>C03</td><td>Participer à un projet</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C07</td><td>Réaliser des maquettes et prototypes</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C11</td><td>Maintenir un système électronique ou réseau informatique</td><td><span class="nck">☐</span></td></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 2</td></tr>
+    <tr><td>C06</td><td>Valider la conformité d'une installation</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C09</td><td>Installer les éléments d'un système informatique</td><td><span class="ck">☑</span></td></tr>
+    <tr><td>C10</td><td>Exploiter un réseau informatique</td><td><span class="ck">☑</span></td></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 3</td></tr>
+    <tr><td>C01</td><td>Communiquer en situation professionnelle</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C04</td><td>Analyser une structure matérielle et logicielle</td><td><span class="ck">☑</span></td></tr>
+    <tr><td>C08</td><td>Coder</td><td><span class="nck">☐</span></td></tr>
+  </table>
+</div>
+
+<div class="content">
+
+<div class="consigne">
+  <strong>📋 Contexte Axentis :</strong> Laurent Ferracci (PDG de Provence Évasion) vient de valider le plan d'adressage et la configuration DHCP (S4). Il attend maintenant la première interconnexion des sites. Votre mission ce jour : construire la topologie Packet Tracer complète des 4 sites et établir la communication entre le siège d'Apt et le site de Roussillon.<br><br>
+  <strong>⏱ Durée :</strong> 4h — Sauvegardez votre fichier sous le nom <code>PE_S5A1_[Nom]_[Prenom].pkt</code> en fin de séance.
+</div>
+
+<div class="warn-box">
+  <strong>⚠ Important :</strong> Cet atelier repart de zéro. Vous pouvez récupérer votre fichier S4 pour copier les configurations des switches et routeurs déjà faites (sous-interfaces LAN, DHCP), mais la topologie WAN est entièrement nouvelle.
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 1 — Placement des équipements</h1>
+
+<h2>1.1 Matériel à placer dans Packet Tracer</h2>
+<p>Ouvrez Packet Tracer et créez un nouveau fichier. Placez les équipements suivants dans l'espace de travail en regroupant chaque site dans une zone distincte :</p>
+
+<table class="data-table">
+  <tr><th>Équipement</th><th>Modèle PT</th><th>Quantité</th><th>Nommage</th></tr>
+  <tr><td>Routeur</td><td>Cisco 2911</td><td>4</td><td>Router-Apt, Router-Rous, Router-Saig, Router-Cuc</td></tr>
+  <tr><td>Switch manageable (Apt)</td><td>Cisco 2960</td><td>1</td><td>SW-Apt</td></tr>
+  <tr><td>Switch manageable (Roussillon)</td><td>Cisco 2960</td><td>1</td><td>SW-Rous</td></tr>
+  <tr><td>PC de test (Apt VLAN 11)</td><td>PC-PT</td><td>1</td><td>PC-Apt-1</td></tr>
+  <tr><td>PC de test (Roussillon VLAN 21)</td><td>PC-PT</td><td>1</td><td>PC-Rous-1</td></tr>
+</table>
+
+<div class="info-box">
+  <strong>Conseil de présentation :</strong> Disposez les 4 routeurs en forme d'étoile avec Router-Apt au centre. Laissez de l'espace pour les liaisons WAN (câbles DTE/DCE ou Ethernet croisés).
+</div>
+
+<label class="qlabel"><span class="num-q">1</span>Faites une capture d'écran de votre espace de travail après le placement des équipements (avant câblage).</label>
+<div class="upload-zone" onclick="document.getElementById('img-1').click()">
+  <input type="file" id="img-1" accept="image/*" onchange="compresserImage(this,'prev-1','hint-1',b64=>{imgData['img1']=b64})">
+  <div class="upload-text">📎 Déposer votre capture (placement équipements)</div>
+  <div class="upload-hint" id="hint-1">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-1" style="display:none;max-width:100%;margin-top:10px;border-radius:6px;">
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 2 — Câblage des liaisons WAN</h1>
+
+<h2>2.1 Liaisons point-à-point entre routeurs</h2>
+<p>Dans Packet Tracer, utilisez des <strong>câbles Ethernet droits</strong> (ou croisés selon la version PT) pour relier les interfaces GigabitEthernet des routeurs :</p>
+
+<table class="data-table">
+  <tr><th>Liaison</th><th>Équipement A</th><th>Interface A</th><th>Équipement B</th><th>Interface B</th></tr>
+  <tr><td>WAN Apt↔Roussillon</td><td class="td-code">Router-Apt</td><td class="td-code">Gi0/1</td><td class="td-code">Router-Rous</td><td class="td-code">Gi0/0</td></tr>
+  <tr><td>WAN Apt↔Saignon</td><td class="td-code">Router-Apt</td><td class="td-code">Gi0/2</td><td class="td-code">Router-Saig</td><td class="td-code">Gi0/0</td></tr>
+  <tr><td>WAN Apt↔Cucuron</td><td class="td-code">Router-Apt</td><td class="td-code">Gi0/3</td><td class="td-code">Router-Cuc</td><td class="td-code">Gi0/0</td></tr>
+  <tr><td>LAN Apt (trunk)</td><td class="td-code">Router-Apt</td><td class="td-code">Gi0/0</td><td class="td-code">SW-Apt</td><td class="td-code">Gi0/1</td></tr>
+  <tr><td>LAN Rous (trunk)</td><td class="td-code">Router-Rous</td><td class="td-code">Gi0/1</td><td class="td-code">SW-Rous</td><td class="td-code">Gi0/1</td></tr>
+  <tr><td>PC-Apt-1 (VLAN 11)</td><td class="td-code">SW-Apt</td><td class="td-code">Fa0/1</td><td class="td-code">PC-Apt-1</td><td class="td-code">Fa0</td></tr>
+  <tr><td>PC-Rous-1 (VLAN 21)</td><td class="td-code">SW-Rous</td><td class="td-code">Fa0/1</td><td class="td-code">PC-Rous-1</td><td class="td-code">Fa0</td></tr>
+</table>
+
+<label class="qlabel"><span class="num-q">2</span>Pourquoi les liaisons WAN entre routeurs utilisent-elles les interfaces GigabitEthernet et non des interfaces Serial (comme dans les configurations réelles) dans Packet Tracer ?</label>
+<textarea class="rep rep-md" id="q2-1" placeholder="Votre réponse…"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 3 — Configuration de Router-Apt</h1>
+
+<h2>3.1 Interfaces WAN (Gi0/1, Gi0/2, Gi0/3)</h2>
+<p>Configurez les 3 interfaces WAN de Router-Apt avec les adresses du plan d'adressage :</p>
+
+<div class="cli"><span class="comment">! Accès configuration Router-Apt</span>
+Router-Apt> enable
+Router-Apt# configure terminal
+
+<span class="comment">! Interface WAN vers Roussillon</span>
+Router-Apt(config)# interface GigabitEthernet0/1
+Router-Apt(config-if)# ip address 10.0.0.1 255.255.255.252
+Router-Apt(config-if)# no shutdown
+Router-Apt(config-if)# description WAN-vers-Roussillon
+Router-Apt(config-if)# exit
+
+<span class="comment">! Interface WAN vers Saignon</span>
+Router-Apt(config)# interface GigabitEthernet0/2
+Router-Apt(config-if)# ip address 10.0.0.5 255.255.255.252
+Router-Apt(config-if)# no shutdown
+Router-Apt(config-if)# description WAN-vers-Saignon
+Router-Apt(config-if)# exit
+
+<span class="comment">! Interface WAN vers Cucuron</span>
+Router-Apt(config)# interface GigabitEthernet0/3
+Router-Apt(config-if)# ip address 10.0.0.9 255.255.255.252
+Router-Apt(config-if)# no shutdown
+Router-Apt(config-if)# description WAN-vers-Cucuron
+Router-Apt(config-if)# exit</div>
+
+<h2>3.2 Sous-interfaces LAN de Router-Apt (VLAN 11, 13, 14, 15)</h2>
+<div class="cli"><span class="comment">! Activation de l'interface physique (trunk)</span>
+Router-Apt(config)# interface GigabitEthernet0/0
+Router-Apt(config-if)# no shutdown
+Router-Apt(config-if)# exit
+
+<span class="comment">! VLAN 11 – Personnel</span>
+Router-Apt(config)# interface GigabitEthernet0/0.11
+Router-Apt(config-subif)# encapsulation dot1Q 11
+Router-Apt(config-subif)# ip address 192.168.11.1 255.255.255.0
+Router-Apt(config-subif)# exit
+
+<span class="comment">! VLAN 13 – Caméras</span>
+Router-Apt(config)# interface GigabitEthernet0/0.13
+Router-Apt(config-subif)# encapsulation dot1Q 13
+Router-Apt(config-subif)# ip address 192.168.13.1 255.255.255.0
+Router-Apt(config-subif)# exit
+
+<span class="comment">! VLAN 14 – Administration</span>
+Router-Apt(config)# interface GigabitEthernet0/0.14
+Router-Apt(config-subif)# encapsulation dot1Q 14
+Router-Apt(config-subif)# ip address 192.168.14.1 255.255.255.0
+Router-Apt(config-subif)# exit
+
+<span class="comment">! VLAN 15 – Serveurs</span>
+Router-Apt(config)# interface GigabitEthernet0/0.15
+Router-Apt(config-subif)# encapsulation dot1Q 15
+Router-Apt(config-subif)# ip address 192.168.15.1 255.255.255.0
+Router-Apt(config-subif)# exit</div>
+
+<label class="qlabel"><span class="num-q">3</span>Après avoir saisi toutes ces commandes, vérifiez avec <code>show ip interface brief</code>. Copiez-collez ci-dessous la sortie obtenue pour Router-Apt.</label>
+<textarea class="rep rep-xl" id="q3-1" placeholder="Collez ici la sortie de 'show ip interface brief' pour Router-Apt…"></textarea>
+
+<label class="qlabel"><span class="num-q">4</span>Combien d'entrées de type "C" (Connected) apparaissent dans <code>show ip route</code> sur Router-Apt après cette configuration ? Pourquoi ?</label>
+<textarea class="rep rep-md" id="q3-2" placeholder="Nombre d'entrées C : … — Explication : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 4 — Configuration de Router-Roussillon</h1>
+
+<h2>4.1 Interface WAN (Gi0/0)</h2>
+<div class="cli"><span class="comment">! Interface WAN vers Apt</span>
+Router-Rous(config)# interface GigabitEthernet0/0
+Router-Rous(config-if)# ip address 10.0.0.2 255.255.255.252
+Router-Rous(config-if)# no shutdown
+Router-Rous(config-if)# description WAN-vers-Apt
+Router-Rous(config-if)# exit</div>
+
+<h2>4.2 Sous-interfaces LAN (VLAN 21, 22, 23, 24)</h2>
+<div class="cli"><span class="comment">! Interface physique trunk</span>
+Router-Rous(config)# interface GigabitEthernet0/1
+Router-Rous(config-if)# no shutdown
+Router-Rous(config-if)# exit
+
+<span class="comment">! VLAN 21 – Personnel (192.168.21.0/26)</span>
+Router-Rous(config)# interface GigabitEthernet0/1.21
+Router-Rous(config-subif)# encapsulation dot1Q 21
+Router-Rous(config-subif)# ip address 192.168.21.1 255.255.255.192
+Router-Rous(config-subif)# exit
+
+<span class="comment">! VLAN 22 – Clients WiFi (192.168.22.0/25)</span>
+Router-Rous(config)# interface GigabitEthernet0/1.22
+Router-Rous(config-subif)# encapsulation dot1Q 22
+Router-Rous(config-subif)# ip address 192.168.22.1 255.255.255.128
+Router-Rous(config-subif)# exit
+
+<span class="comment">! VLAN 23 – Caméras (192.168.23.0/28)</span>
+Router-Rous(config)# interface GigabitEthernet0/1.23
+Router-Rous(config-subif)# encapsulation dot1Q 23
+Router-Rous(config-subif)# ip address 192.168.23.1 255.255.255.240
+Router-Rous(config-subif)# exit
+
+<span class="comment">! VLAN 24 – Administration (192.168.24.0/29)</span>
+Router-Rous(config)# interface GigabitEthernet0/1.24
+Router-Rous(config-subif)# encapsulation dot1Q 24
+Router-Rous(config-subif)# ip address 192.168.24.1 255.255.255.248
+Router-Rous(config-subif)# exit</div>
+
+<h2>4.3 Route par défaut sur Router-Roussillon</h2>
+<div class="cli"><span class="comment">! Tout le trafic non local passe par Router-Apt</span>
+Router-Rous(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.1</div>
+
+<label class="qlabel"><span class="num-q">5</span>Après la route par défaut, copiez la sortie de <code>show ip route</code> sur Router-Roussillon. Identifiez la ligne S* et expliquez ce qu'elle signifie.</label>
+<textarea class="rep rep-xl" id="q4-1" placeholder="Sortie show ip route Router-Rous :&#10;&#10;Signification de la ligne S* : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 5 — Routes statiques sur Router-Apt vers Roussillon</h1>
+
+<p>Pour que Router-Apt puisse atteindre les 4 VLANs de Roussillon, configurez les 4 routes statiques suivantes :</p>
+
+<div class="cli"><span class="comment">! 4 routes statiques vers Roussillon (via 10.0.0.2)</span>
+Router-Apt(config)# ip route 192.168.21.0 255.255.255.192 10.0.0.2
+Router-Apt(config)# ip route 192.168.22.0 255.255.255.128 10.0.0.2
+Router-Apt(config)# ip route 192.168.23.0 255.255.255.240 10.0.0.2
+Router-Apt(config)# ip route 192.168.24.0 255.255.255.248 10.0.0.2</div>
+
+<label class="qlabel"><span class="num-q">6</span>Après cette configuration, affichez <code>show ip route</code> sur Router-Apt. Combien d'entrées "S" voyez-vous ? Copiez les lignes S uniquement.</label>
+<textarea class="rep rep-lg" id="q5-1" placeholder="Lignes S de show ip route Router-Apt :&#10;&#10;S  192.168.21.0/26 [1/0] via 10.0.0.2&#10;…"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 6 — Configuration des switches et PCs de test</h1>
+
+<h2>6.1 SW-Apt — Port trunk et port access VLAN 11</h2>
+<div class="cli"><span class="comment">! Lien trunk vers Router-Apt</span>
+SW-Apt(config)# interface GigabitEthernet0/1
+SW-Apt(config-if)# switchport mode trunk
+SW-Apt(config-if)# exit
+
+<span class="comment">! Port access VLAN 11 pour PC-Apt-1</span>
+SW-Apt(config)# vlan 11
+SW-Apt(config-vlan)# name Personnel-Apt
+SW-Apt(config-vlan)# exit
+SW-Apt(config)# interface FastEthernet0/1
+SW-Apt(config-if)# switchport mode access
+SW-Apt(config-if)# switchport access vlan 11
+SW-Apt(config-if)# exit</div>
+
+<h2>6.2 SW-Rous — Port trunk et port access VLAN 21</h2>
+<div class="cli"><span class="comment">! Lien trunk vers Router-Rous</span>
+SW-Rous(config)# interface GigabitEthernet0/1
+SW-Rous(config-if)# switchport mode trunk
+SW-Rous(config-if)# exit
+
+<span class="comment">! Port access VLAN 21 pour PC-Rous-1</span>
+SW-Rous(config)# vlan 21
+SW-Rous(config-vlan)# name Personnel-Roussillon
+SW-Rous(config-vlan)# exit
+SW-Rous(config)# interface FastEthernet0/1
+SW-Rous(config-if)# switchport mode access
+SW-Rous(config-if)# switchport access vlan 21
+SW-Rous(config-if)# exit</div>
+
+<h2>6.3 Configuration IP des PCs de test</h2>
+<table class="data-table">
+  <tr><th>PC</th><th>Adresse IP</th><th>Masque</th><th>Passerelle</th><th>VLAN</th></tr>
+  <tr><td class="td-code">PC-Apt-1</td><td class="td-code">192.168.11.10</td><td class="td-code">255.255.255.0</td><td class="td-code">192.168.11.1</td><td>11</td></tr>
+  <tr><td class="td-code">PC-Rous-1</td><td class="td-code">192.168.21.10</td><td class="td-code">255.255.255.192</td><td class="td-code">192.168.21.1</td><td>21</td></tr>
+</table>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 7 — Campagne de tests Apt ↔ Roussillon</h1>
+
+<h2>7.1 Tests à réaliser</h2>
+<p>Effectuez les pings suivants depuis l'onglet <em>Desktop > Command Prompt</em> de chaque PC, et renseignez le tableau :</p>
+
+<table class="ping-table">
+  <tr><th>#</th><th>Source</th><th>Destination</th><th>Adresse cible</th><th>Résultat</th><th>Commentaire</th></tr>
+  <tr>
+    <td>1</td>
+    <td><span class="badge-apt">PC-Apt-1</span></td>
+    <td>Router-Apt Gi0/0.11</td>
+    <td class="td-code">192.168.11.1</td>
+    <td><select id="ping1-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="ping1-com" placeholder="Commentaire…" style="width:100%;border:1px solid var(--bleu);border-radius:4px;padding:4px 8px;font-family:Montserrat,sans-serif;font-size:10pt;"></td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><span class="badge-apt">Router-Apt</span></td>
+    <td>Router-Rous (WAN)</td>
+    <td class="td-code">10.0.0.2</td>
+    <td><select id="ping2-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="ping2-com" placeholder="Commentaire…" style="width:100%;border:1px solid var(--bleu);border-radius:4px;padding:4px 8px;font-family:Montserrat,sans-serif;font-size:10pt;"></td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td><span class="badge-apt">PC-Apt-1</span></td>
+    <td>Router-Rous (WAN)</td>
+    <td class="td-code">10.0.0.2</td>
+    <td><select id="ping3-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="ping3-com" placeholder="Commentaire…" style="width:100%;border:1px solid var(--bleu);border-radius:4px;padding:4px 8px;font-family:Montserrat,sans-serif;font-size:10pt;"></td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td><span class="badge-rous">PC-Rous-1</span></td>
+    <td>Router-Rous Gi0/1.21</td>
+    <td class="td-code">192.168.21.1</td>
+    <td><select id="ping4-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="ping4-com" placeholder="Commentaire…" style="width:100%;border:1px solid var(--bleu);border-radius:4px;padding:4px 8px;font-family:Montserrat,sans-serif;font-size:10pt;"></td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td><span class="badge-apt">PC-Apt-1</span></td>
+    <td>PC-Rous-1 (inter-sites)</td>
+    <td class="td-code">192.168.21.10</td>
+    <td><select id="ping5-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="ping5-com" placeholder="Commentaire…" style="width:100%;border:1px solid var(--bleu);border-radius:4px;padding:4px 8px;font-family:Montserrat,sans-serif;font-size:10pt;"></td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td><span class="badge-rous">PC-Rous-1</span></td>
+    <td>PC-Apt-1 (retour)</td>
+    <td class="td-code">192.168.11.10</td>
+    <td><select id="ping6-res"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="ping6-com" placeholder="Commentaire…" style="width:100%;border:1px solid var(--bleu);border-radius:4px;padding:4px 8px;font-family:Montserrat,sans-serif;font-size:10pt;"></td>
+  </tr>
+</table>
+
+<label class="qlabel"><span class="num-q">7</span>Si le ping 5 (PC-Apt-1 → PC-Rous-1) échoue, listez les 4 vérifications à effectuer dans l'ordre logique.</label>
+<textarea class="rep rep-lg" id="q7-1" placeholder="1. Vérifier que la liaison WAN est up (show ip interface brief sur Router-Apt)&#10;2. …&#10;3. …&#10;4. …"></textarea>
+
+<h2>7.2 Capture d'écran — ping inter-sites réussi</h2>
+<label class="qlabel"><span class="num-q">8</span>Faites une capture d'écran montrant un ping réussi entre PC-Apt-1 et PC-Rous-1.</label>
+<div class="upload-zone" onclick="document.getElementById('img-2').click()">
+  <input type="file" id="img-2" accept="image/*" onchange="compresserImage(this,'prev-2','hint-2',b64=>{imgData['img2']=b64})">
+  <div class="upload-text">📎 Déposer votre capture (ping inter-sites)</div>
+  <div class="upload-hint" id="hint-2">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-2" style="display:none;max-width:100%;margin-top:10px;border-radius:6px;">
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 8 — Sauvegarde et section dossier</h1>
+
+<h2>8.1 Sauvegarde Packet Tracer</h2>
+<div class="consigne">
+  <strong>Action obligatoire :</strong> Sauvegardez votre fichier sous le nom <code>PE_S5A1_[Nom]_[Prenom].pkt</code>. Ce fichier sera réutilisé en Atelier 2 pour finaliser l'interconnexion avec Saignon et Cucuron.
+</div>
+
+<h2>8.2 Section 6 du dossier — Schéma topologique (début)</h2>
+<label class="qlabel"><span class="num-q">9</span>Faites une capture d'écran de votre topologie Packet Tracer complète (4 routeurs visibles, liaisons WAN, switches, PCs). Ce schéma ira dans la section 6 du dossier de déploiement.</label>
+<div class="upload-zone" onclick="document.getElementById('img-3').click()">
+  <input type="file" id="img-3" accept="image/*" onchange="compresserImage(this,'prev-3','hint-3',b64=>{imgData['img3']=b64})">
+  <div class="upload-text">📎 Déposer votre capture (topologie complète PT)</div>
+  <div class="upload-hint" id="hint-3">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-3" style="display:none;max-width:100%;margin-top:10px;border-radius:6px;">
+</div>
+
+<label class="qlabel"><span class="num-q">10</span>Bilan de l'atelier : qu'avez-vous configuré ? Qu'est-ce qui reste à faire en Atelier 2 ? (3–5 phrases)</label>
+<textarea class="rep rep-lg" id="q9-1" placeholder="Ce que j'ai réalisé aujourd'hui :&#10;&#10;Ce qui reste à faire en Atelier 2 :"></textarea>
+
+<hr class="sep">
+
+<!-- SYNTHÈSE -->
+<div class="section-synth-titre">🎯 Bilan de l'atelier 1</div>
+<div class="conclusion">
+  <p>Pour Router-Apt, les interfaces WAN sont sur les ports <input class="inline-field" id="synth-1" placeholder="Gi0/1, Gi0/2, …"> et les adresses sont <input class="inline-field" id="synth-2" placeholder="10.0.0.1, 10.0.0.5, 10.0.0.9">.</p>
+  <p>Router-Roussillon utilise une route par défaut pointant vers <input class="inline-field" id="synth-3" placeholder="10.0.0.1"> pour atteindre tous les autres réseaux.</p>
+  <p>Router-Apt a besoin de <input class="inline-field" id="synth-4" placeholder="?"> routes statiques pour atteindre les 4 VLANs de Roussillon.</p>
+  <p>Un ping inter-sites passe par <input class="inline-field" id="synth-5" placeholder="?"> routeurs et <input class="inline-field" id="synth-6" placeholder="?"> liaisons WAN.</p>
+</div>
+
+<hr class="sep">
+<h1>Auto-évaluation</h1>
+<table class="ae-table" id="ae-table"></table>
+
+</div>
+
+<footer>
+  <div>S5 – Atelier 1 | Provence Évasion</div>
+  <div>Lycée Louis Lumière – Chelles</div>
+</footer>
+
+<div class="send-bar">
+  <div class="send-info">Sauvegardez votre fichier .pkt avant de télécharger le JSON !</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div id="toast">✅ Fichier JSON téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+const imgData = {img1:'',img2:'',img3:''};
+
+function compresserImage(input, idPrev, idHint, callback){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = new Image();
+    img.onload = function(){
+      const MAX=900; let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const b64=canvas.toDataURL('image/jpeg',0.72);
+      document.getElementById(idPrev).src=b64;
+      document.getElementById(idPrev).style.display='block';
+      const kb=Math.round(b64.length*0.75/1024);
+      document.getElementById(idHint).textContent=`Image compressée : ${w}×${h}px – environ ${kb} Ko`;
+      callback(b64);
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+const AE_CRITERES=[
+  "J'ai correctement câblé les liaisons WAN entre les 4 routeurs",
+  "J'ai configuré les interfaces WAN de Router-Apt (Gi0/1, Gi0/2, Gi0/3)",
+  "J'ai configuré les sous-interfaces LAN (VLANs) de Router-Apt et Router-Rous",
+  "J'ai ajouté la route par défaut sur Router-Rous",
+  "J'ai saisi les 4 routes statiques sur Router-Apt vers Roussillon",
+  "Les pings inter-sites Apt↔Roussillon fonctionnent (tests 5 et 6)"
+];
+
+function buildAE(){
+  const t=document.getElementById('ae-table');
+  t.innerHTML='<tr><th>Critère</th><th>★★★ Maîtrisé</th><th>★★☆ En cours</th><th>★☆☆ À revoir</th><th>? Non traité</th></tr>';
+  AE_CRITERES.forEach((c,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${c}</td>${['maitrise','en_cours','a_revoir','non_traite'].map((v,j)=>`<td style="text-align:center"><label style="cursor:pointer;font-size:${j<3?'16':'13'}pt;color:${j<3?'#f0b400':'#888'}"><input type="radio" name="ae${i}" value="${v}" style="display:none">${['★★★','★★☆','★☆☆','?'][j]}</label></td>`).join('')}`;
+    t.appendChild(tr);
+  });
+}
+buildAE();
+
+function getAE(){
+  const r={};
+  AE_CRITERES.forEach((c,i)=>{
+    const sel=document.querySelector(`input[name="ae${i}"]:checked`);
+    r[`critere_${i+1}`]={critere:c,niveau:sel?sel.value:'non_traite'};
+  });
+  return r;
+}
+
+function v(id){return(document.getElementById(id)||{value:''}).value;}
+function sel(id){const e=document.getElementById(id);return e?e.value:'';}
+
+function genererJSON(){
+  const data={
+    meta:{
+      devoir:"S5 – Atelier 1 : Construction topologie & routage Apt↔Roussillon",
+      eleve:{nom:v('eleve-nom'),prenom:v('eleve-prenom'),classe:v('eleve-classe')},
+      date:v('eleve-date'),
+      genere_le:new Date().toISOString()
+    },
+    etape2_cablage:{q2:v('q2-1')},
+    etape3_router_apt:{show_ip_interface:v('q3-1'),nb_connected:v('q3-2')},
+    etape4_router_rous:{show_ip_route:v('q4-1')},
+    etape5_routes_statiques:{show_routes_S:v('q5-1')},
+    etape7_tests:{
+      ping1:{resultat:sel('ping1-res'),commentaire:v('ping1-com')},
+      ping2:{resultat:sel('ping2-res'),commentaire:v('ping2-com')},
+      ping3:{resultat:sel('ping3-res'),commentaire:v('ping3-com')},
+      ping4:{resultat:sel('ping4-res'),commentaire:v('ping4-com')},
+      ping5:{resultat:sel('ping5-res'),commentaire:v('ping5-com')},
+      ping6:{resultat:sel('ping6-res'),commentaire:v('ping6-com')},
+      diagnostic_echec:v('q7-1')
+    },
+    captures:{placement:imgData.img1?'[image incluse]':'',ping_intersite:imgData.img2?'[image incluse]':'',topologie_pt:imgData.img3?'[image incluse]':''},
+    images:{placement:imgData.img1,ping_intersite:imgData.img2,topologie:imgData.img3},
+    bilan:v('q9-1'),
+    synthese:{s1:v('synth-1'),s2:v('synth-2'),s3:v('synth-3'),s4:v('synth-4'),s5:v('synth-5'),s6:v('synth-6')},
+    auto_evaluation:getAE()
+  };
+  const nom=v('eleve-nom'),prenom=v('eleve-prenom');
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${safeName}_S5Atelier1.json`;
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

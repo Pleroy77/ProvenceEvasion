@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S5 – Atelier 2 : Routage complet 4 sites &amp; campagne de tests | Provence Évasion</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:11pt;color:#222;background:#fff;padding-bottom:80px;}
+header{background:var(--marine);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
+.badge-ciel{background:var(--bleu);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13pt;padding:4px 14px;border-radius:4px;}
+.header-right{font-family:'Roboto',sans-serif;font-size:10pt;text-align:right;opacity:.9;}
+.header-line{height:3px;background:linear-gradient(90deg,var(--vert),var(--bleu));}
+.garde{padding:32px 40px 24px;border-bottom:2px solid var(--marine);}
+.titre-doc{font-family:'Roboto',sans-serif;font-weight:700;font-size:17pt;color:var(--vert);text-align:center;margin-bottom:6px;}
+.sous-titre{font-family:'Roboto',sans-serif;font-style:italic;font-size:13pt;color:var(--marine);text-align:center;margin-bottom:10px;}
+.infos-doc{text-align:center;color:var(--marine);font-size:10pt;margin-bottom:20px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--ciel-bg);border:1px solid var(--ciel);border-radius:6px;padding:16px;margin-bottom:20px;}
+.eleve-box input{border:1px solid var(--bleu);border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:10pt;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--orange);}
+.comp-table{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:4px;}
+.comp-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;text-align:left;}
+.comp-table .bloc-row{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:5px 10px;}
+.comp-table td{padding:5px 10px;border-bottom:1px solid #dde6f0;}
+.comp-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.ck{color:var(--bleu);font-weight:700;font-size:13pt;}
+.nck{color:#bbb;font-size:13pt;}
+.content{padding:24px 40px;}
+h1{font-family:'Roboto',sans-serif;font-weight:700;font-size:14pt;color:var(--bleu);margin:28px 0 10px;padding-bottom:4px;border-bottom:2px solid var(--bleu);}
+h2{font-family:'Roboto',sans-serif;font-style:italic;font-size:11pt;color:var(--bleu);margin:18px 0 8px;}
+p{margin-bottom:8px;line-height:1.6;}
+.sep{border:none;border-top:1px solid #c8dce8;margin:24px 0;}
+.consigne{background:#fffbf0;border-left:4px solid var(--orange);padding:12px 16px;border-radius:0 6px 6px 0;margin:12px 0;}
+.consigne strong{color:var(--orange);}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:10pt;padding:14px 18px;border-radius:6px;margin:10px 0;line-height:1.7;white-space:pre-wrap;}
+.cli .comment{color:#7ec8e3;font-style:italic;}
+.info-box{background:var(--ciel-bg);border:1px solid var(--ciel);border-radius:6px;padding:12px 16px;margin:12px 0;}
+.warn-box{background:#fff8f0;border:1px solid var(--orange);border-radius:6px;padding:12px 16px;margin:12px 0;}
+.data-table{width:100%;border-collapse:collapse;font-size:10pt;margin:12px 0;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;text-align:left;}
+.data-table td{padding:6px 10px;border:1px solid #c8dce8;}
+.data-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.data-table .td-code{font-family:'Courier New',monospace;color:var(--marine);font-weight:600;}
+.rep{width:100%;border:1px solid var(--bleu);border-radius:4px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:10pt;resize:vertical;color:var(--marine);}
+.rep:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 2px rgba(255,87,34,.15);}
+.rep-sm{min-height:60px;}
+.rep-md{min-height:90px;}
+.rep-lg{min-height:130px;}
+.rep-xl{min-height:180px;}
+.qlabel{display:block;font-weight:600;color:var(--marine);margin:10px 0 4px;}
+.num-q{display:inline-block;background:var(--orange);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:9pt;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;margin-right:6px;}
+/* tableau de tests */
+.ping-table{width:100%;border-collapse:collapse;font-size:10pt;margin:12px 0;}
+.ping-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;text-align:left;}
+.ping-table td{padding:6px 8px;border-bottom:1px solid #dde6f0;vertical-align:middle;}
+.ping-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.ping-table select{border:1px solid var(--bleu);border-radius:4px;padding:4px 6px;font-family:'Montserrat',sans-serif;font-size:10pt;color:var(--marine);background:white;width:130px;}
+.inline-input{border:none;border-bottom:1px solid var(--bleu);background:transparent;font-family:'Montserrat',sans-serif;font-size:10pt;color:var(--marine);padding:2px 4px;width:100%;}
+.inline-input:focus{outline:none;border-bottom-color:var(--orange);}
+/* badges site */
+.badge-apt{background:var(--marine);color:#fff;padding:2px 7px;border-radius:10px;font-size:8.5pt;font-weight:700;}
+.badge-rous{background:var(--bleu);color:#fff;padding:2px 7px;border-radius:10px;font-size:8.5pt;font-weight:700;}
+.badge-saig{background:#7b4ea0;color:#fff;padding:2px 7px;border-radius:10px;font-size:8.5pt;font-weight:700;}
+.badge-cuc{background:#c0392b;color:#fff;padding:2px 7px;border-radius:10px;font-size:8.5pt;font-weight:700;}
+/* tableau synthèse routes */
+.route-table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:10px 0;}
+.route-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;text-align:left;}
+.route-table td{padding:5px 10px;border:1px solid #c8dce8;font-family:'Courier New',monospace;}
+.route-table .td-router{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);background:var(--ciel-bg);}
+.route-table .td-s{color:var(--orange);font-weight:700;}
+.route-table .td-c{color:var(--vert);font-weight:700;}
+/* upload */
+.upload-zone{border:2px dashed var(--bleu);border-radius:8px;padding:16px;text-align:center;cursor:pointer;background:var(--ciel-bg);margin:10px 0;transition:border-color .2s;}
+.upload-zone:hover{border-color:var(--orange);background:#fffbf0;}
+.upload-text{color:var(--marine);font-weight:600;font-size:11pt;margin-bottom:4px;}
+.upload-hint{color:#666;font-size:9pt;}
+.upload-zone input[type=file]{display:none;}
+/* auto-éval */
+.ae-table{width:100%;border-collapse:collapse;font-size:10pt;margin:12px 0;}
+.ae-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;text-align:left;}
+.ae-table td{padding:7px 10px;border-bottom:1px solid #dde6f0;vertical-align:middle;}
+.ae-table tr:nth-child(even) td{background:var(--ciel-bg);}
+/* synth */
+.section-synth-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:13pt;color:#fff;background:var(--marine);padding:10px 18px;border-radius:6px 6px 0 0;margin-top:24px;}
+.inline-field{border:none;border-bottom:2px solid var(--bleu);background:transparent;font-family:'Montserrat',sans-serif;font-size:11pt;color:var(--marine);padding:2px 4px;width:180px;}
+.inline-field:focus{outline:none;border-bottom-color:var(--orange);}
+.conclusion{background:var(--ciel-bg);border:1px solid var(--ciel);border-top:none;border-radius:0 0 6px 6px;padding:18px 20px;line-height:2.4;}
+/* footer + sticky */
+footer{background:var(--marine);color:#fff;padding:8px 24px;display:flex;justify-content:space-between;font-size:9pt;font-family:'Roboto',sans-serif;margin-top:32px;}
+.send-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:3px solid var(--marine);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.1);}
+.send-info{font-size:10pt;color:var(--marine);}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11pt;border:none;border-radius:6px;padding:10px 28px;cursor:pointer;transition:background .2s;}
+.btn-send:hover{background:var(--bleu);}
+#toast{display:none;position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--marine);color:#fff;padding:10px 28px;border-radius:8px;font-family:'Roboto',sans-serif;font-weight:700;font-size:11pt;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQIAHAAcAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCABEAJYDAREAAhEBAxEB/8QAHAAAAQUBAQEAAAAAAAAAAAAABgABAwQFAgcI/8QAGgEAAgMBAQAAAAAAAAAAAAAAAAUBAgMEBv/aAAwDAQACEAMQAAAB+qQQIECBAgQIECBAgQIECBAgYjB7uHB7eCntjvcPeRcDCO1Rlits56EPAxxOzh7i4i1UsBUraKaka9j3FkFbTLy30nlyLgY1tcqG3OSrmeD3cBondV9M7uOwe2Ty11ob4FiproYdAU4RnyN/NW6CO1fOX/nNfl7Mzo5WmNrj7srp5PQkXoUFPXEKcJZa6ADxFdx39Z8v6kQapj5G/mrdAg8+e+ft5bSVnD7eE+RvwR2iN0zuvfO1nqINU81daWuReqbXMtQhwjLVbeWl9HDdyc7fmFmayWltbm69/h787fnGGSyznoSLmWJ28MlbhzZQiSZcylqUdsESZqHHcWz5iQgY1yI8tq4VZi/E9h0EYQEMFokStTbi00GTaDCl+gBb0gmGDuDKtEwb9bVSLBOHMOGHapnS4nem5WzhhTX2DLZwpEdBXkngcOJJoOAYIJL0SgYjOkvwdBnSa0T/AP/EACcQAAICAQMDBAIDAAAAAAAAAAMEAgUBAAY0ERITEBQVFiEzIjZA/9oACAEBAAEFAv8AHnPbg1yEei2rB9CsGA5DeY0BkbOGmxqRnez6gvMZyQ3aulayaYubOVWH7eXX28uqW2laxctpLMQl3w9GeNqtl3CND3zh15ryovxAs5vtgrABixUBLk44hQp+du7h7crVnFPgUNKogS1bc8P6fQke4aq8TaVXwFtCfad8ncasj0r6nnejnEp+du7iKjcnDwWmqrBI19tzw/p9WvJXu+T30f4mK3+W01/ApOM0GwWIDQZtgh0YsToU/O3dw9tPrqqfMpaXdA3m254rBfAvkVtYz1xp1OLgkl5ruB/UvW9G9NojcjKjNjIKPPWYMe2RqpqsXVZO0D9RPr6ifVJTEq5u1M2Wfgi6+CLqGO2GiPCE42wFRdK9r8ki8KbpLUAisXqq66FgKyEw8JUzrg69V2wEgke3WXesLhasnh4WXvso5tu3q6GkLlaxnDdSpcYz3Y1ZmGDc25DiMDc7yrlRE8Ud0lLFtjC4C19BZHdluAkRWe4CwfoNw2Kzu2bmujZX7qDUgD/uFGRiK15I2b+k8zt3twp4I4z19GEl29BUAtBesUUIymB2A1AiAZFZgIFxKjYUC3hdICmhVaYT+KGSkFA2PDDy5qEZZ9uLu8I/L8OjnWMdMf/EAC4RAAEDAgMFCAIDAAAAAAAAAAEAAgMEERIhMRAyM0FSBRMUFSBCUXEiI0BhYv/aAAgBAwEBPwH+Hon1kbdM06rlfk1MqJWc0yuHvCZI2QXaVLK2IXcjXnkEyuB3wnPswvChqjK/DZVdSaZgcBdebu6F5s7oVHVGqBJFrKarMT8NkDcX2ybh2Uxu0sabFPb38p7tSRujNnKh0cnF1RKmU0bBopKRj9Mk9oZCWj4VHxV2twm/a7Op4pYiXtvmvBU/Qo4Y4dwWVXximbo2uFwQoow+5doFFGGSjDoQqd1n4DzVQ67sI0CpR+lxVJxRtm4blR8VdrcJv2oW1BH6r2/pd3W/6VNiETceqq+MUzdHolxU8pwrF34xt3wsnujl5lTcV32oY8EYanB1PL9JlRG8XupKtjNI09wfCXN+FR8VdrcJv2uzZo44iHutmvFwdYTJY5dw3VXxim1EWEfkvERdW2aETNsoI3Ry2cmbsX2o6a0hkdslhbMM0aF/IplD1lOZ+BY1QUron4iVWUxqWBoNl5S/qXlL+pUdI6lJub3U1I6V5cCvAO+V4F3ygLC2025pgY3IBX5K6uEDdXWivZXGiJAV+SxImyBusQ2neCcnHJe5fK5BNKdqE7MJxu1EXKIOpXuTb/KOoQzOabf02C12W9Fh6LDbbZ//xAAuEQABAwIDBQgCAwAAAAAAAAABAAIDBBESITEQMjNBUgUTFBUgI1FxIkJAYoH/2gAIAQIBAT8B/h6plI92uSbTRs3k6CN/JPoj+hT43R7yjidKbNQom8yn0RG4U1l3hpU1MImYrqkphUuLSbLypvUvKm9SrKUUxFje6ipRIzFdEWNtse+NlQLODnC4THdzGMaZI2QXCrdWpobBGn1Ejzqo6p7dc0xxdKCVV8JdlcR30u0KiWKQBhsvG1HUpJpJt83VLwgn7x2tNjdSSFtg3UqSQvjN+RU4u3GOSgbZuI81Un3mhVXCO2LiNVXwl2VxHfSldAD7tv8AVjo/6qpwmZ2DRUvCCfvH0R4Z4hiWHufwdulZsa+PkFFw2qV+OQuCBE8f2n08jDoo6V79ckxpZKAVV8JdlcR30u0YZJJAWNvkvCT9BT4ZIt8WVLwgnQSXOS7iXp2wypgqLnY2jeEZ0YQXH0B8K1sChJVkB0bG3Mbz0Y2fCDKJjxZ8Z9RynvEGu5HEtVhN16MH5gizUrVeWezg++4dWFy+riSsFfuyUAP5mA+WQKKQ3lWzRxsYI7IysnIUkS0u7CyQe8/tZtm9Rzf++v1/Kfccp75A3zoiYzW1XVT778wgaKEuZ3Zvxns4PvuH8FtipQqXYcNOPKKtANZsDt3O8qONtGjDlhkIMDVbwsuUjzB715REBsJptvgkfdNjWeeviSjxhuQy7L7Qjr8TUyseEg+xunvEErnsZpX6j0eUXgMY6XPZwKitC4QXtP8AUf1GFpiG49L0l2nq4ezAFit2dy3IfpbIRVNQQtJ3uDoTKSvQDydozNrKvpT+YZ1DbbfZbT0hcQYNQS31iAhhWbK3I5qgKEsUUd592+J92+IRPWIUlzZ3hZ6qVigbHaf5X6z/ADv1jpBQpo0V0PAXYvOuzR4x0uk6A4o3VugMt1LREIzXTVewUXaM3IlBYDc3g7QtMQRBJW6sRxHkSghNxLgFWguOUkJaCliNI8Zg+1VgixbYOZaPF8rBgNdYkb4xmIO4iv0rYL7IqwOsTaEJVC0NAgrjJLOt2qpLsujiFfi7bE0kRWO1VkqePYRCoBsTGeI7Eb1mioVOLLJdRJ4gAwaRMO0IUBAaFl5NnoBrKM1xLAuVLhMOABtqRxmZL91IDlBFYADKIkt7RbRSjWtMrp1cW2YQsrS4oHg0AcwWyx4lR+ieDeQ0gNWkb56IOrKQMwOqFsDsblKOaj12WGrjaIK7MVmMoDWZduyB4lm8A3zqAnBRR4RjToGXCXuXFa5Gy94ml9Y9XIeRXaAMiQMlMoWqgKRLmTIh5ZEjUjoprAbGFFicnQS3IxF1CjV0ekUxdvqqsAOMZl0asumtgMPllBq8gHMbtCO4UhKpNcZhjHOQKBCgArE9jM2IARK6Ak3VANM2Lo0MusBdW68sRKCuJdWto4CqxcbTqBc1BTcMKrAdEcjtAeTlFRserLNaRsvH5S2q6mAATCWMElYIBRsQTgcmaXetts1H7FagrzBSCgFAGgT/2Q==" alt="CIEL" style="height:40px;width:auto;">
+    <span class="badge-ciel">BAC PRO CIEL</span>
+  </div>
+  <div class="header-right">Lycée Louis Lumière – Chelles<br>Année 2025–2026</div>
+</header>
+<div class="header-line"></div>
+
+<div class="garde">
+  <div class="titre-doc">S5 – Atelier 2</div>
+  <div class="sous-titre">Routage complet 4 sites — Saignon &amp; Cucuron — Campagne de tests inter-sites</div>
+  <div class="infos-doc">Terminale Bac Pro CIEL &nbsp;|&nbsp; Projet Provence Évasion &nbsp;|&nbsp; Atelier (4h)</div>
+
+  <div class="eleve-box">
+    <input id="eleve-nom" placeholder="Nom">
+    <input id="eleve-prenom" placeholder="Prénom">
+    <input id="eleve-classe" placeholder="Classe">
+    <input id="eleve-date" type="date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th>Code</th><th>Compétence</th><th>Mobilisée</th></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 1</td></tr>
+    <tr><td>C03</td><td>Participer à un projet</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C07</td><td>Réaliser des maquettes et prototypes</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C11</td><td>Maintenir un système électronique ou réseau informatique</td><td><span class="nck">☐</span></td></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 2</td></tr>
+    <tr><td>C06</td><td>Valider la conformité d'une installation</td><td><span class="ck">☑</span></td></tr>
+    <tr><td>C09</td><td>Installer les éléments d'un système informatique</td><td><span class="ck">☑</span></td></tr>
+    <tr><td>C10</td><td>Exploiter un réseau informatique</td><td><span class="ck">☑</span></td></tr>
+    <tr><td colspan="3" class="bloc-row">Bloc 3</td></tr>
+    <tr><td>C01</td><td>Communiquer en situation professionnelle</td><td><span class="nck">☐</span></td></tr>
+    <tr><td>C04</td><td>Analyser une structure matérielle et logicielle</td><td><span class="ck">☑</span></td></tr>
+    <tr><td>C08</td><td>Coder</td><td><span class="nck">☐</span></td></tr>
+  </table>
+</div>
+
+<div class="content">
+
+<div class="consigne">
+  <strong>📋 Point de départ :</strong> Ouvrez votre fichier <code>PE_S5A1_[Nom]_[Prenom].pkt</code> sauvegardé lors de l'Atelier 1. Router-Apt et Router-Roussillon sont déjà configurés. Aujourd'hui vous finalisez l'interconnexion avec Saignon et Cucuron, puis vous réalisez la campagne de tests complète pour la <strong>Section 6 du dossier</strong>.
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 1 — Vérification de l'Atelier 1</h1>
+
+<p>Avant tout, vérifiez que votre configuration de l'Atelier 1 est toujours opérationnelle :</p>
+
+<table class="ping-table">
+  <tr><th>#</th><th>Source</th><th>Cible</th><th>Adresse</th><th>Résultat</th></tr>
+  <tr>
+    <td>V1</td><td><span class="badge-apt">PC-Apt-1</span></td><td>PC-Rous-1</td><td class="td-code">192.168.21.10</td>
+    <td><select id="v1"><option value="">—</option><option>✅ OK</option><option>❌ KO – à corriger</option></select></td>
+  </tr>
+  <tr>
+    <td>V2</td><td><span class="badge-rous">PC-Rous-1</span></td><td>PC-Apt-1</td><td class="td-code">192.168.11.10</td>
+    <td><select id="v2"><option value="">—</option><option>✅ OK</option><option>❌ KO – à corriger</option></select></td>
+  </tr>
+</table>
+
+<label class="qlabel"><span class="num-q">1</span>Si l'un des pings de validation échoue, décrivez la cause identifiée et la correction apportée avant de continuer.</label>
+<textarea class="rep rep-md" id="q1-1" placeholder="Si tout fonctionne : écrire 'RAS – les deux pings sont OK'.&#10;Sinon : Cause : … — Correction : … — Résultat après correction : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 2 — Configuration de Router-Saignon</h1>
+
+<h2>2.1 Interface WAN vers Apt</h2>
+<div class="cli"><span class="comment">! WAN vers Apt : 10.0.0.6/30</span>
+Router-Saig> enable
+Router-Saig# configure terminal
+Router-Saig(config)# interface GigabitEthernet0/0
+Router-Saig(config-if)# ip address 10.0.0.6 255.255.255.252
+Router-Saig(config-if)# no shutdown
+Router-Saig(config-if)# description WAN-vers-Apt
+Router-Saig(config-if)# exit</div>
+
+<h2>2.2 Sous-interfaces LAN — VLANs Saignon</h2>
+<div class="cli"><span class="comment">! Interface physique trunk vers SW-Saig</span>
+Router-Saig(config)# interface GigabitEthernet0/1
+Router-Saig(config-if)# no shutdown
+Router-Saig(config-if)# exit
+
+<span class="comment">! VLAN 31 – Personnel (192.168.31.0/26)</span>
+Router-Saig(config)# interface GigabitEthernet0/1.31
+Router-Saig(config-subif)# encapsulation dot1Q 31
+Router-Saig(config-subif)# ip address 192.168.31.1 255.255.255.192
+Router-Saig(config-subif)# exit
+
+<span class="comment">! VLAN 32 – Séminaires (192.168.32.0/26)</span>
+Router-Saig(config)# interface GigabitEthernet0/1.32
+Router-Saig(config-subif)# encapsulation dot1Q 32
+Router-Saig(config-subif)# ip address 192.168.32.1 255.255.255.192
+Router-Saig(config-subif)# exit
+
+<span class="comment">! VLAN 33 – Caméras (192.168.33.0/28)</span>
+Router-Saig(config)# interface GigabitEthernet0/1.33
+Router-Saig(config-subif)# encapsulation dot1Q 33
+Router-Saig(config-subif)# ip address 192.168.33.1 255.255.255.240
+Router-Saig(config-subif)# exit
+
+<span class="comment">! VLAN 34 – Admin (192.168.34.0/29)</span>
+Router-Saig(config)# interface GigabitEthernet0/1.34
+Router-Saig(config-subif)# encapsulation dot1Q 34
+Router-Saig(config-subif)# ip address 192.168.34.1 255.255.255.248
+Router-Saig(config-subif)# exit
+
+<span class="comment">! Route par défaut vers Apt</span>
+Router-Saig(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.5
+Router-Saig(config)# end
+Router-Saig# write memory</div>
+
+<label class="qlabel"><span class="num-q">2</span>Copiez la sortie de <code>show ip route</code> sur Router-Saig après configuration complète.</label>
+<textarea class="rep rep-xl" id="q2-1" placeholder="Codes: C - connected, S - static …&#10;&#10;C  10.0.0.4/30 …&#10;C  192.168.31.0/26 …&#10;S* 0.0.0.0/0 [1/0] via 10.0.0.5"></textarea>
+
+<label class="qlabel"><span class="num-q">3</span>Testez le ping de Router-Saig vers Router-Apt (10.0.0.5). Notez le résultat et expliquez ce qu'il prouve.</label>
+<textarea class="rep rep-md" id="q2-2" placeholder="Résultat : ✅ / ❌ — Ce que ça prouve : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 3 — Configuration de Router-Cucuron (en autonomie)</h1>
+
+<div class="consigne">
+  <strong>📋 Consigne :</strong> Configurez Router-Cucuron de manière autonome. Utilisez les informations du plan d'adressage ci-dessous. La démarche est identique à Saignon.
+</div>
+
+<table class="data-table">
+  <tr><th>Élément</th><th>Valeur</th></tr>
+  <tr><td>Interface WAN (Gi0/0)</td><td class="td-code">10.0.0.10 / 255.255.255.252</td></tr>
+  <tr><td>Description WAN</td><td class="td-code">WAN-vers-Apt</td></tr>
+  <tr><td>Interface trunk LAN (Gi0/1)</td><td><em>no shutdown</em></td></tr>
+  <tr><td>VLAN 41 – Personnel</td><td class="td-code">192.168.41.1 / 255.255.255.192 (/26)</td></tr>
+  <tr><td>VLAN 42 – Clients WiFi</td><td class="td-code">192.168.42.1 / 255.255.255.128 (/25)</td></tr>
+  <tr><td>VLAN 43 – Caméras</td><td class="td-code">192.168.43.1 / 255.255.255.240 (/28)</td></tr>
+  <tr><td>VLAN 44 – Admin</td><td class="td-code">192.168.44.1 / 255.255.255.248 (/29)</td></tr>
+  <tr><td>Route par défaut next-hop</td><td class="td-code">10.0.0.9</td></tr>
+</table>
+
+<label class="qlabel"><span class="num-q">4</span>Rédigez ici toutes les commandes que vous avez saisies sur Router-Cucuron (depuis <code>enable</code> jusqu'à <code>write memory</code>).</label>
+<textarea class="rep rep-xl" id="q3-1" placeholder="Router-Cuc> enable&#10;Router-Cuc# configure terminal&#10;Router-Cuc(config)# interface GigabitEthernet0/0&#10;…"></textarea>
+
+<label class="qlabel"><span class="num-q">5</span>Copiez la sortie de <code>show ip route</code> sur Router-Cuc. Combien de lignes C et combien de lignes S ?</label>
+<textarea class="rep rep-lg" id="q3-2" placeholder="Sortie show ip route :&#10;&#10;Nombre C : … — Nombre S : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 4 — Routes statiques manquantes sur Router-Apt</h1>
+
+<p>Router-Apt connaît déjà les 4 VLANs de Roussillon (Atelier 1). Il faut maintenant ajouter les routes vers Saignon (4 VLANs) et Cucuron (4 VLANs) :</p>
+
+<div class="cli"><span class="comment">! Routes vers Saignon (next-hop : 10.0.0.6)</span>
+Router-Apt(config)# ip route 192.168.31.0 255.255.255.192 10.0.0.6
+Router-Apt(config)# ip route 192.168.32.0 255.255.255.192 10.0.0.6
+Router-Apt(config)# ip route 192.168.33.0 255.255.255.240 10.0.0.6
+Router-Apt(config)# ip route 192.168.34.0 255.255.255.248 10.0.0.6
+
+<span class="comment">! Routes vers Cucuron (next-hop : 10.0.0.10)</span>
+Router-Apt(config)# ip route 192.168.41.0 255.255.255.192 10.0.0.10
+Router-Apt(config)# ip route 192.168.42.0 255.255.255.128 10.0.0.10
+Router-Apt(config)# ip route 192.168.43.0 255.255.255.240 10.0.0.10
+Router-Apt(config)# ip route 192.168.44.0 255.255.255.248 10.0.0.10
+Router-Apt(config)# end
+Router-Apt# write memory</div>
+
+<label class="qlabel"><span class="num-q">6</span>Copiez toutes les lignes "S" de <code>show ip route static</code> sur Router-Apt après ces ajouts. Comptez : combien au total ?</label>
+<textarea class="rep rep-xl" id="q4-1" placeholder="S  192.168.21.0/26 [1/0] via 10.0.0.2&#10;S  192.168.22.0/25 [1/0] via 10.0.0.2&#10;S  192.168.23.0/28 [1/0] via 10.0.0.2&#10;S  192.168.24.0/29 [1/0] via 10.0.0.2&#10;S  192.168.31.0/26 [1/0] via 10.0.0.6&#10;…&#10;&#10;Total routes S : …"></textarea>
+
+<label class="qlabel"><span class="num-q">7</span>Pourquoi Router-Apt a-t-il besoin de 12 routes statiques précises alors que les routeurs secondaires n'en ont qu'une (la route par défaut) ?</label>
+<textarea class="rep rep-md" id="q4-2" placeholder="Router-Apt est le nœud central… il a 3 chemins de sortie possibles… les routeurs secondaires n'ont qu'un seul chemin vers le monde extérieur…"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 5 — Ajout des PCs de test pour Saignon et Cucuron</h1>
+
+<p>Ajoutez les switches et PCs de test pour les deux nouveaux sites, connectez-les et configurez leurs IP :</p>
+
+<table class="data-table">
+  <tr><th>Équipement</th><th>Connexion</th><th>Adresse IP</th><th>Masque</th><th>Passerelle</th><th>VLAN</th></tr>
+  <tr><td class="td-code">SW-Saig</td><td>Router-Saig Gi0/1 (trunk)</td><td>—</td><td>—</td><td>—</td><td>Trunk 31,32,33,34</td></tr>
+  <tr><td class="td-code">PC-Saig-1</td><td>SW-Saig Fa0/1 (access)</td><td class="td-code">192.168.31.10</td><td class="td-code">255.255.255.192</td><td class="td-code">192.168.31.1</td><td>31</td></tr>
+  <tr><td class="td-code">SW-Cuc</td><td>Router-Cuc Gi0/1 (trunk)</td><td>—</td><td>—</td><td>—</td><td>Trunk 41,42,43,44</td></tr>
+  <tr><td class="td-code">PC-Cuc-1</td><td>SW-Cuc Fa0/1 (access)</td><td class="td-code">192.168.41.10</td><td class="td-code">255.255.255.192</td><td class="td-code">192.168.41.1</td><td>41</td></tr>
+</table>
+
+<label class="qlabel"><span class="num-q">8</span>Faites une capture d'écran de votre topologie Packet Tracer complète à ce stade (4 routeurs + 4 switches + 4 PCs + toutes les liaisons).</label>
+<div class="upload-zone" onclick="document.getElementById('img-topo').click()">
+  <input type="file" id="img-topo" accept="image/*" onchange="compresserImage(this,'prev-topo','hint-topo',b64=>{imgData['topo']=b64})">
+  <div class="upload-text">📎 Déposer votre capture — topologie 4 sites complète</div>
+  <div class="upload-hint" id="hint-topo">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-topo" style="display:none;max-width:100%;margin-top:10px;border-radius:6px;">
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 6 — Campagne de tests inter-sites complète (Section 6 du dossier)</h1>
+
+<p>Cette campagne constitue le contenu de la <strong>Section 6 du dossier de déploiement</strong>. Effectuez chaque ping et renseignez le tableau avec soin — c'est une pièce du dossier final.</p>
+
+<h2>6.1 Tests de base — connectivité locale</h2>
+<table class="ping-table">
+  <tr><th>#</th><th>Source</th><th>Cible</th><th>IP cible</th><th>Résultat</th><th>Commentaire</th></tr>
+  <tr>
+    <td>1</td><td><span class="badge-saig">PC-Saig-1</span></td><td>Passerelle VLAN 31</td><td class="td-code">192.168.31.1</td>
+    <td><select id="p1-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p1-c" placeholder="Commentaire…"></td>
+  </tr>
+  <tr>
+    <td>2</td><td><span class="badge-cuc">PC-Cuc-1</span></td><td>Passerelle VLAN 41</td><td class="td-code">192.168.41.1</td>
+    <td><select id="p2-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p2-c" placeholder="Commentaire…"></td>
+  </tr>
+  <tr>
+    <td>3</td><td><span class="badge-apt">Router-Apt</span></td><td>Router-Saig (WAN)</td><td class="td-code">10.0.0.6</td>
+    <td><select id="p3-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p3-c" placeholder="Commentaire…"></td>
+  </tr>
+  <tr>
+    <td>4</td><td><span class="badge-apt">Router-Apt</span></td><td>Router-Cuc (WAN)</td><td class="td-code">10.0.0.10</td>
+    <td><select id="p4-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p4-c" placeholder="Commentaire…"></td>
+  </tr>
+</table>
+
+<h2>6.2 Tests inter-sites — Apt ↔ secondaires</h2>
+<table class="ping-table">
+  <tr><th>#</th><th>Source</th><th>Cible</th><th>IP cible</th><th>Résultat</th><th>Routeurs traversés</th></tr>
+  <tr>
+    <td>5</td><td><span class="badge-apt">PC-Apt-1</span></td><td>PC-Saig-1</td><td class="td-code">192.168.31.10</td>
+    <td><select id="p5-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p5-c" placeholder="Apt → Saig"></td>
+  </tr>
+  <tr>
+    <td>6</td><td><span class="badge-saig">PC-Saig-1</span></td><td>PC-Apt-1</td><td class="td-code">192.168.11.10</td>
+    <td><select id="p6-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p6-c" placeholder="Saig → Apt"></td>
+  </tr>
+  <tr>
+    <td>7</td><td><span class="badge-apt">PC-Apt-1</span></td><td>PC-Cuc-1</td><td class="td-code">192.168.41.10</td>
+    <td><select id="p7-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p7-c" placeholder="Apt → Cuc"></td>
+  </tr>
+  <tr>
+    <td>8</td><td><span class="badge-cuc">PC-Cuc-1</span></td><td>PC-Apt-1</td><td class="td-code">192.168.11.10</td>
+    <td><select id="p8-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p8-c" placeholder="Cuc → Apt"></td>
+  </tr>
+</table>
+
+<h2>6.3 Tests inter-sites secondaires (transit via Apt)</h2>
+<div class="info-box">
+  <strong>Rappel :</strong> Dans la topologie étoile, il n'y a pas de liaison directe entre les sites secondaires. Le trafic Roussillon↔Saignon, Roussillon↔Cucuron et Saignon↔Cucuron transite <em>obligatoirement</em> par Router-Apt.
+</div>
+<table class="ping-table">
+  <tr><th>#</th><th>Source</th><th>Cible</th><th>IP cible</th><th>Résultat</th><th>Chemin complet</th></tr>
+  <tr>
+    <td>9</td><td><span class="badge-rous">PC-Rous-1</span></td><td>PC-Saig-1</td><td class="td-code">192.168.31.10</td>
+    <td><select id="p9-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p9-c" placeholder="Rous → Apt → Saig"></td>
+  </tr>
+  <tr>
+    <td>10</td><td><span class="badge-rous">PC-Rous-1</span></td><td>PC-Cuc-1</td><td class="td-code">192.168.41.10</td>
+    <td><select id="p10-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p10-c" placeholder="Rous → Apt → Cuc"></td>
+  </tr>
+  <tr>
+    <td>11</td><td><span class="badge-saig">PC-Saig-1</span></td><td>PC-Cuc-1</td><td class="td-code">192.168.41.10</td>
+    <td><select id="p11-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p11-c" placeholder="Saig → Apt → Cuc"></td>
+  </tr>
+  <tr>
+    <td>12</td><td><span class="badge-cuc">PC-Cuc-1</span></td><td>PC-Rous-1</td><td class="td-code">192.168.21.10</td>
+    <td><select id="p12-r"><option value="">—</option><option>✅ Succès</option><option>❌ Échec</option><option>⚠ Partiel</option></select></td>
+    <td><input class="inline-input" id="p12-c" placeholder="Cuc → Apt → Rous"></td>
+  </tr>
+</table>
+
+<label class="qlabel"><span class="num-q">9</span>Faites une capture d'écran montrant un ping réussi entre deux sites secondaires (test 11 ou 12 de préférence).</label>
+<div class="upload-zone" onclick="document.getElementById('img-ping').click()">
+  <input type="file" id="img-ping" accept="image/*" onchange="compresserImage(this,'prev-ping','hint-ping',b64=>{imgData['ping']=b64})">
+  <div class="upload-text">📎 Déposer votre capture — ping inter-sites secondaires</div>
+  <div class="upload-hint" id="hint-ping">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-ping" style="display:none;max-width:100%;margin-top:10px;border-radius:6px;">
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 7 — Analyse et traceroute</h1>
+
+<label class="qlabel"><span class="num-q">10</span>Lancez <code>traceroute 192.168.41.10</code> depuis PC-Saig-1. Quelles adresses IP intermédiaires apparaissent ? Correspondent-elles à ce que vous attendiez ? Pourquoi ?</label>
+<textarea class="rep rep-lg" id="q6-1" placeholder="Adresses apparues :&#10;1. …  (= ?)&#10;2. …  (= ?)&#10;3. …  (= ?)&#10;&#10;Analyse : …"></textarea>
+
+<label class="qlabel"><span class="num-q">11</span>Si le test 11 (PC-Saig-1 → PC-Cuc-1) échoue mais que le test 5 (PC-Apt-1 → PC-Saig-1) fonctionne, identifiez les 3 causes les plus probables et la commande de vérification associée.</label>
+<textarea class="rep rep-lg" id="q6-2" placeholder="Cause 1 : … — Vérification : …&#10;Cause 2 : … — Vérification : …&#10;Cause 3 : … — Vérification : …"></textarea>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 8 — Section 6 du dossier de déploiement</h1>
+
+<h2>8.1 Tableau de synthèse des routes statiques</h2>
+<p>Ce tableau sera intégré à la Section 6 de votre dossier. Vérifiez que chaque ligne correspond à votre configuration réelle :</p>
+
+<table class="route-table">
+  <tr><th>Routeur</th><th>Type</th><th>Destination</th><th>Masque</th><th>Next-hop</th></tr>
+  <tr class="td-router"><td colspan="5">Router-Apt — 12 routes statiques</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.21.0</td><td>255.255.255.192</td><td>10.0.0.2</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.22.0</td><td>255.255.255.128</td><td>10.0.0.2</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.23.0</td><td>255.255.255.240</td><td>10.0.0.2</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.24.0</td><td>255.255.255.248</td><td>10.0.0.2</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.31.0</td><td>255.255.255.192</td><td>10.0.0.6</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.32.0</td><td>255.255.255.192</td><td>10.0.0.6</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.33.0</td><td>255.255.255.240</td><td>10.0.0.6</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.34.0</td><td>255.255.255.248</td><td>10.0.0.6</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.41.0</td><td>255.255.255.192</td><td>10.0.0.10</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.42.0</td><td>255.255.255.128</td><td>10.0.0.10</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.43.0</td><td>255.255.255.240</td><td>10.0.0.10</td></tr>
+  <tr><td class="td-router">Router-Apt</td><td class="td-s">S</td><td>192.168.44.0</td><td>255.255.255.248</td><td>10.0.0.10</td></tr>
+  <tr class="td-router"><td colspan="5">Routeurs secondaires — routes par défaut</td></tr>
+  <tr><td class="td-router">Router-Rous</td><td class="td-s">S*</td><td>0.0.0.0</td><td>0.0.0.0</td><td>10.0.0.1</td></tr>
+  <tr><td class="td-router">Router-Saig</td><td class="td-s">S*</td><td>0.0.0.0</td><td>0.0.0.0</td><td>10.0.0.5</td></tr>
+  <tr><td class="td-router">Router-Cuc</td><td class="td-s">S*</td><td>0.0.0.0</td><td>0.0.0.0</td><td>10.0.0.9</td></tr>
+</table>
+
+<label class="qlabel"><span class="num-q">12</span>Faites une capture d'écran de la topologie Packet Tracer finale avec les annotations d'adresses IP (au moins les IPs WAN visibles). Ce schéma sera collé dans la Section 6 du dossier.</label>
+<div class="upload-zone" onclick="document.getElementById('img-final').click()">
+  <input type="file" id="img-final" accept="image/*" onchange="compresserImage(this,'prev-final','hint-final',b64=>{imgData['final']=b64})">
+  <div class="upload-text">📎 Déposer votre schéma de topologie finale (Section 6)</div>
+  <div class="upload-hint" id="hint-final">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-final" style="display:none;max-width:100%;margin-top:10px;border-radius:6px;">
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════════════════ -->
+<h1>Étape 9 — Ouverture : limites du routage statique</h1>
+
+<label class="qlabel"><span class="num-q">13</span>Provence Évasion envisage d'ouvrir un 5ème site à Gordes. Combien de commandes <code>ip route</code> supplémentaires faudrait-il saisir, et sur quels routeurs ? Y a-t-il un risque d'erreur ?</label>
+<textarea class="rep rep-md" id="q8-1" placeholder="Commandes supplémentaires : … sur Router-Apt + 1 route par défaut sur Router-Gordes…&#10;Risque : …"></textarea>
+
+<label class="qlabel"><span class="num-q">14</span>En S10, nous verrons les protocoles de routage dynamique (OSPF, EIGRP). Selon vous, quel avantage principal apporteraient-ils par rapport au routage statique dans le contexte de Provence Évasion ?</label>
+<textarea class="rep rep-md" id="q8-2" placeholder="Avantage principal : …"></textarea>
+
+<div class="consigne">
+  <strong>💾 Sauvegarde finale :</strong> Enregistrez votre fichier Packet Tracer sous le nom <code>PE_S5_FINAL_[Nom]_[Prenom].pkt</code>. Il servira de point de départ pour la S6 (tests de conformité et débogage).
+</div>
+
+<hr class="sep">
+
+<!-- SYNTHÈSE -->
+<div class="section-synth-titre">🎯 Bilan de l'atelier 2 — Complétez</div>
+<div class="conclusion">
+  <p>Au total, Router-Apt possède <input class="inline-field" id="s1" placeholder="?"> routes statiques vers les sites secondaires, réparties en <input class="inline-field" id="s2" placeholder="?"> par site × <input class="inline-field" id="s3" placeholder="?"> sites.</p>
+  <p>Les routeurs secondaires n'ont besoin que d'<input class="inline-field" id="s4" placeholder="?"> route(s) car ils n'ont qu'un seul chemin de sortie : la <input class="inline-field" id="s5" placeholder="?">.</p>
+  <p>Un paquet de Saignon vers Cucuron traverse <input class="inline-field" id="s6" placeholder="?"> routeur(s) intermédiaire(s), ce qui est une conséquence de la topologie <input class="inline-field" id="s7" placeholder="?">.</p>
+  <p>Sur les <input class="inline-field" id="s8" placeholder="12"> tests de la campagne, j'ai obtenu <input class="inline-field" id="s9" placeholder="?"> succès et <input class="inline-field" id="s10" placeholder="?"> échec(s).</p>
+</div>
+
+<hr class="sep">
+<h1>Auto-évaluation</h1>
+<table class="ae-table" id="ae-table"></table>
+
+</div>
+
+<footer>
+  <div>S5 – Atelier 2 | Provence Évasion</div>
+  <div>Lycée Louis Lumière – Chelles</div>
+</footer>
+
+<div class="send-bar">
+  <div class="send-info">Sauvegardez PE_S5_FINAL_[Nom]_[Prenom].pkt avant de générer le JSON !</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div id="toast">✅ Fichier JSON téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+const imgData = {topo:'',ping:'',final:''};
+
+function compresserImage(input,idPrev,idHint,cb){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const img=new Image();
+    img.onload=function(){
+      const MAX=900; let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const b64=canvas.toDataURL('image/jpeg',0.72);
+      document.getElementById(idPrev).src=b64;
+      document.getElementById(idPrev).style.display='block';
+      const kb=Math.round(b64.length*0.75/1024);
+      document.getElementById(idHint).textContent=`Image compressée : ${w}×${h}px – environ ${kb} Ko`;
+      cb(b64);
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+const AE_CRITERES=[
+  "J'ai configuré Router-Saig de manière guidée (WAN + LAN + route par défaut)",
+  "J'ai configuré Router-Cuc de manière autonome",
+  "J'ai complété les 8 routes statiques manquantes sur Router-Apt",
+  "Tous les pings de base (tests 1–4) sont réussis",
+  "Les pings Apt↔secondaires (tests 5–8) sont réussis",
+  "Les pings entre sites secondaires (tests 9–12) sont réussis",
+  "J'ai utilisé traceroute pour analyser un chemin inter-sites",
+  "J'ai complété la Section 6 du dossier (tableau routes + schéma)"
+];
+
+function buildAE(){
+  const t=document.getElementById('ae-table');
+  t.innerHTML='<tr><th>Critère</th><th>★★★ Maîtrisé</th><th>★★☆ En cours</th><th>★☆☆ À revoir</th><th>? Non traité</th></tr>';
+  AE_CRITERES.forEach((c,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${c}</td>${['maitrise','en_cours','a_revoir','non_traite'].map((nv,j)=>`<td style="text-align:center"><label style="cursor:pointer;font-size:${j<3?'16':'13'}pt;color:${j<3?'#f0b400':'#888'}"><input type="radio" name="ae${i}" value="${nv}" style="display:none">${['★★★','★★☆','★☆☆','?'][j]}</label></td>`).join('')}`;
+    t.appendChild(tr);
+  });
+}
+buildAE();
+
+function getAE(){
+  const r={};
+  AE_CRITERES.forEach((c,i)=>{
+    const sel=document.querySelector(`input[name="ae${i}"]:checked`);
+    r[`critere_${i+1}`]={critere:c,niveau:sel?sel.value:'non_traite'};
+  });
+  return r;
+}
+
+function v(id){return(document.getElementById(id)||{value:''}).value;}
+function sv(id){const e=document.getElementById(id);return e?e.value:'';}
+
+function genererJSON(){
+  const data={
+    meta:{
+      devoir:"S5 – Atelier 2 : Routage complet 4 sites & campagne de tests",
+      eleve:{nom:v('eleve-nom'),prenom:v('eleve-prenom'),classe:v('eleve-classe')},
+      date:v('eleve-date'),
+      genere_le:new Date().toISOString()
+    },
+    etape1_validation:{v1:sv('v1'),v2:sv('v2'),observation:v('q1-1')},
+    etape2_saignon:{show_ip_route:v('q2-1'),ping_wan:v('q2-2')},
+    etape3_cucuron:{commandes:v('q3-1'),show_ip_route:v('q3-2')},
+    etape4_routes_apt:{show_static:v('q4-1'),pourquoi_12:v('q4-2')},
+    etape6_tests:{
+      t1:{res:sv('p1-r'),com:v('p1-c')},
+      t2:{res:sv('p2-r'),com:v('p2-c')},
+      t3:{res:sv('p3-r'),com:v('p3-c')},
+      t4:{res:sv('p4-r'),com:v('p4-c')},
+      t5:{res:sv('p5-r'),com:v('p5-c')},
+      t6:{res:sv('p6-r'),com:v('p6-c')},
+      t7:{res:sv('p7-r'),com:v('p7-c')},
+      t8:{res:sv('p8-r'),com:v('p8-c')},
+      t9:{res:sv('p9-r'),com:v('p9-c')},
+      t10:{res:sv('p10-r'),com:v('p10-c')},
+      t11:{res:sv('p11-r'),com:v('p11-c')},
+      t12:{res:sv('p12-r'),com:v('p12-c')}
+    },
+    etape7_analyse:{traceroute:v('q6-1'),diagnostic:v('q6-2')},
+    etape9_ouverture:{q13:v('q8-1'),q14:v('q8-2')},
+    synthese:{s1:v('s1'),s2:v('s2'),s3:v('s3'),s4:v('s4'),s5:v('s5'),s6:v('s6'),s7:v('s7'),s8:v('s8'),s9:v('s9'),s10:v('s10')},
+    captures:{
+      topo_4sites:imgData.topo?'[image incluse]':'',
+      ping_secondaires:imgData.ping?'[image incluse]':'',
+      topo_finale:imgData.final?'[image incluse]':''
+    },
+    images:{topo:imgData.topo,ping:imgData.ping,final:imgData.final},
+    auto_evaluation:getAE()
+  };
+  const nom=v('eleve-nom'),prenom=v('eleve-prenom');
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${safeName}_S5Atelier2.json`;
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

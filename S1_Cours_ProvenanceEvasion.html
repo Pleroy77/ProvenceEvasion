@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S1 — Cours : Découverte du projet Provence Évasion</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.choices{display:flex;gap:14px;flex-wrap:wrap;margin:4px 0 10px;}
+.choices label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;}
+.choices input{accent-color:var(--bleu);}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:120px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.0;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.fiche-entreprise{background:#f8fafc;border:1.5px solid var(--ciel);border-radius:8px;padding:14px 18px;margin:14px 0 18px;font-size:12px;}
+.fiche-entreprise .fiche-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+.fiche-ligne{display:grid;grid-template-columns:180px 1fr;gap:6px;padding:3px 0;border-bottom:1px dotted #cde;}
+.fiche-ligne .fiche-label{font-weight:600;color:var(--marine);}
+.tag-site{display:inline-block;background:var(--marine);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:2px 3px;}
+.plan-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.plan-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);text-align:left;}
+.plan-table td{border:1px solid #c0d0e0;padding:6px 10px;vertical-align:top;}
+.plan-table tr:nth-child(even){background:var(--ciel-bg);}
+.badge-vlan{background:#e8f4fd;color:var(--bleu);border-radius:3px;padding:1px 6px;font-size:11px;font-weight:600;}
+.badge-warn{background:#fff3e0;color:var(--orange);border-radius:3px;padding:1px 6px;font-size:11px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <svg width="110" height="44" viewBox="0 0 110 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="110" height="44" rx="4" fill="#1E3A5F"/>
+      <text x="8" y="17" font-family="Roboto,sans-serif" font-weight="700" font-size="13" fill="#8BC34A">BAC PRO</text>
+      <text x="8" y="32" font-family="Roboto,sans-serif" font-weight="700" font-size="15" fill="#fff">CIEL</text>
+      <text x="55" y="20" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Cybersécurité</text>
+      <text x="55" y="31" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Informatique</text>
+      <text x="55" y="42" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Électronique</text>
+    </svg>
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S1 – Cours : Découverte du projet et analyse du besoin</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 2h30 &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <!-- Tableau des compétences -->
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Mise en œuvre de réseaux informatiques (U31)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système électronique ou informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Valorisation de la donnée et cybersécurité (U32)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle (français/anglais)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Présentation de Provence Évasion</h1>
+
+<div class="mise-en-situation">
+  <strong>🌿 Contexte du projet</strong><br>
+  Vous venez d'être recruté(e) par un cabinet de conseil informatique basé à Avignon. Votre première mission : déployer l'infrastructure réseau complète du groupe <strong>Provence Évasion</strong>, une PME touristique en plein essor dans le Luberon. Le directeur, <strong>Laurent Ferracci</strong>, vous attend à Apt lundi matin.
+</div>
+
+<h2>1.1 Histoire et développement de l'entreprise</h2>
+<p>Provence Évasion est née en <strong>2009</strong> à l'initiative de Laurent Ferracci, ancien guide de randonnée passionné du Luberon. Avec un capital de départ modeste et un premier mas racheté à Roussillon, il transforme un bâtiment agricole en ruine en un centre d'hébergement de 12 gîtes ruraux. Dès l'été 2010, le taux de remplissage dépasse les 80 %.</p>
+<p>En <strong>2013</strong>, il rachète un domaine viticole désaffecté à Saignon et le reconvertit en village vacances (chalets, piscine naturelle, salle de séminaire). L'entreprise commence à attirer une clientèle professionnelle pour des séminaires d'entreprise.</p>
+<p>En <strong>2017</strong>, ouverture des bureaux administratifs à <strong>Apt</strong> : siège social, direction, comptabilité, ressources humaines. En <strong>2021</strong>, rachat d'un troisième site à <strong>Cucuron</strong> pour développer un camping haut de gamme (glamping).</p>
+<p>En <strong>2025</strong>, Provence Évasion emploie 38 salariés permanents et 60 saisonniers pour un chiffre d'affaires de 2,4 M€.</p>
+
+<div class="fiche-entreprise">
+  <div class="fiche-titre">📋 Fiche d'identité – Provence Évasion</div>
+  <div class="fiche-ligne"><span class="fiche-label">Forme juridique</span><span>SAS – Capital 280 000 €</span></div>
+  <div class="fiche-ligne"><span class="fiche-label">SIRET</span><span>512 847 293 00024</span></div>
+  <div class="fiche-ligne"><span class="fiche-label">Siège social</span><span>14 rue des Aiguiers, 84400 Apt (Vaucluse)</span></div>
+  <div class="fiche-ligne"><span class="fiche-label">Dirigeant</span><span>Laurent Ferracci, PDG</span></div>
+  <div class="fiche-ligne"><span class="fiche-label">Effectif</span><span>38 permanents + 60 saisonniers</span></div>
+  <div class="fiche-ligne"><span class="fiche-label">CA 2024</span><span>2 400 000 €</span></div>
+  <div class="fiche-ligne"><span class="fiche-label">Taux d'occupation moyen</span><span>74 % annuel – 96 % juillet/août</span></div>
+  <div class="fiche-ligne"><span class="fiche-label">Sites</span><span>
+    <span class="tag-site">Apt (siège)</span>
+    <span class="tag-site">Roussillon</span>
+    <span class="tag-site">Saignon</span>
+    <span class="tag-site">Cucuron</span>
+  </span></div>
+</div>
+
+<h2>1.2 Les quatre sites</h2>
+<table class="plan-table">
+  <tr><th>Site</th><th>Commune</th><th>Type</th><th>Capacité</th><th>Personnel permanent</th></tr>
+  <tr><td><strong>Siège administratif</strong></td><td>Apt</td><td>Bureaux</td><td>15 postes fixes</td><td>Direction, compta, RH, commercial</td></tr>
+  <tr><td><strong>Mas des Ocres</strong></td><td>Roussillon</td><td>Gîtes ruraux</td><td>12 hébergements / 60 pers.</td><td>Accueil, entretien, animateurs</td></tr>
+  <tr><td><strong>Domaine de Saignon</strong></td><td>Saignon</td><td>Village vacances + séminaires</td><td>18 chalets / 90 pers.</td><td>Accueil, restauration, animation</td></tr>
+  <tr><td><strong>Camping l'Étang</strong></td><td>Cucuron</td><td>Glamping haut de gamme</td><td>24 emplacements / 72 pers.</td><td>Accueil, entretien</td></tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 1 — Localisation des sites</div>
+  <p>Recherchez sur <strong>Google Maps</strong> (ou une carte de France) les quatre communes : Apt, Roussillon, Saignon et Cucuron.</p>
+  <label class="qlabel">Q1.1 — Dans quel département se situent ces communes ? Quel est le numéro de département ?</label>
+  <textarea class="rep rep-xs" id="ex1-q1"></textarea>
+  <label class="qlabel">Q1.2 — Estimez la distance routière entre le siège (Apt) et chacun des trois sites. Complétez le tableau :</label>
+  <table class="data-table">
+    <tr><th>Trajet</th><th>Distance estimée (km)</th><th>Temps estimé (min)</th></tr>
+    <tr><td class="left">Apt → Roussillon (Mas des Ocres)</td><td><input type="text" id="ex1-dist1"></td><td><input type="text" id="ex1-time1"></td></tr>
+    <tr><td class="left">Apt → Saignon (Domaine)</td><td><input type="text" id="ex1-dist2"></td><td><input type="text" id="ex1-time2"></td></tr>
+    <tr><td class="left">Apt → Cucuron (Camping l'Étang)</td><td><input type="text" id="ex1-dist3"></td><td><input type="text" id="ex1-time3"></td></tr>
+  </table>
+  <label class="qlabel">Q1.3 — D'après ces distances, quel type de liaison réseau sera nécessaire pour relier les sites entre eux ? (réseau local LAN, réseau métropolitain MAN, réseau étendu WAN ?)</label>
+  <textarea class="rep rep-sm" id="ex1-q3"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Le problème : une informatique « qui tient à un fil »</h1>
+
+<h2>2.1 La situation actuelle</h2>
+<p>Jusqu'en 2025, chaque site fonctionnait de manière totalement <strong>indépendante</strong>. Voici ce qu'a trouvé le cabinet lors de l'audit initial :</p>
+<ul>
+  <li>Des <strong>box grand public</strong> (SFR, Orange) installées par le beau-frère de Laurent sur chaque site</li>
+  <li>Des <strong>fichiers Excel partagés par clé USB</strong> pour la comptabilité et les réservations</li>
+  <li>Pas de <strong>réseau WiFi fiable</strong> pour les clients (coupures fréquentes, portée insuffisante)</li>
+  <li>Aucune <strong>caméra de surveillance</strong> centralisée — certains sites ont des caméras IP non connectées</li>
+  <li>Impossible pour la direction d'Apt d'<strong>accéder aux données des sites</strong> en temps réel</li>
+  <li>Aucune <strong>sauvegarde automatisée</strong> des données — risque de perte totale en cas de panne</li>
+</ul>
+
+<div class="attention">
+  <strong>⚠ Incident déclencheur (janvier 2025)</strong><br>
+  Une erreur de double réservation sur le Domaine de Saignon pendant les fêtes de fin d'année provoque l'arrivée simultanée de deux familles pour le même chalet. L'incident est relayé sur TripAdvisor et dans la presse locale. Laurent Ferracci perd 3 contrats de séminaire en une semaine. Il décide immédiatement de mandater un cabinet informatique pour tout reprendre de zéro.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 2 — Analyse des problèmes</div>
+  <label class="qlabel">Q2.1 — Listez au moins 4 problèmes concrets que l'absence de réseau informatique professionnel cause à Provence Évasion. Pour chaque problème, précisez la conséquence pour l'entreprise.</label>
+  <textarea class="rep rep-lg" id="ex2-q1"></textarea>
+  <label class="qlabel">Q2.2 — Pour chaque problème identifié, proposez brièvement quelle solution réseau pourrait y remédier (ex : VPN, WiFi professionnel, serveur de fichiers...).</label>
+  <textarea class="rep rep-lg" id="ex2-q2"></textarea>
+  <label class="qlabel">Q2.3 — Selon vous, pourquoi une box grand public (type Livebox ou Freebox) n'est-elle pas adaptée à un usage professionnel comme celui de Provence Évasion ?</label>
+  <textarea class="rep rep-md" id="ex2-q3"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Rappels — Les fondamentaux des réseaux informatiques</h1>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Types de réseaux</div>
+  <ul>
+    <li><strong>LAN (Local Area Network)</strong> : réseau local, limité à un bâtiment ou un site. Ex : réseau d'une salle informatique.</li>
+    <li><strong>MAN (Metropolitan Area Network)</strong> : réseau métropolitain, couvre une ville ou une agglomération. Ex : réseau d'un campus universitaire.</li>
+    <li><strong>WAN (Wide Area Network)</strong> : réseau étendu, couvre de grandes distances. Ex : Internet, liaison entre deux agences distantes.</li>
+  </ul>
+</div>
+
+<h2>3.1 Rappel sur l'adressage IP</h2>
+<p>Chaque équipement connecté à un réseau possède une <strong>adresse IP</strong>. Cette adresse est composée de 4 octets séparés par des points (notation décimale pointée). Le <strong>masque de sous-réseau</strong> permet de déterminer quelle partie de l'adresse identifie le réseau et quelle partie identifie l'hôte.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Classes d'adresses IP privées</div>
+  <table class="data-table">
+    <tr><th>Classe</th><th>Plage d'adresses</th><th>Masque par défaut</th><th>Usage typique</th></tr>
+    <tr><td class="center">A</td><td>10.0.0.0 → 10.255.255.255</td><td>255.0.0.0 (/8)</td><td>Très grands réseaux</td></tr>
+    <tr><td class="center">B</td><td>172.16.0.0 → 172.31.255.255</td><td>255.255.0.0 (/16)</td><td>Réseaux moyens</td></tr>
+    <tr><td class="center">C</td><td>192.168.0.0 → 192.168.255.255</td><td>255.255.255.0 (/24)</td><td>Petits réseaux (entreprises)</td></tr>
+  </table>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 3 — Rappel adressage IP</div>
+  <label class="qlabel">Q3.1 — Indiquez pour chaque adresse IP si elle appartient à la classe A, B ou C des adresses privées, et donnez son masque par défaut :</label>
+  <table class="data-table">
+    <tr><th>Adresse IP</th><th>Classe</th><th>Masque par défaut</th><th>Réseau ou hôte ?</th></tr>
+    <tr><td class="center">192.168.1.25</td><td><input type="text" id="ex3-c1"></td><td><input type="text" id="ex3-m1"></td><td><input type="text" id="ex3-r1"></td></tr>
+    <tr><td class="center">10.0.0.1</td><td><input type="text" id="ex3-c2"></td><td><input type="text" id="ex3-m2"></td><td><input type="text" id="ex3-r2"></td></tr>
+    <tr><td class="center">172.16.5.100</td><td><input type="text" id="ex3-c3"></td><td><input type="text" id="ex3-m3"></td><td><input type="text" id="ex3-r3"></td></tr>
+    <tr><td class="center">192.168.10.50</td><td><input type="text" id="ex3-c4"></td><td><input type="text" id="ex3-m4"></td><td><input type="text" id="ex3-r4"></td></tr>
+  </table>
+  <label class="qlabel">Q3.2 — Deux machines sont sur le même réseau si leurs adresses réseau sont identiques. Les paires de machines suivantes peuvent-elles communiquer directement sans routeur ? Justifiez.</label>
+  <table class="data-table">
+    <tr><th>Machine A</th><th>Machine B</th><th>Masque</th><th>Communication directe ?</th><th>Justification</th></tr>
+    <tr><td>192.168.1.10</td><td>192.168.1.50</td><td>/24</td><td><input type="text" id="ex3-com1"></td><td><input type="text" id="ex3-just1"></td></tr>
+    <tr><td>192.168.1.10</td><td>192.168.2.10</td><td>/24</td><td><input type="text" id="ex3-com2"></td><td><input type="text" id="ex3-just2"></td></tr>
+    <tr><td>10.0.0.1</td><td>10.0.5.1</td><td>/8</td><td><input type="text" id="ex3-com3"></td><td><input type="text" id="ex3-just3"></td></tr>
+  </table>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Le cahier des charges réseau de Provence Évasion</h1>
+
+<h2>4.1 Les objectifs du projet</h2>
+<p>Laurent Ferracci a formalisé ses attentes dans un <strong>cahier des charges</strong>. Voici les 6 objectifs principaux :</p>
+<ol>
+  <li>Fournir aux <strong>clients</strong> un accès WiFi fiable et sécurisé sur chaque site</li>
+  <li>Disposer d'un <strong>réseau interne protégé</strong> pour le personnel, totalement séparé du WiFi clients</li>
+  <li>Permettre à la <strong>direction d'Apt</strong> d'accéder aux données de tous les sites en temps réel</li>
+  <li>Centraliser la <strong>surveillance vidéo</strong> (caméras IP) depuis le siège</li>
+  <li>Mettre en place des <strong>services réseau partagés</strong> : messagerie interne, serveur de fichiers, logiciel de réservation</li>
+  <li>Garantir la <strong>sécurité des données</strong> sensibles (comptabilité, RH) face aux intrusions</li>
+</ol>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Notion de VLAN</div>
+  <p>Un <strong>VLAN (Virtual Local Area Network)</strong> est un réseau local virtuel qui permet de segmenter logiquement un réseau physique en plusieurs sous-réseaux isolés. Les équipements appartenant à des VLANs différents ne peuvent pas communiquer directement entre eux sans passer par un routeur.</p>
+  <p>Exemple : sur un même switch, on peut créer un VLAN « Clients » et un VLAN « Personnel » : les clients ne voient pas les imprimantes et les serveurs du personnel.</p>
+</div>
+
+<h2>4.2 Première ébauche d'architecture</h2>
+<p>Pour répondre aux besoins de Provence Évasion, voici une première répartition des équipements par site. Cette architecture sera affinée tout au long du projet.</p>
+
+<table class="plan-table">
+  <tr><th>Site</th><th>Équipements réseau envisagés</th><th>Services nécessaires</th></tr>
+  <tr>
+    <td><strong>Apt (siège)</strong></td>
+    <td>Routeur principal, switch manageable, serveur NAS, point d'accès WiFi</td>
+    <td>DHCP, DNS, serveur de fichiers, accès distant sécurisé (VPN)</td>
+  </tr>
+  <tr>
+    <td><strong>Roussillon</strong></td>
+    <td>Routeur, switch manageable, points d'accès WiFi (×3), caméras IP</td>
+    <td>DHCP local, WiFi clients, WiFi personnel, surveillance vidéo</td>
+  </tr>
+  <tr>
+    <td><strong>Saignon</strong></td>
+    <td>Routeur, switch manageable, points d'accès WiFi (×4), caméras IP</td>
+    <td>DHCP local, WiFi clients, WiFi personnel, salle séminaire réseau</td>
+  </tr>
+  <tr>
+    <td><strong>Cucuron</strong></td>
+    <td>Routeur, switch manageable, points d'accès WiFi (×2), caméras IP</td>
+    <td>DHCP local, WiFi clients, WiFi personnel</td>
+  </tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 4 — Analyse du cahier des charges</div>
+  <label class="qlabel">Q4.1 — Pour chacun des 6 objectifs du cahier des charges, identifiez la ou les technologie(s) réseau qui permettront d'y répondre (VLAN, VPN, WiFi, serveur DHCP, ACL, DNS...) :</label>
+  <table class="data-table">
+    <tr><th>#</th><th>Objectif</th><th>Technologie(s) réseau associée(s)</th></tr>
+    <tr><td class="center">1</td><td class="left">WiFi fiable et sécurisé pour les clients</td><td><input type="text" id="ex4-obj1"></td></tr>
+    <tr><td class="center">2</td><td class="left">Réseau interne séparé pour le personnel</td><td><input type="text" id="ex4-obj2"></td></tr>
+    <tr><td class="center">3</td><td class="left">Accès temps réel depuis Apt</td><td><input type="text" id="ex4-obj3"></td></tr>
+    <tr><td class="center">4</td><td class="left">Surveillance vidéo centralisée</td><td><input type="text" id="ex4-obj4"></td></tr>
+    <tr><td class="center">5</td><td class="left">Services réseau partagés</td><td><input type="text" id="ex4-obj5"></td></tr>
+    <tr><td class="center">6</td><td class="left">Sécurité des données sensibles</td><td><input type="text" id="ex4-obj6"></td></tr>
+  </table>
+
+  <label class="qlabel">Q4.2 — Combien de VLANs minimum faudra-t-il créer sur le site de Roussillon ? Listez-les avec leur rôle.</label>
+  <textarea class="rep rep-md" id="ex4-q2"></textarea>
+
+  <label class="qlabel">Q4.3 — La direction veut que les clients du Mas des Ocres (Roussillon) ne puissent en aucun cas accéder aux serveurs du siège (Apt). Quelle(s) mesure(s) technique(s) permettent de garantir cela ?</label>
+  <textarea class="rep rep-md" id="ex4-q3"></textarea>
+
+  <label class="qlabel">Q4.4 — Le budget alloué est de 45 000 €. Selon vous, quelle partie du projet sera la plus coûteuse ? Justifiez votre réponse.</label>
+  <textarea class="rep rep-md" id="ex4-q4"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. Le dossier de déploiement</h1>
+
+<h2>5.1 Qu'est-ce que le dossier de déploiement ?</h2>
+<p>Tout au long de ce projet, vous allez constituer un <strong>dossier de déploiement</strong>. C'est le document technique que vous remettrez à Provence Évasion à la fin du projet : il décrit l'infrastructure réseau mise en place, justifie les choix techniques et permet à n'importe quel technicien de maintenir ou faire évoluer le réseau.</p>
+<p>Ce dossier se construit <strong>progressivement</strong>, séance après séance. À chaque fin de séance, vous complétez une nouvelle section.</p>
+
+<h2>5.2 Section 1 du dossier — Fiche d'identité client</h2>
+<p>La première section du dossier est la <strong>fiche d'identité client</strong>. C'est la carte de visite de l'entreprise que tout technicien doit connaître avant d'intervenir.</p>
+
+<div class="exercice-synth">
+  <div class="exercice-titre">📂 Dossier de déploiement — Section 1 : Fiche d'identité client</div>
+  <label class="qlabel">Nom de l'entreprise :</label>
+  <textarea class="rep rep-xs" id="dos-nom"></textarea>
+  <label class="qlabel">Activité principale :</label>
+  <textarea class="rep rep-xs" id="dos-activite"></textarea>
+  <label class="qlabel">Dirigeant et contact :</label>
+  <textarea class="rep rep-xs" id="dos-contact"></textarea>
+  <label class="qlabel">Liste des sites (nom, commune, type) :</label>
+  <textarea class="rep rep-md" id="dos-sites"></textarea>
+  <label class="qlabel">Nombre total d'utilisateurs du réseau (permanents + saisonniers) :</label>
+  <textarea class="rep rep-xs" id="dos-users"></textarea>
+  <label class="qlabel">Résumé du besoin principal en une ou deux phrases (dans vos propres mots) :</label>
+  <textarea class="rep rep-md" id="dos-besoin"></textarea>
+  <label class="qlabel">Contrainte principale identifiée (délai, budget, technique...) :</label>
+  <textarea class="rep rep-sm" id="dos-contrainte"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Synthèse de la séance</div>
+
+<div class="conclusion">
+  <p>Au terme de cette séance, complétez les phrases suivantes :</p>
+  <p>Provence Évasion est un groupe touristique composé de <input class="inline-field" id="synth-1" placeholder="..."> sites, dont le siège est situé à <input class="inline-field" id="synth-2" placeholder="...">.</p>
+  <p>L'entreprise a besoin d'un réseau de type <input class="inline-field" id="synth-3" placeholder="LAN / MAN / WAN"> pour relier ses sites car ils sont séparés de plusieurs dizaines de kilomètres.</p>
+  <p>Pour séparer le trafic des clients et du personnel sur un même switch, on utilisera la technologie <input class="inline-field" id="synth-4" placeholder="...">.</p>
+  <p>Le principal risque de sécurité identifié est <input class="inline-field" style="width:200px" id="synth-5" placeholder="...">.</p>
+  <p>Le budget alloué au projet est de <input class="inline-field" id="synth-6" placeholder="..."> € et la mise en service doit intervenir avant <input class="inline-field" id="synth-7" placeholder="...">.</p>
+</div>
+
+<!-- ══ AUTO-ÉVALUATION ══ -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <div id="ae-container"></div>
+</div>
+
+</div><!-- fin .content -->
+
+<div class="footer">
+  <span>S1 – Cours : Découverte du projet Provence Évasion</span>
+  <span>Lycée Louis Lumière – Chelles</span>
+</div>
+
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+const CRITERES = [
+  "Je suis capable de situer les 4 sites de Provence Évasion sur une carte et d'expliquer leur activité",
+  "Je comprends pourquoi l'infrastructure actuelle est insuffisante pour une entreprise professionnelle",
+  "Je sais distinguer LAN, MAN et WAN et identifier le type de réseau nécessaire pour Provence Évasion",
+  "Je connais les classes d'adresses IP privées (A, B, C) et leurs masques par défaut",
+  "Je suis capable de déterminer si deux machines peuvent communiquer directement à partir de leurs adresses IP et masques",
+  "Je comprends ce qu'est un VLAN et pourquoi il est nécessaire dans ce projet",
+  "Je sais associer chaque besoin du cahier des charges à une technologie réseau",
+  "J'ai complété la section 1 du dossier de déploiement de manière précise et complète"
+];
+
+const ae = document.getElementById('ae-container');
+CRITERES.forEach((c, i) => {
+  const row = document.createElement('div');
+  row.className = 'ae-row';
+  const niveaux = [
+    {id:`ae-${i}-3`,val:'maitrise',label:'★★★'},
+    {id:`ae-${i}-2`,val:'en_cours',label:'★★☆'},
+    {id:`ae-${i}-1`,val:'a_revoir',label:'★☆☆'},
+    {id:`ae-${i}-0`,val:'non_traite',label:'?'}
+  ];
+  let html = `<div>${c}</div>`;
+  niveaux.forEach(n => {
+    html += `<div style="text-align:center"><input type="radio" name="ae-${i}" id="${n.id}" value="${n.val}"><label for="${n.id}" style="cursor:pointer;font-size:14px">${n.label}</label></div>`;
+  });
+  row.innerHTML = html;
+  ae.appendChild(row);
+});
+
+function v(id) { const el = document.getElementById(id); return el ? (el.value !== undefined ? el.value : '') : ''; }
+
+function genererJSON() {
+  const nom = v('eleve-nom').trim();
+  const prenom = v('eleve-prenom').trim();
+  const classe = v('eleve-classe').trim();
+  const date = v('eleve-date');
+
+  const auto_eval = {};
+  CRITERES.forEach((c, i) => {
+    const sel = document.querySelector(`input[name="ae-${i}"]:checked`);
+    auto_eval[`critere_${i+1}`] = { critere: c, niveau: sel ? sel.value : 'non_traite' };
+  });
+
+  const data = {
+    meta: {
+      devoir: "S1 Cours — Découverte du projet Provence Évasion",
+      eleve: { nom, prenom, classe },
+      date,
+      genere_le: new Date().toISOString()
+    },
+    exercice1: {
+      q1: v('ex1-q1'),
+      distances: {
+        apt_roussillon: { km: v('ex1-dist1'), min: v('ex1-time1') },
+        apt_saignon:    { km: v('ex1-dist2'), min: v('ex1-time2') },
+        apt_cucuron:    { km: v('ex1-dist3'), min: v('ex1-time3') }
+      },
+      q3: v('ex1-q3')
+    },
+    exercice2: {
+      q1: v('ex2-q1'),
+      q2: v('ex2-q2'),
+      q3: v('ex2-q3')
+    },
+    exercice3: {
+      tableau_classes: [
+        { ip:'192.168.1.25', classe:v('ex3-c1'), masque:v('ex3-m1'), reseau_hote:v('ex3-r1') },
+        { ip:'10.0.0.1',     classe:v('ex3-c2'), masque:v('ex3-m2'), reseau_hote:v('ex3-r2') },
+        { ip:'172.16.5.100', classe:v('ex3-c3'), masque:v('ex3-m3'), reseau_hote:v('ex3-r3') },
+        { ip:'192.168.10.50',classe:v('ex3-c4'), masque:v('ex3-m4'), reseau_hote:v('ex3-r4') }
+      ],
+      communication: [
+        { a:'192.168.1.10', b:'192.168.1.50', masque:'/24', rep:v('ex3-com1'), justif:v('ex3-just1') },
+        { a:'192.168.1.10', b:'192.168.2.10', masque:'/24', rep:v('ex3-com2'), justif:v('ex3-just2') },
+        { a:'10.0.0.1',     b:'10.0.5.1',    masque:'/8',  rep:v('ex3-com3'), justif:v('ex3-just3') }
+      ]
+    },
+    exercice4: {
+      objectifs: [
+        { num:1, techno:v('ex4-obj1') },
+        { num:2, techno:v('ex4-obj2') },
+        { num:3, techno:v('ex4-obj3') },
+        { num:4, techno:v('ex4-obj4') },
+        { num:5, techno:v('ex4-obj5') },
+        { num:6, techno:v('ex4-obj6') }
+      ],
+      q2: v('ex4-q2'),
+      q3: v('ex4-q3'),
+      q4: v('ex4-q4')
+    },
+    dossier_section1: {
+      nom_entreprise: v('dos-nom'),
+      activite: v('dos-activite'),
+      contact: v('dos-contact'),
+      sites: v('dos-sites'),
+      nb_utilisateurs: v('dos-users'),
+      besoin_principal: v('dos-besoin'),
+      contrainte_principale: v('dos-contrainte')
+    },
+    synthese: {
+      nb_sites: v('synth-1'),
+      siege: v('synth-2'),
+      type_reseau: v('synth-3'),
+      techno_separation: v('synth-4'),
+      risque_securite: v('synth-5'),
+      budget: v('synth-6'),
+      delai: v('synth-7')
+    },
+    auto_evaluation: auto_eval
+  };
+
+  const safeName = (nom + prenom).replace(/[^a-zA-Z0-9]/g, '') || 'Eleve';
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${safeName}_S1_Cours_ProvenanceEvasion.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+</script>
+</body>
+</html>

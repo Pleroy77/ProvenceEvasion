@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S1 — Atelier 2 : Calculs CIDR, plan d'adressage et schémas réseau</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.data-table input[type=text]{border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;width:100%;font-family:'Montserrat',sans-serif;font-size:12px;text-align:center;}
+.data-table input[type=text]:focus{outline:none;border-color:var(--bleu);}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}.rep-xl{min-height:180px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.choices{display:flex;gap:14px;flex-wrap:wrap;margin:4px 0 10px;}
+.choices label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;}
+.choices input{accent-color:var(--bleu);}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:130px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.schema-zone{background:#f8fafc;border:2px dashed #c0d0e0;border-radius:8px;padding:16px;margin:10px 0 14px;}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.2;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.duree-badge{display:inline-block;background:var(--marine);color:#fff;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:600;margin-left:8px;vertical-align:middle;}
+.rappel-bloc1{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 18px;margin:14px 0 18px;font-size:12px;line-height:1.8;}
+.rappel-bloc1 .rappel-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:8px;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:12px 16px;border-radius:6px;margin:8px 0 12px;line-height:1.8;white-space:pre;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <svg width="110" height="44" viewBox="0 0 110 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="110" height="44" rx="4" fill="#1E3A5F"/>
+      <text x="8" y="17" font-family="Roboto,sans-serif" font-weight="700" font-size="13" fill="#8BC34A">BAC PRO</text>
+      <text x="8" y="32" font-family="Roboto,sans-serif" font-weight="700" font-size="15" fill="#fff">CIEL</text>
+      <text x="55" y="20" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Cybersécurité</text>
+      <text x="55" y="31" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Informatique</text>
+      <text x="55" y="42" font-family="Roboto,sans-serif" font-size="9" fill="#5BB8E8">Électronique</text>
+    </svg>
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S1 – Atelier 2 : Calculs CIDR approfondis, plan d'adressage complet et schémas réseau</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Mise en œuvre de réseaux informatiques (U31)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système électronique ou informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Valorisation de la donnée et cybersécurité (U32)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle (français/anglais)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<div class="mise-en-situation">
+  <strong>🎯 Objectif de cet atelier</strong><br>
+  Dans l'atelier précédent, vous avez audité le réseau existant, recensé les utilisateurs et analysé les flux. Vous avez également posé les premières bases du calcul de sous-réseaux. Dans ce second atelier, vous allez <strong>approfondir les calculs CIDR</strong>, construire le <strong>plan d'adressage complet du site de Roussillon</strong> avec toutes ses contraintes, puis représenter graphiquement le <strong>réseau actuel et le réseau cible</strong> sous forme de schémas structurés. Ce travail constituera la section 2 de votre dossier de déploiement.
+</div>
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Approfondissement des calculs CIDR <span class="duree-badge">≈ 1h</span></h1>
+
+<h2>1.1 Rappel de l'atelier précédent</h2>
+
+<div class="rappel-bloc1">
+  <div class="rappel-titre">📋 Ce que vous avez vu dans l'atelier 1</div>
+  <p>Vous avez appris que la notation CIDR (ex : <strong>/24</strong>) indique le nombre de bits réservés à la partie réseau. Les bits restants servent à identifier les hôtes :</p>
+  <ul>
+    <li>/24 → 8 bits hôtes → <strong>254 hôtes</strong> utilisables</li>
+    <li>/25 → 7 bits hôtes → <strong>126 hôtes</strong> utilisables</li>
+    <li>/26 → 6 bits hôtes → <strong>62 hôtes</strong> utilisables</li>
+    <li>/27 → 5 bits hôtes → <strong>30 hôtes</strong> utilisables</li>
+    <li>/28 → 4 bits hôtes → <strong>14 hôtes</strong> utilisables</li>
+  </ul>
+  <p>Dans cet atelier, vous allez aller plus loin : calculer des masques à la demande, détecter des chevauchements et justifier vos choix de dimensionnement.</p>
+</div>
+
+<h2>1.2 Calcul de masque à partir d'un besoin</h2>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Méthode — Choisir le bon masque</div>
+  <p>Pour choisir le bon masque, on part du <strong>nombre d'hôtes nécessaires</strong> et on cherche la puissance de 2 immédiatement supérieure :</p>
+  <ul>
+    <li>Besoin de 10 hôtes → 2⁴ = 16 → on prend /28 (14 hôtes utilisables, suffisant avec marge)</li>
+    <li>Besoin de 50 hôtes → 2⁶ = 64 → on prend /26 (62 hôtes utilisables)</li>
+    <li>Besoin de 100 hôtes → 2⁷ = 128 → on prend /25 (126 hôtes utilisables)</li>
+  </ul>
+  <p><strong>Règle d'or :</strong> toujours prévoir une marge de croissance d'au moins 20% par rapport au besoin actuel.</p>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 1 — Dimensionnement des VLANs</div>
+
+  <p>Voici les besoins en nombre d'équipements pour chaque VLAN du site de Roussillon :</p>
+  <table class="data-table">
+    <tr><th>VLAN</th><th>Nom</th><th>Équipements actuels</th><th>Prévision max (3 ans)</th></tr>
+    <tr><td class="center">10</td><td>Administration</td><td class="center">4 PC + 2 imprimantes = 6</td><td class="center">12 max</td></tr>
+    <tr><td class="center">20</td><td>Personnel accueil</td><td class="center">4 PC + 1 caisse = 5</td><td class="center">20 max</td></tr>
+    <tr><td class="center">30</td><td>Clients WiFi</td><td class="center">jusqu'à 60 connexions simultanées</td><td class="center">100 max</td></tr>
+    <tr><td class="center">40</td><td>Caméras IP</td><td class="center">4 caméras</td><td class="center">10 max</td></tr>
+  </table>
+
+  <label class="qlabel">Q1.1 — Pour chaque VLAN, choisissez le masque le plus adapté à la prévision max (3 ans). Justifiez en calculant le nombre d'hôtes disponibles et en vérifiant la marge :</label>
+  <table class="data-table">
+    <tr><th>VLAN</th><th>Nom</th><th>Masque choisi</th><th>Hôtes disponibles</th><th>Marge (%)</th><th>Justification</th></tr>
+    <tr><td class="center">10</td><td>Administration</td>
+      <td><input type="text" id="dim-1-mask"></td>
+      <td><input type="text" id="dim-1-nb"></td>
+      <td><input type="text" id="dim-1-marge"></td>
+      <td><input type="text" id="dim-1-just"></td>
+    </tr>
+    <tr><td class="center">20</td><td>Personnel accueil</td>
+      <td><input type="text" id="dim-2-mask"></td>
+      <td><input type="text" id="dim-2-nb"></td>
+      <td><input type="text" id="dim-2-marge"></td>
+      <td><input type="text" id="dim-2-just"></td>
+    </tr>
+    <tr><td class="center">30</td><td>Clients WiFi</td>
+      <td><input type="text" id="dim-3-mask"></td>
+      <td><input type="text" id="dim-3-nb"></td>
+      <td><input type="text" id="dim-3-marge"></td>
+      <td><input type="text" id="dim-3-just"></td>
+    </tr>
+    <tr><td class="center">40</td><td>Caméras IP</td>
+      <td><input type="text" id="dim-4-mask"></td>
+      <td><input type="text" id="dim-4-nb"></td>
+      <td><input type="text" id="dim-4-marge"></td>
+      <td><input type="text" id="dim-4-just"></td>
+    </tr>
+  </table>
+
+  <label class="qlabel">Q1.2 — Pourquoi ne pas toujours choisir /24 (254 hôtes) pour tous les VLANs, même si c'est plus simple ? Donnez deux inconvénients concrets.</label>
+  <textarea class="rep rep-md" id="ex1-q2"></textarea>
+
+  <label class="qlabel">Q1.3 — Le VLAN Clients WiFi est prévu pour 100 hôtes maximum. Quel masque choisissez-vous ? Un /24 (254 hôtes) serait-il acceptable ? Comparez les deux options en termes de gaspillage d'adresses.</label>
+  <textarea class="rep rep-md" id="ex1-q3"></textarea>
+</div>
+
+<h2>1.3 Détection de chevauchements</h2>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Chevauchement de plages — Danger !</div>
+  <p>Deux sous-réseaux <strong>ne doivent jamais se chevaucher</strong> : si deux VLANs partagent des adresses communes, les routeurs ne sauront plus à quel réseau acheminer les paquets. Cela provoque des pannes imprévisibles.</p>
+  <p><strong>Comment vérifier ?</strong> Pour chaque sous-réseau, calculez la plage d'adresses de la première à la dernière adresse hôte. Ces plages ne doivent jamais se croiser.</p>
+  <p>Exemple : <strong>192.168.20.0/26</strong> couvre de .1 à .62 · <strong>192.168.20.64/26</strong> couvre de .65 à .126 → pas de chevauchement ✅</p>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 2 — Détection et correction de chevauchements</div>
+
+  <p>Un technicien stagiaire a proposé le plan d'adressage suivant pour Roussillon. Il contient des erreurs :</p>
+  <table class="data-table">
+    <tr><th>VLAN</th><th>Adresse réseau proposée</th><th>Masque</th><th>Plage hôtes</th></tr>
+    <tr><td class="center">10 — Administration</td><td class="center">192.168.20.0</td><td class="center">/26</td><td class="center">192.168.20.1 → 192.168.20.62</td></tr>
+    <tr><td class="center">20 — Personnel</td><td class="center">192.168.20.32</td><td class="center">/27</td><td class="center">192.168.20.33 → 192.168.20.62</td></tr>
+    <tr><td class="center">30 — Clients WiFi</td><td class="center">192.168.20.128</td><td class="center">/25</td><td class="center">192.168.20.129 → 192.168.20.254</td></tr>
+    <tr><td class="center">40 — Caméras IP</td><td class="center">192.168.20.112</td><td class="center">/28</td><td class="center">192.168.20.113 → 192.168.20.126</td></tr>
+  </table>
+
+  <label class="qlabel">Q2.1 — Identifiez le ou les chevauchements présents dans ce plan. Expliquez précisément pourquoi c'est un problème.</label>
+  <textarea class="rep rep-md" id="ex2-q1"></textarea>
+
+  <label class="qlabel">Q2.2 — Corrigez le plan en proposant des adresses réseau cohérentes pour chaque VLAN, sans chevauchement. Respectez la convention du projet (192.168.20.x pour Roussillon).</label>
+  <table class="data-table">
+    <tr><th>VLAN</th><th>Adresse réseau corrigée</th><th>Masque</th><th>Plage hôtes corrigée</th><th>Broadcast</th></tr>
+    <tr><td class="center">10 — Administration</td>
+      <td><input type="text" id="cor-1-net"></td>
+      <td><input type="text" id="cor-1-mask"></td>
+      <td><input type="text" id="cor-1-range"></td>
+      <td><input type="text" id="cor-1-bcast"></td>
+    </tr>
+    <tr><td class="center">20 — Personnel</td>
+      <td><input type="text" id="cor-2-net"></td>
+      <td><input type="text" id="cor-2-mask"></td>
+      <td><input type="text" id="cor-2-range"></td>
+      <td><input type="text" id="cor-2-bcast"></td>
+    </tr>
+    <tr><td class="center">30 — Clients WiFi</td>
+      <td><input type="text" id="cor-3-net"></td>
+      <td><input type="text" id="cor-3-mask"></td>
+      <td><input type="text" id="cor-3-range"></td>
+      <td><input type="text" id="cor-3-bcast"></td>
+    </tr>
+    <tr><td class="center">40 — Caméras IP</td>
+      <td><input type="text" id="cor-4-net"></td>
+      <td><input type="text" id="cor-4-mask"></td>
+      <td><input type="text" id="cor-4-range"></td>
+      <td><input type="text" id="cor-4-bcast"></td>
+    </tr>
+  </table>
+
+  <label class="qlabel">Q2.3 — Après correction, calculez l'espace d'adressage total utilisé (somme de toutes les plages). Reste-t-il de la place pour ajouter un 5ème VLAN si Provence Évasion ajoute un réseau de vidéoprojecteurs pour la salle de séminaire ?</label>
+  <textarea class="rep rep-md" id="ex2-q3"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Plan d'adressage complet du site de Roussillon <span class="duree-badge">≈ 1h10</span></h1>
+
+<h2>2.1 Construction du plan final</h2>
+<p>Vous allez maintenant construire le plan d'adressage <strong>définitif et complet</strong> du site de Roussillon, en intégrant tous les éléments : adresse réseau, masque, passerelle, plage DHCP, adresses réservées pour les équipements fixes.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Convention de réservation d'adresses</div>
+  <p>Dans le projet Provence Évasion, la convention suivante s'applique pour toutes les adresses fixes :</p>
+  <ul>
+    <li><strong>.1</strong> : passerelle (routeur ou interface VLAN du switch L3)</li>
+    <li><strong>.2 → .9</strong> : réservées pour les équipements réseau (switches, points d'accès...)</li>
+    <li><strong>.10 → .19</strong> : réservées pour les serveurs et équipements fixes (PC accueil, imprimantes...)</li>
+    <li><strong>.20 et au-delà</strong> : plage DHCP dynamique (PC utilisateurs, clients WiFi, caméras...)</li>
+  </ul>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 3 — Plan d'adressage détaillé de Roussillon</div>
+
+  <label class="qlabel">Q3.1 — Complétez le plan d'adressage complet du site de Roussillon. Pour chaque VLAN, renseignez toutes les colonnes en appliquant la convention ci-dessus :</label>
+  <table class="data-table">
+    <tr><th>VLAN</th><th>Nom</th><th>Réseau / Masque</th><th>Passerelle (.1)</th><th>Début DHCP</th><th>Fin DHCP</th><th>Broadcast</th><th>Nb hôtes max</th></tr>
+    <tr><td class="center">10</td><td>Administration</td>
+      <td><input type="text" id="pl-1-net" placeholder="192.168.20.x/xx"></td>
+      <td><input type="text" id="pl-1-gw"></td>
+      <td><input type="text" id="pl-1-dhcp-start"></td>
+      <td><input type="text" id="pl-1-dhcp-end"></td>
+      <td><input type="text" id="pl-1-bcast"></td>
+      <td><input type="text" id="pl-1-nb"></td>
+    </tr>
+    <tr><td class="center">20</td><td>Personnel accueil</td>
+      <td><input type="text" id="pl-2-net"></td>
+      <td><input type="text" id="pl-2-gw"></td>
+      <td><input type="text" id="pl-2-dhcp-start"></td>
+      <td><input type="text" id="pl-2-dhcp-end"></td>
+      <td><input type="text" id="pl-2-bcast"></td>
+      <td><input type="text" id="pl-2-nb"></td>
+    </tr>
+    <tr><td class="center">30</td><td>Clients WiFi</td>
+      <td><input type="text" id="pl-3-net"></td>
+      <td><input type="text" id="pl-3-gw"></td>
+      <td><input type="text" id="pl-3-dhcp-start"></td>
+      <td><input type="text" id="pl-3-dhcp-end"></td>
+      <td><input type="text" id="pl-3-bcast"></td>
+      <td><input type="text" id="pl-3-nb"></td>
+    </tr>
+    <tr><td class="center">40</td><td>Caméras IP</td>
+      <td><input type="text" id="pl-4-net"></td>
+      <td><input type="text" id="pl-4-gw"></td>
+      <td><input type="text" id="pl-4-dhcp-start"></td>
+      <td><input type="text" id="pl-4-dhcp-end"></td>
+      <td><input type="text" id="pl-4-bcast"></td>
+      <td><input type="text" id="pl-4-nb"></td>
+    </tr>
+  </table>
+
+  <label class="qlabel">Q3.2 — Le switch manageable du site de Roussillon doit lui-même avoir une adresse IP fixe pour pouvoir être administré à distance. Dans quel VLAN doit-on l'intégrer ? Quelle adresse lui attribuer selon la convention ?</label>
+  <textarea class="rep rep-sm" id="ex3-q2"></textarea>
+
+  <label class="qlabel">Q3.3 — Le point d'accès WiFi (AP) des clients doit également être joignable pour être configuré. Quelle adresse lui attribuez-vous ? Justifiez le choix du VLAN.</label>
+  <textarea class="rep rep-sm" id="ex3-q3"></textarea>
+
+  <label class="qlabel">Q3.4 — Une caméra IP tombe en panne et doit être remplacée. L'installateur branche la nouvelle caméra. Elle reçoit automatiquement une adresse IP via DHCP. Comment l'administrateur réseau peut-il lui attribuer une adresse fixe pour la retrouver facilement ? (Donnez le principe, pas forcément la configuration exacte.)</label>
+  <textarea class="rep rep-md" id="ex3-q4"></textarea>
+</div>
+
+<h2>2.2 Tableau des équipements fixes</h2>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 4 — Attribution des adresses fixes</div>
+
+  <label class="qlabel">Q4.1 — Complétez le tableau des équipements à adresse fixe du site de Roussillon :</label>
+  <table class="data-table">
+    <tr><th>Équipement</th><th>VLAN</th><th>Adresse IP fixe</th><th>Rôle / Justification</th></tr>
+    <tr>
+      <td>Switch manageable principal</td>
+      <td><input type="text" id="eq-1-vlan"></td>
+      <td><input type="text" id="eq-1-ip"></td>
+      <td><input type="text" id="eq-1-role"></td>
+    </tr>
+    <tr>
+      <td>Point d'accès WiFi clients</td>
+      <td><input type="text" id="eq-2-vlan"></td>
+      <td><input type="text" id="eq-2-ip"></td>
+      <td><input type="text" id="eq-2-role"></td>
+    </tr>
+    <tr>
+      <td>PC Accueil 1 (réservation)</td>
+      <td><input type="text" id="eq-3-vlan"></td>
+      <td><input type="text" id="eq-3-ip"></td>
+      <td><input type="text" id="eq-3-role"></td>
+    </tr>
+    <tr>
+      <td>PC Caisse</td>
+      <td><input type="text" id="eq-4-vlan"></td>
+      <td><input type="text" id="eq-4-ip"></td>
+      <td><input type="text" id="eq-4-role"></td>
+    </tr>
+    <tr>
+      <td>Caméra IP 1 (entrée)</td>
+      <td><input type="text" id="eq-5-vlan"></td>
+      <td><input type="text" id="eq-5-ip"></td>
+      <td><input type="text" id="eq-5-role"></td>
+    </tr>
+    <tr>
+      <td>Caméra IP 2 (piscine)</td>
+      <td><input type="text" id="eq-6-vlan"></td>
+      <td><input type="text" id="eq-6-ip"></td>
+      <td><input type="text" id="eq-6-role"></td>
+    </tr>
+  </table>
+
+  <label class="qlabel">Q4.2 — Pourquoi les caméras IP ont-elles une adresse fixe plutôt qu'une adresse DHCP dynamique ? Quelles seraient les conséquences si une caméra changeait d'adresse à chaque redémarrage ?</label>
+  <textarea class="rep rep-md" id="ex4-q2"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Schémas réseau actuel et cible <span class="duree-badge">≈ 1h20</span></h1>
+
+<h2>3.1 Règles de représentation d'un schéma réseau</h2>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Symboles et règles de représentation</div>
+  <table class="data-table">
+    <tr><th>Équipement</th><th>Symbole</th><th>À préciser sur le schéma</th></tr>
+    <tr><td>Box internet / Routeur FAI</td><td class="center">[ BOX ]</td><td>Opérateur, modèle</td></tr>
+    <tr><td>Routeur</td><td class="center">[ R ]</td><td>Modèle, interfaces</td></tr>
+    <tr><td>Switch non manageable</td><td class="center">[ SW ]</td><td>Nb de ports</td></tr>
+    <tr><td>Switch manageable</td><td class="center">[ SW-M ]</td><td>Modèle, VLANs configurés</td></tr>
+    <tr><td>Point d'accès WiFi</td><td class="center">[ AP ]</td><td>SSID, VLAN associé</td></tr>
+    <tr><td>PC / Poste de travail</td><td class="center">[ PC ]</td><td>Nom, VLAN, IP si fixe</td></tr>
+    <tr><td>Caméra IP</td><td class="center">[ CAM ]</td><td>Numéro, VLAN, IP si fixe</td></tr>
+    <tr><td>Internet / Cloud</td><td class="center">[ ☁ WAN ]</td><td>—</td></tr>
+    <tr><td>VLAN (délimitation)</td><td class="center">— — — —</td><td>Numéro et nom du VLAN</td></tr>
+  </table>
+  <p style="margin-top:8px;"><strong>Règles :</strong> les équipements du même VLAN sont regroupés. Les liaisons trunk entre switches sont représentées par une double ligne. Les liaisons access sont des lignes simples. Chaque équipement indique son adresse IP si elle est fixe.</p>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 5 — Schéma du réseau ACTUEL de Roussillon</div>
+
+  <p>Rappelez-vous de l'état actuel du Mas des Ocres (Roussillon) tel que décrit dans le compte-rendu d'audit : 1 Freebox Revolution, 1 switch 5 ports non manageable, 3 PC fixes accueil + 1 PC caisse, 1 AP WiFi grand public, 4 caméras IP non raccordées.</p>
+
+  <label class="qlabel">Q5.1 — Représentez le réseau ACTUEL du Mas des Ocres sous forme de schéma textuel structuré. Faites apparaître tous les équipements, leurs connexions et leurs éventuelles adresses IP (si configurées). Mettez en évidence les problèmes identifiés lors de l'audit (en ajoutant ⚠️ à côté).</label>
+  <textarea class="rep rep-xl" id="ex5-q1" placeholder="Exemple de structure attendue :&#10;&#10;        [ ☁ WAN — Internet ]&#10;                 |&#10;         [ BOX Freebox Rev. ]&#10;                 |&#10;          [ SW 5 ports ] ⚠️ non manageable&#10;        /    |    |    \&#10;      [PC1] [PC2] [PC3] [PC Caisse]&#10;      &#10;[ AP WiFi TP-Link ] ⚠️ portée insuffisante&#10;      |&#10;   (clients)&#10;&#10;[ CAM1 ] ⚠️ [ CAM2 ] ⚠️ [ CAM3 ] ⚠️ [ CAM4 ] ⚠️&#10;   non raccordées au réseau&#10;&#10;Complétez et améliorez ce schéma..."></textarea>
+
+  <label class="qlabel">Q5.2 — Listez tous les problèmes que vous avez identifiés et matérialisés par ⚠️ dans votre schéma. Pour chacun, précisez la conséquence concrète pour Provence Évasion.</label>
+  <table class="data-table">
+    <tr><th>Problème identifié</th><th>Conséquence concrète</th></tr>
+    <tr><td><input type="text" id="pb-1-prob"></td><td><input type="text" id="pb-1-cons"></td></tr>
+    <tr><td><input type="text" id="pb-2-prob"></td><td><input type="text" id="pb-2-cons"></td></tr>
+    <tr><td><input type="text" id="pb-3-prob"></td><td><input type="text" id="pb-3-cons"></td></tr>
+    <tr><td><input type="text" id="pb-4-prob"></td><td><input type="text" id="pb-4-cons"></td></tr>
+    <tr><td><input type="text" id="pb-5-prob"></td><td><input type="text" id="pb-5-cons"></td></tr>
+  </table>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 6 — Schéma du réseau CIBLE de Roussillon</div>
+
+  <p>Vous allez maintenant représenter le réseau tel qu'il doit être <strong>après votre intervention</strong>. Le matériel prévu pour Roussillon est : 1 routeur Cisco (connexion WAN + routage inter-VLAN), 1 switch manageable 24 ports Cisco Catalyst, 2 points d'accès WiFi professionnels, 4 caméras IP raccordées, équipements existants conservés (PC, caisse).</p>
+
+  <label class="qlabel">Q6.1 — Représentez le réseau CIBLE complet du Mas des Ocres. Faites apparaître : les 4 VLANs (délimités par des pointillés), tous les équipements avec leur adresse IP fixe ou leur VLAN DHCP, les liaisons trunk (double trait) et les liaisons access (trait simple).</label>
+  <textarea class="rep rep-xl" id="ex6-q1" placeholder="Structure suggérée :&#10;&#10;           [ ☁ WAN ]&#10;                |&#10;        [ R Cisco — routeur ]&#10;         192.168.20.x.1 (passerelle)&#10;                |  (trunk 4 VLANs)&#10;    [ SW-M Cisco Catalyst 24p ]&#10;     ||          ||         ||        ||&#10; — — — —    — — — —    — — — —   — — — —&#10; VLAN 10     VLAN 20    VLAN 30    VLAN 40&#10; Admin       Personnel  Clients    Caméras&#10;&#10;Développez chaque VLAN avec ses équipements et adresses..."></textarea>
+
+  <label class="qlabel">Q6.2 — Sur votre schéma cible, une liaison est représentée en "trunk". Expliquez ce que cela signifie concrètement : quelles données circulent sur ce lien, et pourquoi ne peut-on pas utiliser une liaison "access" à la place ?</label>
+  <textarea class="rep rep-md" id="ex6-q2"></textarea>
+
+  <label class="qlabel">Q6.3 — Comparez vos deux schémas (actuel vs cible). En quoi la structure du réseau cible répond-elle aux problèmes identifiés dans le schéma actuel ? Répondez en faisant correspondre chaque problème ⚠️ à sa solution dans le réseau cible.</label>
+  <textarea class="rep rep-lg" id="ex6-q3"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ DOSSIER ══ -->
+<div class="section-synth-titre">📂 Dossier de déploiement — Section 2 : Audit et plan d'adressage (suite)</div>
+
+<div class="exercice-synth">
+  <div class="exercice-titre">Complétez la section 2 de votre dossier de déploiement</div>
+  <p style="font-size:12px;margin-bottom:12px;">Cette section doit être rédigée de manière <strong>professionnelle</strong>, comme si vous la remettiez à Laurent Ferracci, PDG de Provence Évasion. Utilisez un vocabulaire technique précis mais accessible.</p>
+
+  <label class="qlabel">2.1 — Plan d'adressage IP complet du site de Roussillon (tableau de synthèse propre et complet) :</label>
+  <textarea class="rep rep-lg" id="dos-plan"></textarea>
+
+  <label class="qlabel">2.2 — Tableau des équipements à adresse fixe (recopiez proprement votre tableau de l'exercice 4) :</label>
+  <textarea class="rep rep-lg" id="dos-equipements"></textarea>
+
+  <label class="qlabel">2.3 — Justification des choix de masques retenus pour chaque VLAN (style professionnel, 5 à 8 lignes) :</label>
+  <textarea class="rep rep-lg" id="dos-justif"></textarea>
+
+  <label class="qlabel">2.4 — Description du réseau cible de Roussillon : expliquez en 6 à 10 lignes l'architecture choisie, les équipements retenus et les améliorations apportées par rapport à la situation actuelle :</label>
+  <textarea class="rep rep-xl" id="dos-archi"></textarea>
+</div>
+
+<!-- ══ AUTO-ÉVALUATION ══ -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <div id="ae-container"></div>
+</div>
+
+</div><!-- fin .content -->
+
+<div class="footer">
+  <span>S1 – Atelier 2 : Calculs CIDR, plan d'adressage complet et schémas réseau</span>
+  <span>Lycée Louis Lumière – Chelles</span>
+</div>
+
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+const CRITERES = [
+  "Je sais choisir un masque adapté en fonction du nombre d'hôtes nécessaires et d'une marge de croissance",
+  "Je suis capable de détecter un chevauchement de plages d'adresses et de le corriger",
+  "J'ai construit un plan d'adressage complet avec passerelle, plage DHCP et adresses fixes pour Roussillon",
+  "Je comprends pourquoi certains équipements doivent avoir une adresse IP fixe plutôt que dynamique",
+  "Je sais attribuer des adresses fixes selon la convention du projet (rôle de .1, .2-.9, .10-.19)",
+  "Je suis capable de représenter le réseau actuel sous forme de schéma textuel avec ses problèmes",
+  "Je suis capable de représenter le réseau cible avec les 4 VLANs, les liaisons trunk et access",
+  "Je sais expliquer la différence entre une liaison trunk et une liaison access",
+  "J'ai rédigé la section 2 du dossier de déploiement de manière précise et professionnelle"
+];
+
+const ae = document.getElementById('ae-container');
+CRITERES.forEach((c, i) => {
+  const row = document.createElement('div');
+  row.className = 'ae-row';
+  const niveaux = [
+    {id:`ae-${i}-3`,val:'maitrise',label:'★★★'},
+    {id:`ae-${i}-2`,val:'en_cours',label:'★★☆'},
+    {id:`ae-${i}-1`,val:'a_revoir',label:'★☆☆'},
+    {id:`ae-${i}-0`,val:'non_traite',label:'?'}
+  ];
+  let html = `<div>${c}</div>`;
+  niveaux.forEach(n => {
+    html += `<div style="text-align:center"><input type="radio" name="ae-${i}" id="${n.id}" value="${n.val}"><label for="${n.id}" style="cursor:pointer;font-size:14px">${n.label}</label></div>`;
+  });
+  row.innerHTML = html;
+  ae.appendChild(row);
+});
+
+function v(id) { const el = document.getElementById(id); return el ? (el.value !== undefined ? el.value : '') : ''; }
+
+function genererJSON() {
+  const nom = v('eleve-nom').trim();
+  const prenom = v('eleve-prenom').trim();
+  const classe = v('eleve-classe').trim();
+  const date = v('eleve-date');
+
+  const auto_eval = {};
+  CRITERES.forEach((c, i) => {
+    const sel = document.querySelector(`input[name="ae-${i}"]:checked`);
+    auto_eval[`critere_${i+1}`] = { critere: c, niveau: sel ? sel.value : 'non_traite' };
+  });
+
+  const data = {
+    meta: {
+      devoir: "S1 Atelier 2 — Calculs CIDR, plan d'adressage complet et schémas réseau",
+      eleve: { nom, prenom, classe },
+      date,
+      genere_le: new Date().toISOString()
+    },
+    exercice1_dimensionnement: {
+      vlans: [
+        { vlan:10, nom:'Administration',  mask:v('dim-1-mask'), nb:v('dim-1-nb'), marge:v('dim-1-marge'), just:v('dim-1-just') },
+        { vlan:20, nom:'Personnel',       mask:v('dim-2-mask'), nb:v('dim-2-nb'), marge:v('dim-2-marge'), just:v('dim-2-just') },
+        { vlan:30, nom:'Clients WiFi',    mask:v('dim-3-mask'), nb:v('dim-3-nb'), marge:v('dim-3-marge'), just:v('dim-3-just') },
+        { vlan:40, nom:'Caméras IP',      mask:v('dim-4-mask'), nb:v('dim-4-nb'), marge:v('dim-4-marge'), just:v('dim-4-just') }
+      ],
+      q2: v('ex1-q2'),
+      q3: v('ex1-q3')
+    },
+    exercice2_chevauchements: {
+      q1: v('ex2-q1'),
+      correction: [
+        { vlan:10, net:v('cor-1-net'), mask:v('cor-1-mask'), range:v('cor-1-range'), bcast:v('cor-1-bcast') },
+        { vlan:20, net:v('cor-2-net'), mask:v('cor-2-mask'), range:v('cor-2-range'), bcast:v('cor-2-bcast') },
+        { vlan:30, net:v('cor-3-net'), mask:v('cor-3-mask'), range:v('cor-3-range'), bcast:v('cor-3-bcast') },
+        { vlan:40, net:v('cor-4-net'), mask:v('cor-4-mask'), range:v('cor-4-range'), bcast:v('cor-4-bcast') }
+      ],
+      q3: v('ex2-q3')
+    },
+    exercice3_plan_adressage: {
+      vlans: [
+        { vlan:10, net:v('pl-1-net'), gw:v('pl-1-gw'), dhcp_start:v('pl-1-dhcp-start'), dhcp_end:v('pl-1-dhcp-end'), bcast:v('pl-1-bcast'), nb:v('pl-1-nb') },
+        { vlan:20, net:v('pl-2-net'), gw:v('pl-2-gw'), dhcp_start:v('pl-2-dhcp-start'), dhcp_end:v('pl-2-dhcp-end'), bcast:v('pl-2-bcast'), nb:v('pl-2-nb') },
+        { vlan:30, net:v('pl-3-net'), gw:v('pl-3-gw'), dhcp_start:v('pl-3-dhcp-start'), dhcp_end:v('pl-3-dhcp-end'), bcast:v('pl-3-bcast'), nb:v('pl-3-nb') },
+        { vlan:40, net:v('pl-4-net'), gw:v('pl-4-gw'), dhcp_start:v('pl-4-dhcp-start'), dhcp_end:v('pl-4-dhcp-end'), bcast:v('pl-4-bcast'), nb:v('pl-4-nb') }
+      ],
+      q2: v('ex3-q2'),
+      q3: v('ex3-q3'),
+      q4: v('ex3-q4')
+    },
+    exercice4_adresses_fixes: {
+      equipements: [
+        { nom:'Switch manageable', vlan:v('eq-1-vlan'), ip:v('eq-1-ip'), role:v('eq-1-role') },
+        { nom:'AP WiFi clients',   vlan:v('eq-2-vlan'), ip:v('eq-2-ip'), role:v('eq-2-role') },
+        { nom:'PC Accueil 1',      vlan:v('eq-3-vlan'), ip:v('eq-3-ip'), role:v('eq-3-role') },
+        { nom:'PC Caisse',         vlan:v('eq-4-vlan'), ip:v('eq-4-ip'), role:v('eq-4-role') },
+        { nom:'Caméra IP 1',       vlan:v('eq-5-vlan'), ip:v('eq-5-ip'), role:v('eq-5-role') },
+        { nom:'Caméra IP 2',       vlan:v('eq-6-vlan'), ip:v('eq-6-ip'), role:v('eq-6-role') }
+      ],
+      q2: v('ex4-q2')
+    },
+    exercice5_schema_actuel: {
+      schema: v('ex5-q1'),
+      problemes: [
+        { prob:v('pb-1-prob'), cons:v('pb-1-cons') },
+        { prob:v('pb-2-prob'), cons:v('pb-2-cons') },
+        { prob:v('pb-3-prob'), cons:v('pb-3-cons') },
+        { prob:v('pb-4-prob'), cons:v('pb-4-cons') },
+        { prob:v('pb-5-prob'), cons:v('pb-5-cons') }
+      ]
+    },
+    exercice6_schema_cible: {
+      schema: v('ex6-q1'),
+      q2: v('ex6-q2'),
+      q3: v('ex6-q3')
+    },
+    dossier_section2: {
+      plan_adressage:  v('dos-plan'),
+      adresses_fixes:  v('dos-equipements'),
+      justification:   v('dos-justif'),
+      archi_cible:     v('dos-archi')
+    },
+    auto_evaluation: auto_eval
+  };
+
+  const safeName = (nom + prenom).replace(/[^a-zA-Z0-9]/g, '') || 'Eleve';
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${safeName}_S1_Atelier2_ProvenanceEvasion.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S12 — Atelier : Évaluation individuelle — Provence Évasion</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+code{font-family:'Courier New',monospace;background:#eef4f8;padding:1px 5px;border-radius:3px;font-size:12px;color:var(--marine);}
+hr.sep{border:none;border-top:1px solid #d8e8f0;margin:22px 0;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.consigne{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 12px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.consigne strong{color:#4a7a1a;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{border:none;border-bottom:1.5px solid var(--bleu);padding:2px 4px;font-family:'Montserrat',sans-serif;font-size:12px;width:120px;color:var(--marine);outline:none;background:transparent;}
+.inline-field:focus{border-bottom-color:var(--orange);}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:14px;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.1;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.partie-card{border:2px solid var(--bleu);border-radius:10px;margin:18px 0;overflow:hidden;}
+.partie-head{background:var(--bleu);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;}
+.partie-pts{font-size:11px;background:rgba(255,255,255,0.25);border-radius:10px;padding:2px 12px;}
+.partie-body{padding:14px 18px;background:#f8fbff;}
+.question-block{border-left:3px solid var(--ciel);padding:8px 0 8px 12px;margin:10px 0;}
+.q-num{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);}
+.q-pts{font-size:10px;color:#fff;background:var(--orange);border-radius:8px;padding:1px 8px;margin-left:6px;}
+.bareme-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px;}
+.bareme-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--marine);text-align:left;}
+.bareme-table td{border:1px solid #c0d0e0;padding:6px 10px;}
+.bareme-table tr:nth-child(even){background:var(--ciel-bg);}
+.bareme-table td.center{text-align:center;}
+.grille-comp{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:11px;}
+.grille-comp th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:5px 8px;border:1px solid var(--marine);text-align:center;}
+.grille-comp td{border:1px solid #c0d0e0;padding:5px 8px;text-align:center;}
+.grille-comp tr:nth-child(even){background:var(--ciel-bg);}
+.grille-comp td.left{text-align:left;font-weight:600;color:var(--marine);}
+.timer-box{display:inline-block;background:var(--orange);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;border-radius:12px;padding:3px 12px;margin-left:8px;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S12 — Atelier : Évaluation individuelle</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Travail STRICTEMENT INDIVIDUEL &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+  <div class="eleve-box" style="grid-template-columns:1fr;">
+    <input type="text" id="eleve-poste" placeholder="N° de poste / fichier Packet Tracer attribué">
+  </div>
+
+  <div class="attention">
+  <strong>⚠ Rappel des conditions d'épreuve.</strong> Ce travail est strictement individuel. Toute communication avec un autre élève, tout échange de fichier, invalide l'épreuve. Vous disposez du fichier <code>ProvenceEvasion_S12_Reference.pkt</code> fourni par votre professeur, de votre dossier de déploiement personnel, et de vos cours. Aucune ressource internet externe non autorisée.
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<h1>Présentation de l'épreuve</h1>
+
+<div class="mise-en-situation">
+<strong>📍 Situation.</strong> Axentis Informatique a transmis à Provence Évasion une infrastructure réseau en cours de finalisation. Avant la remise officielle du dossier complet à Laurent Ferracci, Thomas Vidal vous demande, en tant que technicien chargé de la recette finale, de vérifier individuellement la conformité de l'installation et de corriger les anomalies identifiées.
+</div>
+
+<table class="bareme-table">
+<tr><th>Partie</th><th>Thème</th><th style="text-align:center">Points</th><th style="text-align:center">Durée indicative</th></tr>
+<tr><td>A</td><td class="left">VLAN et configuration switch</td><td class="center">3 pts</td><td class="center">35 min</td></tr>
+<tr><td>B</td><td class="left">DHCP</td><td class="center">3 pts</td><td class="center">35 min</td></tr>
+<tr><td>C</td><td class="left">Routage inter-sites</td><td class="center">4 pts</td><td class="center">45 min</td></tr>
+<tr><td>D</td><td class="left">DNS</td><td class="center">2 pts</td><td class="center">25 min</td></tr>
+<tr><td>E</td><td class="left">ACL et sécurité</td><td class="center">4 pts</td><td class="center">45 min</td></tr>
+<tr><td>F</td><td class="left">SSH et accès distant</td><td class="center">3 pts</td><td class="center">35 min</td></tr>
+<tr><td>G</td><td class="left">Synthèse et résumé exécutif final</td><td class="center">1 pt</td><td class="center">20 min</td></tr>
+<tr style="font-weight:700;background:var(--ciel-bg);"><td colspan="2">TOTAL</td><td class="center">20 pts</td><td class="center">≈ 4h</td></tr>
+</table>
+
+<div class="retenir">
+<div class="retenir-titre">📌 Méthode imposée pour chaque partie</div>
+Pour chaque partie technique (A à F), suivez systématiquement la démarche : <strong>1)</strong> formuler une hypothèse à partir de la situation décrite, <strong>2)</strong> vérifier par la commande ou l'action appropriée dans Packet Tracer, <strong>3)</strong> conclure avec une réponse argumentée, <strong>4)</strong> corriger si une anomalie est confirmée.
+</div>
+
+<hr class="sep">
+<!-- ══ PARTIE A — VLAN ══ -->
+<div class="partie-card">
+  <div class="partie-head"><span>Partie A — VLAN et configuration switch</span><span class="partie-pts">3 points · ⏱ 35 min</span></div>
+  <div class="partie-body">
+
+<div class="consigne">
+<strong>Situation.</strong> Un poste du service Caméras IP du Domaine de Saignon (VLAN 33, réseau 192.168.33.0/28) ne parvient à transmettre aucune image vers le NVR situé à Apt. Le câblage a déjà été vérifié par un collègue et déclaré conforme.
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">A.1</span><span class="q-pts">0,5 pt</span> Ouvrez la topologie de référence et identifiez le switch concerné par cette panne. Quel est son nom ?</label>
+<textarea class="rep rep-xs" id="qA1" placeholder="Nom du switch"></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">A.2</span><span class="q-pts">1 pt</span> Utilisez la commande <code>show vlan brief</code> (ou équivalent) sur ce switch. Le VLAN 33 apparaît-il dans la liste ? Notez exactement ce que vous observez.</label>
+<textarea class="rep rep-md" id="qA2" placeholder="Résultat de la commande et constat précis."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">A.3</span><span class="q-pts">1 pt</span> D'après votre constat, formulez le diagnostic exact de cette panne, en vous appuyant sur le plan VLAN officiel du projet (section 4 de votre dossier de déploiement).</label>
+<textarea class="rep rep-md" id="qA3" placeholder="Diagnostic argumenté."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">A.4</span><span class="q-pts">0,5 pt</span> Corrigez la configuration sur le switch pour résoudre cette panne. Notez la ou les commandes exactes utilisées.</label>
+<textarea class="rep rep-sm" id="qA4" placeholder="Commandes de correction."></textarea>
+</div>
+
+  </div>
+</div>
+
+<!-- ══ PARTIE B — DHCP ══ -->
+<div class="partie-card">
+  <div class="partie-head"><span>Partie B — DHCP</span><span class="partie-pts">3 points · ⏱ 35 min</span></div>
+  <div class="partie-body">
+
+<div class="consigne">
+<strong>Situation.</strong> En pleine haute saison, le Camping l'Étang (Cucuron) signale que plusieurs appareils de clients WiFi (VLAN 42) n'obtiennent plus d'adresse IP, alors que le service fonctionnait normalement en début de matinée.
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">B.1</span><span class="q-pts">1 pt</span> Rappelez le réseau CIDR du VLAN 42 (cf. section 3 de votre dossier). Combien d'adresses hôtes utilisables ce réseau permet-il théoriquement ?</label>
+<textarea class="rep rep-sm" id="qB1" placeholder="Réseau CIDR + calcul du nombre d'hôtes utilisables."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">B.2</span><span class="q-pts">1 pt</span> Sur le routeur ou serveur DHCP du site Cucuron, vérifiez l'étendue (pool) configurée pour ce VLAN. Combien d'adresses sont réellement disponibles dans le pool actuel ? Le dimensionnement est-il cohérent avec l'estimation de 20 appareils clients WiFi en haute saison (cf. section 2 — équipements du site) ?</label>
+<textarea class="rep rep-md" id="qB2" placeholder="Taille du pool observée + analyse de cohérence."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">B.3</span><span class="q-pts">1 pt</span> Corrigez le dimensionnement de l'étendue DHCP du VLAN 42 pour qu'elle couvre correctement le besoin estimé, sans gaspiller d'adresses. Notez votre nouvelle configuration (plage ou exclusions modifiées).</label>
+<textarea class="rep rep-md" id="qB3" placeholder="Nouvelle configuration de l'étendue DHCP."></textarea>
+</div>
+
+  </div>
+</div>
+
+<!-- ══ PARTIE C — ROUTAGE INTER-SITES ══ -->
+<div class="partie-card">
+  <div class="partie-head"><span>Partie C — Routage inter-sites</span><span class="partie-pts">4 points · ⏱ 45 min</span></div>
+  <div class="partie-body">
+
+<div class="consigne">
+<strong>Situation.</strong> Le technicien Axentis en charge du VLAN Administration du Domaine de Saignon (VLAN 34) signale qu'il ne peut pas accéder à distance depuis Apt aux équipements de gestion de ce site, alors que le personnel du site lui-même accède normalement à internet et aux ressources locales.
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">C.1</span><span class="q-pts">1 pt</span> Sur <code>R-Apt</code>, exécutez <code>show ip route</code>. Le réseau 192.168.34.0/29 apparaît-il dans la table de routage ? Notez le résultat exact.</label>
+<textarea class="rep rep-md" id="qC1" placeholder="Résultat de show ip route, avec ou sans la route concernée."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">C.2</span><span class="q-pts">1 pt</span> Si la route est absente : par quelle adresse IP de tronçon (next-hop) cette route statique doit-elle passer ? Justifiez à partir du plan des liaisons WAN (section 6 de votre dossier).</label>
+<textarea class="rep rep-md" id="qC2" placeholder="Next-hop identifié + justification."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">C.3</span><span class="q-pts">1 pt</span> Ajoutez la route statique manquante sur <code>R-Apt</code>. Notez la commande exacte que vous avez utilisée.</label>
+<textarea class="rep rep-sm" id="qC3" placeholder="Commande ip route utilisée."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">C.4</span><span class="q-pts">1 pt</span> Vérifiez votre correction par un test de connectivité approprié (ping depuis Apt vers une adresse du VLAN 34). Notez le résultat. Pourquoi le personnel du site Saignon, lui, n'était-il pas impacté par cette panne ?</label>
+<textarea class="rep rep-lg" id="qC4" placeholder="Résultat du test + explication de la portée limitée de la panne."></textarea>
+</div>
+
+  </div>
+</div>
+
+<!-- ══ PARTIE D — DNS ══ -->
+<div class="partie-card">
+  <div class="partie-head"><span>Partie D — DNS</span><span class="partie-pts">2 points · ⏱ 25 min</span></div>
+  <div class="partie-body">
+
+<div class="consigne">
+<strong>Situation.</strong> Un poste du siège d'Apt (VLAN 11) tente de joindre le service de vidéosurveillance via le nom <code>nvr.provence-evasion.local</code> et n'y parvient pas, alors que l'accès direct par adresse IP fonctionne normalement.
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">D.1</span><span class="q-pts">1 pt</span> Depuis le poste de test, lancez la commande de résolution de nom appropriée (<code>nslookup</code> ou équivalent Packet Tracer) pour <code>nvr.provence-evasion.local</code>. Que constatez-vous ? Sur quel serveur configuré devez-vous enquêter ?</label>
+<textarea class="rep rep-md" id="qD1" placeholder="Résultat de la commande + serveur identifié."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">D.2</span><span class="q-pts">1 pt</span> Sur <code>SRV-DNS</code>, vérifiez la présence et l'exactitude de l'enregistrement attendu pour ce nom (cf. section 8 de votre dossier). Si une erreur est trouvée (enregistrement absent ou IP incorrecte), corrigez-la et notez votre action.</label>
+<textarea class="rep rep-md" id="qD2" placeholder="Constat sur l'enregistrement DNS + correction effectuée."></textarea>
+</div>
+
+  </div>
+</div>
+
+<hr class="sep">
+<!-- ══ PARTIE E — ACL ══ -->
+<div class="partie-card">
+  <div class="partie-head"><span>Partie E — ACL et sécurité</span><span class="partie-pts">4 points · ⏱ 45 min</span></div>
+  <div class="partie-body">
+
+<div class="consigne">
+<strong>Situation.</strong> Laurent Ferracci s'inquiète : un client connecté au WiFi du Mas des Ocres (VLAN 22) affirme avoir réussi à « pinger » une adresse du VLAN Serveurs d'Apt (192.168.15.x). Si cela est confirmé, c'est une faille de sécurité grave par rapport à la politique définie en S9.
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">E.1</span><span class="q-pts">1 pt</span> Rappelez, d'après votre dossier (section 10), la règle de sécurité qui devrait normalement interdire cette communication.</label>
+<textarea class="rep rep-md" id="qE1" placeholder="Règle de sécurité attendue."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">E.2</span><span class="q-pts">1 pt</span> Sur le routeur concerné, vérifiez la présence et le contenu de l'ACL censée bloquer cette communication (<code>show access-lists</code>, <code>show running-config</code>). Cette ACL est-elle bien appliquée sur la bonne interface, dans le bon sens (in/out) ?</label>
+<textarea class="rep rep-lg" id="qE2" placeholder="Résultat de votre vérification, ACL trouvée ou non, application correcte ou non."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">E.3</span><span class="q-pts">1 pt</span> Rédigez (en syntaxe Cisco IOS, avec wildcard mask) la règle ACL qui devrait être en place pour bloquer toute communication du VLAN 22 vers le VLAN 15, tout en autorisant le reste du trafic légitime de ce VLAN.</label>
+<textarea class="rep rep-lg" id="qE3" placeholder="ip access-list extended ...&#10;deny ip ... ... ... ...&#10;permit ip ... any"></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">E.4</span><span class="q-pts">1 pt</span> Appliquez votre correction sur l'équipement concerné, puis testez à nouveau la connectivité VLAN 22 → VLAN 15. Confirmez par le résultat de votre test que la faille est corrigée, sans bloquer le trafic légitime du VLAN 22 vers Internet ou sa passerelle.</label>
+<textarea class="rep rep-md" id="qE4" placeholder="Résultat du test après correction."></textarea>
+</div>
+
+  </div>
+</div>
+
+<!-- ══ PARTIE F — SSH ══ -->
+<div class="partie-card">
+  <div class="partie-head"><span>Partie F — SSH et accès distant</span><span class="partie-pts">3 points · ⏱ 35 min</span></div>
+  <div class="partie-body">
+
+<div class="consigne">
+<strong>Situation.</strong> Lors d'un audit de sécurité, Axentis Informatique exige que tous les équipements d'administration de Provence Évasion soient exclusivement accessibles en SSH, jamais en Telnet.
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">F.1</span><span class="q-pts">1 pt</span> Vérifiez, sur chaque switch manageable de la topologie, la configuration des lignes VTY (<code>show running-config</code>, section <code>line vty</code>). Un switch présente-t-il encore une faille (Telnet actif) ? Lequel ?</label>
+<textarea class="rep rep-md" id="qF1" placeholder="Switch(es) concerné(s) + constat précis (transport input telnet ssh, ou telnet seul)."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">F.2</span><span class="q-pts">1 pt</span> Corrigez la configuration de ce switch pour n'autoriser que SSH sur les lignes VTY, en conservant l'accès administrateur existant. Notez les commandes exactes utilisées.</label>
+<textarea class="rep rep-md" id="qF2" placeholder="Commandes de correction (transport input ssh, etc.)."></textarea>
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">F.3</span><span class="q-pts">1 pt</span> Pourquoi cette faille (Telnet actif en plus de SSH) est-elle dangereuse même si le mot de passe SSH lui-même est robuste ? Appuyez votre réponse sur ce qui a été vu en S10 concernant le chiffrement des échanges.</label>
+<textarea class="rep rep-md" id="qF3" placeholder="Votre explication, en lien avec le chiffrement vs le texte en clair."></textarea>
+</div>
+
+  </div>
+</div>
+
+<!-- ══ PARTIE G — SYNTHÈSE ══ -->
+<div class="partie-card">
+  <div class="partie-head"><span>Partie G — Synthèse et résumé exécutif final</span><span class="partie-pts">1 point · ⏱ 20 min</span></div>
+  <div class="partie-body">
+
+<div class="consigne">
+<strong>Situation.</strong> Vous avez identifié et corrigé l'ensemble des anomalies de cette topologie de référence. Thomas Vidal vous demande une synthèse finale avant la remise du dossier complet.
+</div>
+
+<div class="question-block">
+<label class="qlabel"><span class="q-num">G.1</span><span class="q-pts">1 pt</span> Listez, dans l'ordre où vous les avez traitées, les anomalies que vous avez identifiées et corrigées au cours de cette épreuve (une ligne par anomalie : thème, cause, correction apportée).</label>
+<textarea class="rep rep-lg" id="qG1" placeholder="1. [Thème] — Cause : ... — Correction : ...&#10;2. [Thème] — Cause : ... — Correction : ...&#10;3. ...&#10;4. ..."></textarea>
+</div>
+
+  </div>
+</div>
+
+<hr class="sep">
+
+<!-- ══ BARÈME DÉTAILLÉ ══ -->
+<h1>Barème détaillé (réservé à la correction)</h1>
+
+<table class="bareme-table">
+<tr><th>Question</th><th>Critère de réussite</th><th style="text-align:center">Points</th></tr>
+<tr><td>A.1</td><td class="left">Switch correctement identifié</td><td class="center">0,5</td></tr>
+<tr><td>A.2</td><td class="left">Commande correcte utilisée + constat exact (VLAN 33 absent)</td><td class="center">1</td></tr>
+<tr><td>A.3</td><td class="left">Diagnostic correct et argumenté</td><td class="center">1</td></tr>
+<tr><td>A.4</td><td class="left">Commande de correction exacte et fonctionnelle</td><td class="center">0,5</td></tr>
+<tr><td>B.1</td><td class="left">Calcul correct du nombre d'hôtes utilisables</td><td class="center">1</td></tr>
+<tr><td>B.2</td><td class="left">Constat correct du sous-dimensionnement + analyse cohérente</td><td class="center">1</td></tr>
+<tr><td>B.3</td><td class="left">Nouveau dimensionnement cohérent et fonctionnel</td><td class="center">1</td></tr>
+<tr><td>C.1</td><td class="left">Constat exact de l'absence de route</td><td class="center">1</td></tr>
+<tr><td>C.2</td><td class="left">Next-hop correctement identifié et justifié</td><td class="center">1</td></tr>
+<tr><td>C.3</td><td class="left">Commande ip route exacte</td><td class="center">1</td></tr>
+<tr><td>C.4</td><td class="left">Test concluant + explication correcte de la portée limitée</td><td class="center">1</td></tr>
+<tr><td>D.1</td><td class="left">Constat correct + serveur identifié</td><td class="center">1</td></tr>
+<tr><td>D.2</td><td class="left">Correction DNS exacte et fonctionnelle</td><td class="center">1</td></tr>
+<tr><td>E.1</td><td class="left">Règle de sécurité correctement rappelée</td><td class="center">1</td></tr>
+<tr><td>E.2</td><td class="left">Vérification précise (ACL absente/mal appliquée identifiée)</td><td class="center">1</td></tr>
+<tr><td>E.3</td><td class="left">Syntaxe ACL correcte (wildcard mask exact, ordre des règles)</td><td class="center">1</td></tr>
+<tr><td>E.4</td><td class="left">Correction appliquée et test concluant sans sur-blocage</td><td class="center">1</td></tr>
+<tr><td>F.1</td><td class="left">Faille Telnet correctement identifiée</td><td class="center">1</td></tr>
+<tr><td>F.2</td><td class="left">Correction exacte (transport input ssh uniquement)</td><td class="center">1</td></tr>
+<tr><td>F.3</td><td class="left">Explication correcte du risque (texte en clair vs chiffré)</td><td class="center">1</td></tr>
+<tr><td>G.1</td><td class="left">Synthèse complète et fidèle des 4 anomalies traitées</td><td class="center">1</td></tr>
+<tr style="font-weight:700;background:var(--ciel-bg);"><td colspan="2">TOTAL</td><td class="center">20</td></tr>
+</table>
+
+<hr class="sep">
+
+<!-- ══ GRILLE CRITÉRIÉE PAR COMPÉTENCE ══ -->
+<h1>Grille critériée par compétence (réservée à la correction)</h1>
+
+<table class="grille-comp">
+<tr><th style="text-align:left">Compétence</th><th>Parties concernées</th><th>Maîtrisé</th><th>Satisfaisant</th><th>Insuffisant</th><th>Non maîtrisé</th></tr>
+<tr><td class="left">C01 — Communiquer en situation professionnelle</td><td>G</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td class="left">C04 — Analyser une structure matérielle et logicielle</td><td>A, C, E</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td class="left">C06 — Valider la conformité d'une installation</td><td>C, E, F</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td class="left">C09 — Installer les éléments d'un système informatique</td><td>A, B, D</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td class="left">C10 — Exploiter un réseau informatique</td><td>A, B, C, D, E, F</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td class="left">C11 — Maintenir un système électronique ou réseau</td><td>A, B, C, F</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>
+</table>
+
+<div class="retenir">
+<div class="retenir-titre">📌 Note pour le correcteur</div>
+Cette grille critériée complète le barème chiffré : elle permet de documenter, séance par séance et compétence par compétence, le niveau d'acquisition de chaque élève sur l'ensemble du projet, en cohérence avec le suivi par compétences CIEL demandé sur l'année.
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE FINALE ÉLÈVE ══ -->
+<div class="section-synth-titre">🎯 Bilan de fin de projet</div>
+
+<div class="conclusion">
+<p>Sur les 4 anomalies identifiées durant cette épreuve, celle qui m'a demandé le plus de temps à diagnostiquer est <input class="inline-field" style="width:220px" id="synth-1" placeholder="thème/numéro"> car <input class="inline-field" style="width:260px" id="synth-2" placeholder="raison"></p>
+<p>Sur l'ensemble du projet Provence Évasion (12 séances), la compétence que je maîtrise le mieux aujourd'hui est <input class="inline-field" style="width:220px" id="synth-3" placeholder="…"></p>
+<p>La compétence que je dois encore consolider en vue de mon examen est <input class="inline-field" style="width:220px" id="synth-4" placeholder="…"></p>
+</div>
+
+</div><!-- /content -->
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <div><strong style="color:var(--orange)">S12</strong> — Atelier : Évaluation individuelle — Provence Évasion</div>
+  <div>Lycée Louis Lumière – Chelles · Bac Pro CIEL · 2025-2026</div>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+function genererJSON(){
+  const nom = document.getElementById('eleve-nom').value;
+  const prenom = document.getElementById('eleve-prenom').value;
+  const v = id => { const el=document.getElementById(id); return el?el.value:''; };
+
+  const data = {
+    meta: {
+      devoir: "S12 – Atelier : Évaluation individuelle Provence Évasion",
+      eleve: { nom, prenom, classe: v('eleve-classe'), poste: v('eleve-poste') },
+      date: v('eleve-date'),
+      genere_le: new Date().toISOString()
+    },
+    partieA_vlan: { A1: v('qA1'), A2: v('qA2'), A3: v('qA3'), A4: v('qA4') },
+    partieB_dhcp: { B1: v('qB1'), B2: v('qB2'), B3: v('qB3') },
+    partieC_routage: { C1: v('qC1'), C2: v('qC2'), C3: v('qC3'), C4: v('qC4') },
+    partieD_dns: { D1: v('qD1'), D2: v('qD2') },
+    partieE_acl: { E1: v('qE1'), E2: v('qE2'), E3: v('qE3'), E4: v('qE4') },
+    partieF_ssh: { F1: v('qF1'), F2: v('qF2'), F3: v('qF3') },
+    partieG_synthese_anomalies: { G1: v('qG1') },
+    bilan_final: {
+      anomalie_plus_longue: v('synth-1'),
+      raison: v('synth-2'),
+      competence_maitrisee: v('synth-3'),
+      competence_a_consolider: v('synth-4')
+    }
+  };
+
+  const safeName = (nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${safeName}_S12EvaluationIndividuelle.json`;
+  a.click();
+  const t = document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

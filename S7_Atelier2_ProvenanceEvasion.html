@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S7 — Atelier 2 : DNS — Zone inverse, CNAME, forwarder et diagnostic</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+code{font-family:'Courier New',monospace;background:#eef4f8;padding:1px 5px;border-radius:3px;font-size:12px;color:var(--marine);}
+hr.sep{border:none;border-top:1px solid #d8e8f0;margin:22px 0;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.consigne{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 12px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.consigne strong{color:#4a7a1a;}
+/* Bloc panne / erreur */
+.panne-box{border:2px solid var(--orange);background:#fff4f0;border-radius:8px;padding:14px 16px;margin:12px 0 16px;font-size:12px;line-height:1.75;}
+.panne-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);font-size:13px;margin-bottom:8px;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:65px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{border:none;border-bottom:1.5px solid var(--bleu);padding:2px 4px;font-family:'Montserrat',sans-serif;font-size:12px;width:120px;color:var(--marine);outline:none;background:transparent;}
+.inline-field:focus{border-bottom-color:var(--orange);}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.pt-step{background:var(--ciel-bg);border-left:4px solid var(--bleu);padding:10px 14px;margin:7px 0;border-radius:0 6px 6px 0;font-size:12px;line-height:1.75;}
+.pt-num{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-right:6px;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.cli .cm-err{color:#FF5722;font-weight:700;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);overflow-x:auto;}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.test-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.test-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--marine);text-align:left;}
+.test-table td{border:1px solid #c0d0e0;padding:7px 10px;vertical-align:middle;}
+.test-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.test-table select{border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-family:'Montserrat',sans-serif;font-size:11px;color:var(--marine);background:#fff;width:100%;}
+.test-table input[type="text"]{border:none;border-bottom:1.5px solid var(--bleu);width:100%;padding:2px 4px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);background:transparent;outline:none;}
+.fill-table{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:12px;}
+.fill-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--marine);text-align:left;}
+.fill-table td{border:1px solid #c0d0e0;padding:5px 8px;vertical-align:middle;}
+.fill-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.fill-table input[type="text"]{border:none;border-bottom:1.5px solid var(--bleu);width:100%;padding:2px 4px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);background:transparent;outline:none;}
+.fill-table td.fixed{color:var(--marine);font-weight:600;}
+/* Tableau diagnostic */
+.diag-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.diag-table th{background:var(--orange);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--orange);text-align:left;}
+.diag-table td{border:1px solid #f0c080;padding:7px 10px;vertical-align:top;}
+.diag-table tr:nth-child(even) td{background:#fff8f0;}
+.diag-table select{border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-family:'Montserrat',sans-serif;font-size:11px;color:var(--marine);background:#fff;width:100%;}
+.diag-table input[type="text"]{border:none;border-bottom:1.5px solid var(--orange);width:100%;padding:2px 4px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);background:transparent;outline:none;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:14px;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.1;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S7 – Atelier 2 : DNS avancé — Zone inverse, CNAME, forwarder et diagnostic de panne</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<h1>Contexte et prérequis</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Prérequis :</strong> Cet atelier reprend directement la topologie et le fichier Packet Tracer construits en Atelier 1. Votre zone directe <code>provence-evasion.local</code> est opérationnelle avec ses enregistrements A. Nous allons maintenant aller plus loin : zone de résolution inverse (PTR), alias CNAME, simulation d'un forwarder vers Internet, extension de la topologie (Saignon + Cucuron), et enfin un scénario de diagnostic de panne DNS réaliste.
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📋 Topologie étendue pour cet atelier</div>
+  <p>Vous allez ajouter deux équipements à votre topologie existante :</p>
+  <ul>
+    <li><strong>PC-SAIGNON</strong> : <code>192.168.31.10</code> / GW <code>192.168.31.254</code> / DNS <code>192.168.15.1</code> — relié via un nouveau routeur Routeur-SAIGNON (<code>10.0.13.2/30</code> côté WAN, <code>192.168.31.254</code> côté LAN)</li>
+    <li><strong>Serveur-WEB-EXTERNE</strong> : <code>8.8.8.1</code> — simule un serveur Internet, relié directement au Routeur-APT via une troisième interface, avec un enregistrement DNS <code>www.internet-simule.com → 8.8.8.1</code> configuré sur ce serveur lui-même (qui jouera le rôle de DNS racine simulé)</li>
+  </ul>
+  <p>Le Routeur-APT reçoit une nouvelle route statique : <code>ip route 192.168.31.0 255.255.255.0 10.0.13.1</code> (via Routeur-SAIGNON).</p>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">✏️ Exercice 0 — Extension de la topologie</div>
+  <label class="qlabel">Q0.1 — Ajoutez Routeur-SAIGNON et PC-SAIGNON à votre topologie. Configurez les interfaces et les routes statiques nécessaires. Vérifiez que PC-SAIGNON peut pinguer <code>192.168.15.1</code> (le serveur DNS). Notez les commandes que vous avez saisies sur Routeur-SAIGNON.</label>
+  <textarea class="rep rep-lg" id="q0-config" placeholder="hostname Routeur-SAIGNON&#10;interface Fa0/0&#10;  ip address …&#10;interface Se0/0/0&#10;  ip address …&#10;ip route …&#10;…"></textarea>
+  <label class="qlabel">Q0.2 — Résultat du ping PC-SAIGNON → 192.168.15.1 :</label>
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;">
+    <label style="font-size:12px;"><input type="radio" name="q0-ping" value="succes" style="accent-color:var(--bleu)"> Succès</label>
+    <label style="font-size:12px;"><input type="radio" name="q0-ping" value="echec" style="accent-color:var(--bleu)"> Échec</label>
+  </div>
+  <textarea class="rep rep-sm" id="q0-analyse" placeholder="Si échec : cause identifiée et correction apportée…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Enregistrements CNAME — les alias DNS</h1>
+
+<h2>1.1 Principe du CNAME</h2>
+<p>Un enregistrement <strong>CNAME</strong> (Canonical Name) crée un alias : il fait pointer un nom vers un autre nom (et non vers une IP directement). Cela permet d'avoir plusieurs noms pour un même équipement, sans dupliquer les enregistrements A.</p>
+<p>Exemple : <code>fichiers.provence-evasion.local</code> → <code>nas.provence-evasion.local</code> → <code>192.168.15.2</code>. Si l'IP du NAS change, on ne modifie que l'enregistrement A de <code>nas</code> — le CNAME suit automatiquement.</p>
+
+<div class="attention">
+  <strong>⚠ Règle importante :</strong> Un CNAME ne peut jamais pointer vers une adresse IP directement — uniquement vers un autre nom de domaine. Et on ne peut pas créer un CNAME pour la racine d'une zone (le sommet de zone doit avoir un enregistrement A ou NS, pas un CNAME).
+</div>
+
+<h2>1.2 Création des CNAME dans Packet Tracer</h2>
+
+<div class="consigne">
+  <strong>🛠 Consigne :</strong> Ouvrez l'onglet Services → DNS du Serveur-DNS. Ajoutez les enregistrements CNAME suivants. Dans Packet Tracer, utilisez le type "CNAME" dans le menu déroulant et saisissez le nom canonique (cible) dans le champ Address.
+</div>
+
+<table class="data-table">
+  <tr><th>#</th><th>Type</th><th>Alias (Name)</th><th>Cible canonique (Address)</th><th>Utilité pour PE</th></tr>
+  <tr><td class="center">1</td><td class="center"><strong>CNAME</strong></td><td><code>fichiers.provence-evasion.local</code></td><td><code>nas.provence-evasion.local</code></td><td class="left">Nom convivial pour le NAS</td></tr>
+  <tr><td class="center">2</td><td class="center"><strong>CNAME</strong></td><td><code>video.provence-evasion.local</code></td><td><code>nvr.provence-evasion.local</code></td><td class="left">Nom convivial pour l'enregistreur vidéo</td></tr>
+  <tr><td class="center">3</td><td class="center"><strong>CNAME</strong></td><td><code>gestion.provence-evasion.local</code></td><td><code>nas.provence-evasion.local</code></td><td class="left">Accès depuis l'interface de réservation</td></tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">✏️ Exercice 1 — Test des CNAME</div>
+  <label class="qlabel">Q1.1 — Depuis PC-SAIGNON, testez les résolutions suivantes et notez les résultats :</label>
+  <table class="test-table">
+    <tr><th>Commande nslookup</th><th>IP retournée</th><th>Chaîne de résolution observée</th></tr>
+    <tr>
+      <td class="fixed"><code>nslookup fichiers.provence-evasion.local</code></td>
+      <td><input type="text" id="cn1-ip" placeholder="192.168.…"></td>
+      <td><input type="text" id="cn1-chain" placeholder="fichiers → nas → 192.168.…"></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup video.provence-evasion.local</code></td>
+      <td><input type="text" id="cn2-ip" placeholder="192.168.…"></td>
+      <td><input type="text" id="cn2-chain" placeholder="video → nvr → 192.168.…"></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup gestion.provence-evasion.local</code></td>
+      <td><input type="text" id="cn3-ip" placeholder="192.168.…"></td>
+      <td><input type="text" id="cn3-chain" placeholder="gestion → nas → 192.168.…"></td>
+    </tr>
+  </table>
+
+  <label class="qlabel">Q1.2 — Si l'adresse IP du NAS change de <code>192.168.15.2</code> à <code>192.168.15.10</code>, combien d'enregistrements DNS faut-il modifier ? Lesquels ? Quel est l'avantage du CNAME dans ce cas ?</label>
+  <textarea class="rep rep-sm" id="ex1-q2" placeholder="Nombre d'enregistrements à modifier : …&#10;Lesquels : …&#10;Avantage CNAME : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Zone de résolution inverse — enregistrements PTR</h1>
+
+<h2>2.1 Rappel et construction du nom de zone inverse</h2>
+<p>La zone inverse permet de trouver le nom associé à une adresse IP (opération inverse du DNS classique). Pour le réseau <code>192.168.15.0/24</code>, la zone inverse se nomme <code>15.168.192.in-addr.arpa</code> — les trois premiers octets du réseau sont inversés et suivis de <code>.in-addr.arpa</code>.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Construction d'un enregistrement PTR</div>
+  <p>Pour créer l'enregistrement PTR de <code>nas.provence-evasion.local</code> (<code>192.168.15.2</code>) :</p>
+  <ul>
+    <li><strong>Name :</strong> <code>2.15.168.192.in-addr.arpa</code> (l'IP complète inversée + <code>.in-addr.arpa</code>)</li>
+    <li><strong>Type :</strong> PTR</li>
+    <li><strong>Address :</strong> <code>nas.provence-evasion.local</code> (le FQDN cible)</li>
+  </ul>
+  <p>Dans Packet Tracer, on utilise le même serveur DNS pour les enregistrements PTR — il n'y a pas de zone "inverse" séparée dans l'interface graphique, on ajoute simplement des enregistrements de type PTR.</p>
+</div>
+
+<h2>2.2 Création des enregistrements PTR</h2>
+
+<div class="consigne">
+  <strong>🛠 Consigne :</strong> Dans l'onglet DNS du Serveur-DNS, ajoutez les enregistrements PTR ci-dessous. Sélectionnez le type PTR dans le menu déroulant.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">✏️ Exercice 2 — Calcul des enregistrements PTR à créer</div>
+  <label class="qlabel">Q2.1 — Complétez le tableau des enregistrements PTR à créer pour le réseau <code>192.168.15.0/24</code> :</label>
+  <table class="fill-table">
+    <tr><th>IP de l'équipement</th><th>Name (format PTR)</th><th>Type</th><th>Address (FQDN cible)</th></tr>
+    <tr><td class="fixed">192.168.15.1</td><td><input type="text" id="ptr1-name" placeholder="x.15.168.192.in-addr.arpa"></td><td class="fixed">PTR</td><td><input type="text" id="ptr1-fqdn" placeholder="dns.provence-…"></td></tr>
+    <tr><td class="fixed">192.168.15.2</td><td><input type="text" id="ptr2-name" placeholder="x.15.168.192.in-addr.arpa"></td><td class="fixed">PTR</td><td><input type="text" id="ptr2-fqdn" placeholder="nas.provence-…"></td></tr>
+    <tr><td class="fixed">192.168.15.3</td><td><input type="text" id="ptr3-name" placeholder="x.15.168.192.in-addr.arpa"></td><td class="fixed">PTR</td><td><input type="text" id="ptr3-fqdn" placeholder="nvr.provence-…"></td></tr>
+  </table>
+
+  <label class="qlabel">Q2.2 — Saisissez ces enregistrements dans Packet Tracer, puis testez la résolution inverse depuis PC-APT. Pour une résolution inverse, on utilise <code>nslookup &lt;adresse-IP&gt;</code>. Notez les résultats :</label>
+  <table class="test-table">
+    <tr><th>Commande</th><th>Résultat (nom retourné)</th><th>Succès / Échec</th></tr>
+    <tr>
+      <td class="fixed"><code>nslookup 192.168.15.1</code></td>
+      <td><input type="text" id="ptr-t1-res" placeholder="dns.provence-…"></td>
+      <td><select id="ptr-t1-ok"><option value="">—</option><option>Succès</option><option>Échec</option></select></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup 192.168.15.2</code></td>
+      <td><input type="text" id="ptr-t2-res" placeholder="nas.provence-…"></td>
+      <td><select id="ptr-t2-ok"><option value="">—</option><option>Succès</option><option>Échec</option></select></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup 192.168.15.3</code></td>
+      <td><input type="text" id="ptr-t3-res" placeholder="nvr.provence-…"></td>
+      <td><select id="ptr-t3-ok"><option value="">—</option><option>Succès</option><option>Échec</option></select></td>
+    </tr>
+  </table>
+
+  <label class="qlabel">Q2.3 — Dans quel cas concret la résolution inverse est-elle utile pour un administrateur réseau de Provence Évasion ? Donnez un exemple précis.</label>
+  <textarea class="rep rep-sm" id="ex2-q3" placeholder="Exemple concret : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Simulation du forwarder — résolution de noms externes</h1>
+
+<h2>3.1 Mise en place du serveur DNS "Internet" simulé</h2>
+
+<p>Dans un environnement réel, quand le DNS interne ne connaît pas un nom (ex : <code>www.meteo.fr</code>), il transfère la requête vers un résolveur public. Dans Packet Tracer, on va simuler ce comportement en ajoutant un deuxième serveur DNS qui jouera le rôle d'un serveur DNS externe.</p>
+
+<div class="pt-step"><span class="pt-num">①</span> Ajoutez un serveur <strong>Serveur-DNS-EXTERNE</strong> à l'adresse <code>8.8.8.1</code>, relié directement au Routeur-APT (interface Fa1/0 ou une interface libre) via un câble direct</div>
+<div class="pt-step"><span class="pt-num">②</span> Activez le service DNS sur ce serveur et créez un enregistrement A : <code>www.internet-simule.com → 8.8.8.10</code></div>
+<div class="pt-step"><span class="pt-num">③</span> Sur le Routeur-APT, ajoutez une route vers le réseau <code>8.8.8.0/24</code> : <code>ip route 8.8.8.0 255.255.255.0 [interface ou nexthop vers Srv-Ext]</code></div>
+<div class="pt-step"><span class="pt-num">④</span> Sur le <strong>Serveur-DNS interne</strong>, configurez le forwarder : dans l'onglet DNS, cherchez le champ <strong>Default Server</strong> (ou DNS Server) et saisissez <code>8.8.8.1</code></div>
+
+<div class="attention">
+  <strong>⚠ Limitation Packet Tracer :</strong> Selon la version, le forwarder peut ne pas être configurable graphiquement sur un serveur Packet Tracer basique. Si c'est le cas, notez-le et décrivez comment cela fonctionnerait en production (la question Q3.2 reste à traiter par analyse).
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">✏️ Exercice 3 — Test du forwarder</div>
+  <label class="qlabel">Q3.1 — Depuis PC-ROUSSILLON, tapez <code>nslookup www.internet-simule.com</code>. Décrivez le résultat et le chemin emprunté par la requête DNS :</label>
+  <textarea class="rep rep-sm" id="ex3-q1" placeholder="Résultat nslookup : …&#10;Chemin emprunté : PC-ROUSSILLON → DNS-APT → … → DNS-EXTERNE → …"></textarea>
+
+  <label class="qlabel">Q3.2 — En production réelle, citez deux serveurs DNS publics que l'on pourrait utiliser comme forwarder. Quel est l'avantage de configurer un forwarder plutôt de laisser le serveur DNS interne sans résolution externe ?</label>
+  <textarea class="rep rep-sm" id="ex3-q2" placeholder="Serveur 1 : …  (société : …)&#10;Serveur 2 : …  (société : …)&#10;Avantage du forwarder : …"></textarea>
+
+  <label class="qlabel">Q3.3 — Dessinez (ou décrivez en texte) le chemin complet d'une requête DNS pour <code>www.internet-simule.com</code> émise depuis PC-SAIGNON, en passant par tous les routeurs et serveurs DNS :</label>
+  <textarea class="rep rep-md" id="ex3-q3" placeholder="PC-SAIGNON (192.168.31.10) → Routeur-SAIGNON → … → Serveur-DNS-APT (192.168.15.1) → … → Serveur-DNS-EXTERNE (8.8.8.1) → réponse retour…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Scénario de diagnostic — panne DNS chez Provence Évasion</h1>
+
+<div class="panne-box">
+  <div class="panne-titre">🚨 Situation de panne — Appel de Laurent Ferracci</div>
+  <p>Le lundi matin, Laurent Ferracci appelle Axentis : <em>"Depuis ce matin, personne ne peut accéder au NAS depuis Roussillon. Quand on tape <code>\\fichiers.provence-evasion.local</code> dans l'explorateur Windows, on obtient 'Impossible de trouver le chemin réseau'. Par contre, en tapant <code>\\192.168.15.2</code>, ça fonctionne. Le problème vient d'hier soir : un technicien a 'fait quelque chose' sur le réseau."</em>
+  <br><br>
+  Votre mission : diagnostiquer la panne et la corriger dans Packet Tracer.</p>
+</div>
+
+<h2>4.1 Reproduction de la panne dans Packet Tracer</h2>
+
+<div class="consigne">
+  <strong>🛠 Consigne :</strong> Pour simuler la panne, effectuez l'une des modifications suivantes sur votre topologie (au choix, ou votre enseignant vous indique laquelle) :
+  <ul style="margin-top:6px;">
+    <li><strong>Scénario A :</strong> Modifiez l'IP du serveur DNS configurée sur PC-ROUSSILLON (par ex. mettez <code>192.168.15.99</code> au lieu de <code>192.168.15.1</code>)</li>
+    <li><strong>Scénario B :</strong> Supprimez l'enregistrement CNAME <code>fichiers.provence-evasion.local</code> du service DNS</li>
+    <li><strong>Scénario C :</strong> Désactivez le service DNS sur le serveur (DNS Service → OFF)</li>
+  </ul>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">✏️ Exercice 4A — Identification du scénario de panne</div>
+  <label class="qlabel">Q4.1 — Quel scénario de panne avez-vous appliqué (A, B ou C) ?</label>
+  <div style="display:flex;gap:14px;margin-bottom:8px;">
+    <label style="font-size:12px;"><input type="radio" name="q4-scenario" value="A" style="accent-color:var(--bleu)"> Scénario A (mauvaise IP DNS sur le client)</label>
+    <label style="font-size:12px;"><input type="radio" name="q4-scenario" value="B" style="accent-color:var(--bleu)"> Scénario B (CNAME supprimé)</label>
+    <label style="font-size:12px;"><input type="radio" name="q4-scenario" value="C" style="accent-color:var(--bleu)"> Scénario C (service DNS désactivé)</label>
+  </div>
+
+  <label class="qlabel">Q4.2 — Vérifiez les symptômes depuis PC-ROUSSILLON. Notez les résultats :</label>
+  <table class="diag-table">
+    <tr><th>Test effectué</th><th>Résultat observé</th><th>Interprétation</th></tr>
+    <tr>
+      <td class="fixed"><code>ping 192.168.15.2</code></td>
+      <td><input type="text" id="diag-t1-res" placeholder="Succès / Échec"></td>
+      <td><input type="text" id="diag-t1-int" placeholder="Ce que ça prouve…"></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup nas.provence-evasion.local</code></td>
+      <td><input type="text" id="diag-t2-res" placeholder="Résultat…"></td>
+      <td><input type="text" id="diag-t2-int" placeholder="Ce que ça prouve…"></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup fichiers.provence-evasion.local</code></td>
+      <td><input type="text" id="diag-t3-res" placeholder="Résultat…"></td>
+      <td><input type="text" id="diag-t3-int" placeholder="Ce que ça prouve…"></td>
+    </tr>
+    <tr>
+      <td class="fixed">Vérification config DNS du PC</td>
+      <td><input type="text" id="diag-t4-res" placeholder="IP DNS configurée…"></td>
+      <td><input type="text" id="diag-t4-int" placeholder="Correcte / Incorrecte…"></td>
+    </tr>
+    <tr>
+      <td class="fixed">Vérification service DNS sur serveur</td>
+      <td><input type="text" id="diag-t5-res" placeholder="ON / OFF"></td>
+      <td><input type="text" id="diag-t5-int" placeholder="Impact…"></td>
+    </tr>
+  </table>
+</div>
+
+<h2>4.2 Méthodologie de diagnostic DNS</h2>
+
+<p>Face à une panne de résolution DNS, voici la méthode logique à suivre — du plus simple au plus complexe :</p>
+
+<table class="data-table">
+  <tr><th>Étape</th><th>Commande / Action</th><th>Ce qu'on cherche</th></tr>
+  <tr><td class="center"><strong>1</strong></td><td class="left"><code>ping &lt;IP directe du serveur&gt;</code></td><td class="left">Vérifier que le réseau fonctionne indépendamment du DNS</td></tr>
+  <tr><td class="center"><strong>2</strong></td><td class="left">Vérifier l'IP du DNS dans la config du poste</td><td class="left">Le client pointe-t-il vers le bon serveur DNS ?</td></tr>
+  <tr><td class="center"><strong>3</strong></td><td class="left"><code>ping &lt;IP du serveur DNS&gt;</code></td><td class="left">Le serveur DNS est-il joignable ?</td></tr>
+  <tr><td class="center"><strong>4</strong></td><td class="left"><code>nslookup &lt;nom&gt; &lt;IP du DNS&gt;</code></td><td class="left">Le serveur DNS répond-il aux requêtes ?</td></tr>
+  <tr><td class="center"><strong>5</strong></td><td class="left">Vérifier le service DNS sur le serveur</td><td class="left">Le service est-il démarré (DNS ON) ?</td></tr>
+  <tr><td class="center"><strong>6</strong></td><td class="left">Vérifier les enregistrements dans la zone</td><td class="left">L'enregistrement du nom demandé existe-t-il ?</td></tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">✏️ Exercice 4B — Résolution et analyse</div>
+  <label class="qlabel">Q4.3 — Appliquez la méthode ci-dessus. À quelle étape avez-vous identifié la cause de la panne ? Décrivez précisément ce que vous avez trouvé.</label>
+  <textarea class="rep rep-sm" id="ex4-q3" placeholder="Étape où la panne est identifiée : …&#10;Ce qui a été trouvé : …"></textarea>
+
+  <label class="qlabel">Q4.4 — Quelle correction avez-vous appliquée pour résoudre la panne ? Vérifiez que la résolution fonctionne à nouveau depuis PC-ROUSSILLON.</label>
+  <textarea class="rep rep-sm" id="ex4-q4" placeholder="Correction appliquée : …&#10;Vérification : nslookup fichiers.provence-evasion.local → résultat …"></textarea>
+
+  <label class="qlabel">Q4.5 — Cas supplémentaire : un PC-SAIGNON tape <code>nslookup nas.provence-evasion.local</code> et obtient <em>"DNS request timed out"</em> alors que PC-APT résout correctement. Quelle est la cause la plus probable ? Quelle commande de vérification appliquez-vous en premier ?</label>
+  <textarea class="rep rep-sm" id="ex4-q5" placeholder="Cause probable : …&#10;Première commande de vérification : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. Bilan complet de la zone DNS et validation finale</h1>
+
+<h2>5.1 État final de la zone DNS</h2>
+
+<div class="exercice">
+  <div class="exercice-titre">✏️ Exercice 5 — Tableau de recette DNS</div>
+  <label class="qlabel">Q5.1 — Remplissez le tableau de recette complet. Pour chaque test, indiquez la commande utilisée, le résultat et la conformité (conforme / non conforme) :</label>
+
+  <table class="test-table">
+    <tr><th>Test</th><th>Depuis</th><th>Résultat attendu</th><th>Résultat obtenu</th><th>Conformité</th></tr>
+    <tr>
+      <td class="fixed"><code>nslookup dns.prov-ev.local</code></td>
+      <td class="fixed">PC-APT</td>
+      <td class="fixed">192.168.15.1</td>
+      <td><input type="text" id="rec-t1" placeholder="…"></td>
+      <td><select id="rec-t1-ok"><option value="">—</option><option>✅ Conforme</option><option>❌ Non conforme</option></select></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup nas.prov-ev.local</code></td>
+      <td class="fixed">PC-ROUSSILLON</td>
+      <td class="fixed">192.168.15.2</td>
+      <td><input type="text" id="rec-t2" placeholder="…"></td>
+      <td><select id="rec-t2-ok"><option value="">—</option><option>✅ Conforme</option><option>❌ Non conforme</option></select></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup fichiers.prov-ev.local</code></td>
+      <td class="fixed">PC-SAIGNON</td>
+      <td class="fixed">192.168.15.2 (via CNAME)</td>
+      <td><input type="text" id="rec-t3" placeholder="…"></td>
+      <td><select id="rec-t3-ok"><option value="">—</option><option>✅ Conforme</option><option>❌ Non conforme</option></select></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup video.prov-ev.local</code></td>
+      <td class="fixed">PC-ROUSSILLON</td>
+      <td class="fixed">192.168.15.3 (via CNAME)</td>
+      <td><input type="text" id="rec-t4" placeholder="…"></td>
+      <td><select id="rec-t4-ok"><option value="">—</option><option>✅ Conforme</option><option>❌ Non conforme</option></select></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup 192.168.15.2</code> (inverse)</td>
+      <td class="fixed">PC-APT</td>
+      <td class="fixed">nas.provence-evasion.local</td>
+      <td><input type="text" id="rec-t5" placeholder="…"></td>
+      <td><select id="rec-t5-ok"><option value="">—</option><option>✅ Conforme</option><option>❌ Non conforme</option></select></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup 192.168.15.3</code> (inverse)</td>
+      <td class="fixed">PC-SAIGNON</td>
+      <td class="fixed">nvr.provence-evasion.local</td>
+      <td><input type="text" id="rec-t6" placeholder="…"></td>
+      <td><select id="rec-t6-ok"><option value="">—</option><option>✅ Conforme</option><option>❌ Non conforme</option></select></td>
+    </tr>
+    <tr>
+      <td class="fixed"><code>nslookup www.internet-simule.com</code></td>
+      <td class="fixed">PC-APT</td>
+      <td class="fixed">8.8.8.10 (via forwarder)</td>
+      <td><input type="text" id="rec-t7" placeholder="…"></td>
+      <td><select id="rec-t7-ok"><option value="">—</option><option>✅ Conforme</option><option>❌ Non conforme</option><option>⚠ Limitation PT</option></select></td>
+    </tr>
+  </table>
+
+  <label class="qlabel">Q5.2 — Bilan général : combien de tests sont conformes sur 7 ? Si certains tests ont échoué, décrivez les corrections apportées.</label>
+  <textarea class="rep rep-sm" id="ex5-q2" placeholder="Tests conformes : …/7&#10;Corrections apportées : …"></textarea>
+
+  <label class="qlabel">Q5.3 — Réflexion finale : en production, que faudrait-il configurer de plus pour que les quatre sites de Provence Évasion (Apt, Roussillon, Saignon, Cucuron) bénéficient tous du DNS, même en cas de panne du lien WAN vers Apt ?</label>
+  <textarea class="rep rep-md" id="ex5-q3" placeholder="Votre réponse (pensez à la redondance DNS, à un DNS secondaire, à la zone de secours…)"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Synthèse de l'Atelier 2</div>
+
+<div class="conclusion">
+  <p>Un enregistrement <input class="inline-field" id="synth-1" placeholder="..."> crée un alias DNS qui pointe vers un autre <input class="inline-field" id="synth-2" placeholder="..."> et non vers une adresse IP. Son avantage principal est que si l'IP cible change, seul l'enregistrement <input class="inline-field" id="synth-3" placeholder="..."> est à modifier.</p>
+
+  <p>La zone de résolution <input class="inline-field" id="synth-4" placeholder="..."> répond à la question "quel est le nom de cette adresse IP ?". Elle utilise des enregistrements de type <input class="inline-field" id="synth-5" placeholder="...">. Pour le réseau <code>192.168.15.0/24</code>, cette zone se nomme <input class="inline-field" id="synth-6" style="width:200px" placeholder="…in-addr.arpa">.</p>
+
+  <p>Le <input class="inline-field" id="synth-7" placeholder="..."> est un serveur DNS externe vers lequel le DNS interne transfère les requêtes qu'il ne peut pas résoudre lui-même. Dans notre simulation, nous avons utilisé l'adresse <input class="inline-field" id="synth-8" placeholder="..."> pour simuler un DNS "Internet".</p>
+
+  <p>Face à une panne DNS, la première commande à taper est <input class="inline-field" id="synth-9" placeholder="..."> vers l'IP du serveur (sans DNS), pour vérifier que le <input class="inline-field" id="synth-10" placeholder="..."> fonctionne indépendamment du service de nommage. Si ce ping réussit mais que le DNS ne répond pas, la panne est localisée sur le <input class="inline-field" id="synth-11" placeholder="..."> lui-même (service éteint, enregistrement manquant, mauvaise config client…).</p>
+</div>
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <script>
+  const criteres = [
+    "Je sais créer un enregistrement CNAME et comprends son utilité face à un enregistrement A",
+    "Je sais calculer le nom d'une zone inverse à partir d'un réseau IP",
+    "Je sais créer des enregistrements PTR pour la résolution inverse",
+    "Je sais tester une résolution inverse avec nslookup",
+    "Je comprends le rôle d'un forwarder DNS et sais l'identifier dans une topologie",
+    "Je sais appliquer une méthode de diagnostic DNS étape par étape",
+    "Je sais distinguer une panne réseau (ICMP) d'une panne DNS (résolution de nom)",
+    "Je sais compléter un tableau de recette DNS et identifier les tests non conformes"
+  ];
+  const niveaux = ['maitrise','en_cours','a_revoir','non_traite'];
+  const labels = ['★★★','★★☆','★☆☆','?'];
+  const cont = document.querySelector('.autoeval');
+  criteres.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className='ae-row';
+    let html=`<div>${c}</div>`;
+    niveaux.forEach((n,j)=>{
+      html+=`<div style="text-align:center"><label style="cursor:pointer"><input type="radio" name="ae-${i}" value="${n}" style="accent-color:var(--bleu);margin-right:4px">${labels[j]}</label></div>`;
+    });
+    row.innerHTML=html;
+    cont.appendChild(row);
+  });
+  </script>
+</div>
+
+</div><!-- /content -->
+
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <div><strong style="color:var(--orange)">S7</strong> — Atelier 2 : DNS avancé — Zone inverse, CNAME, forwarder et diagnostic</div>
+  <div>Lycée Louis Lumière – Chelles · Bac Pro CIEL · 2025-2026</div>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+function genererJSON(){
+  const nom    = document.getElementById('eleve-nom').value;
+  const prenom = document.getElementById('eleve-prenom').value;
+  const v   = id => { const el=document.getElementById(id); return el?el.value:''; };
+  const sel = id => { const el=document.getElementById(id); return el?el.value:''; };
+  const rad = name => { const r=document.querySelector(`input[name="${name}"]:checked`); return r?r.value:''; };
+
+  const ae = {};
+  ["Je sais créer un enregistrement CNAME et comprends son utilité face à un enregistrement A",
+   "Je sais calculer le nom d'une zone inverse à partir d'un réseau IP",
+   "Je sais créer des enregistrements PTR pour la résolution inverse",
+   "Je sais tester une résolution inverse avec nslookup",
+   "Je comprends le rôle d'un forwarder DNS et sais l'identifier dans une topologie",
+   "Je sais appliquer une méthode de diagnostic DNS étape par étape",
+   "Je sais distinguer une panne réseau (ICMP) d'une panne DNS (résolution de nom)",
+   "Je sais compléter un tableau de recette DNS et identifier les tests non conformes"
+  ].forEach((c,i)=>{
+    const r=document.querySelector(`input[name="ae-${i}"]:checked`);
+    ae[`critere_${i+1}`]={critere:c,niveau:r?r.value:'non_traite'};
+  });
+
+  const data = {
+    meta: {
+      devoir: "S7 – Atelier 2 : DNS avancé — Zone inverse, CNAME, forwarder et diagnostic",
+      eleve: { nom, prenom, classe: v('eleve-classe') },
+      date: v('eleve-date'),
+      genere_le: new Date().toISOString()
+    },
+    partie0_extension_topo: {
+      config_saignon: v('q0-config'),
+      ping_dns: rad('q0-ping'),
+      analyse: v('q0-analyse')
+    },
+    partie1_cname: {
+      tests: {
+        fichiers: { ip: v('cn1-ip'), chaine: v('cn1-chain') },
+        video:    { ip: v('cn2-ip'), chaine: v('cn2-chain') },
+        gestion:  { ip: v('cn3-ip'), chaine: v('cn3-chain') }
+      },
+      q2_avantage: v('ex1-q2')
+    },
+    partie2_zone_inverse: {
+      enregistrements_ptr: {
+        ip_15_1: { name: v('ptr1-name'), fqdn: v('ptr1-fqdn') },
+        ip_15_2: { name: v('ptr2-name'), fqdn: v('ptr2-fqdn') },
+        ip_15_3: { name: v('ptr3-name'), fqdn: v('ptr3-fqdn') }
+      },
+      tests_inverse: {
+        t1: { res: v('ptr-t1-res'), ok: sel('ptr-t1-ok') },
+        t2: { res: v('ptr-t2-res'), ok: sel('ptr-t2-ok') },
+        t3: { res: v('ptr-t3-res'), ok: sel('ptr-t3-ok') }
+      },
+      q3_utilite: v('ex2-q3')
+    },
+    partie3_forwarder: {
+      q1_test_forwarder:   v('ex3-q1'),
+      q2_serveurs_publics: v('ex3-q2'),
+      q3_chemin_complet:   v('ex3-q3')
+    },
+    partie4_diagnostic_panne: {
+      scenario_choisi: rad('q4-scenario'),
+      tests_diagnostic: {
+        t1: { res: v('diag-t1-res'), int: v('diag-t1-int') },
+        t2: { res: v('diag-t2-res'), int: v('diag-t2-int') },
+        t3: { res: v('diag-t3-res'), int: v('diag-t3-int') },
+        t4: { res: v('diag-t4-res'), int: v('diag-t4-int') },
+        t5: { res: v('diag-t5-res'), int: v('diag-t5-int') }
+      },
+      q3_identification: v('ex4-q3'),
+      q4_correction:     v('ex4-q4'),
+      q5_cas_saignon:    v('ex4-q5')
+    },
+    partie5_bilan_recette: {
+      tests_conformite: {
+        t1: { res: v('rec-t1'), ok: sel('rec-t1-ok') },
+        t2: { res: v('rec-t2'), ok: sel('rec-t2-ok') },
+        t3: { res: v('rec-t3'), ok: sel('rec-t3-ok') },
+        t4: { res: v('rec-t4'), ok: sel('rec-t4-ok') },
+        t5: { res: v('rec-t5'), ok: sel('rec-t5-ok') },
+        t6: { res: v('rec-t6'), ok: sel('rec-t6-ok') },
+        t7: { res: v('rec-t7'), ok: sel('rec-t7-ok') }
+      },
+      q2_bilan:      v('ex5-q2'),
+      q3_redondance: v('ex5-q3')
+    },
+    synthese: {
+      s1:  v('synth-1'),  s2:  v('synth-2'),  s3:  v('synth-3'),
+      s4:  v('synth-4'),  s5:  v('synth-5'),  s6:  v('synth-6'),
+      s7:  v('synth-7'),  s8:  v('synth-8'),  s9:  v('synth-9'),
+      s10: v('synth-10'), s11: v('synth-11')
+    },
+    auto_evaluation: ae
+  };
+
+  const safeName = (nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${safeName}_S7Atelier2.json`;
+  a.click();
+  const t = document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

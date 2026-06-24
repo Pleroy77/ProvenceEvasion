@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S7 — Cours : DNS et services de nommage</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+code{font-family:'Courier New',monospace;background:#eef4f8;padding:1px 5px;border-radius:3px;font-size:12px;color:var(--marine);}
+hr.sep{border:none;border-top:1px solid #d8e8f0;margin:22px 0;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:65px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{border:none;border-bottom:1.5px solid var(--bleu);padding:2px 4px;font-family:'Montserrat',sans-serif;font-size:12px;width:120px;color:var(--marine);outline:none;background:transparent;}
+.inline-field:focus{border-bottom-color:var(--orange);}
+/* QCM */
+.qcm-block{margin:8px 0 12px;}
+.qcm-opt{display:block;padding:4px 0;cursor:pointer;font-size:12px;}
+.qcm-opt input{accent-color:var(--bleu);margin-right:6px;}
+/* Tableau à compléter */
+.fill-table{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:12px;}
+.fill-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--marine);text-align:left;}
+.fill-table td{border:1px solid #c0d0e0;padding:5px 8px;vertical-align:middle;}
+.fill-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.fill-table input[type="text"]{border:none;border-bottom:1.5px solid var(--bleu);width:100%;padding:2px 4px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);background:transparent;outline:none;}
+.fill-table td.fixed{color:var(--marine);font-weight:600;}
+/* CLI */
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.cli .cm-prompt{color:#FF5722;}
+/* Schéma ASCII */
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);overflow-x:auto;}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+/* Badge */
+.badge-dns{background:#e8f4fd;color:var(--bleu);border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;margin:1px 2px;font-family:'Roboto',sans-serif;}
+.badge-site{display:inline-block;background:var(--marine);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:1px 2px;}
+/* Bloc résolution */
+.resolution-steps{counter-reset:step;margin:10px 0 14px;}
+.resolution-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-size:12px;line-height:1.6;}
+.step-num{background:var(--bleu);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px;}
+.step-txt{flex:1;}
+/* Bloc zone DNS */
+.zone-card{border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.75;margin-bottom:10px;}
+.zone-card.directe{background:#f0fef0;border:2px solid var(--vert);}
+.zone-card.inverse{background:#f0f4ff;border:2px solid var(--bleu);}
+.zone-card .zc-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;margin-bottom:6px;}
+.zone-card.directe .zc-titre{color:#4a7a1a;}
+.zone-card.inverse .zc-titre{color:var(--marine);}
+/* Tableau types enregistrements */
+.rec-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.rec-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);text-align:left;}
+.rec-table td{border:1px solid #c0d0e0;padding:7px 10px;vertical-align:top;}
+.rec-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.rec-table .td-type{font-weight:700;color:var(--bleu);font-family:'Roboto',sans-serif;white-space:nowrap;}
+/* Section synthèse */
+.section-synth-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:14px;color:var(--marine);background:var(--ciel-bg);border:2px solid var(--ciel);border-radius:8px;padding:10px 16px;margin:24px 0 12px;}
+.conclusion{border:1px solid #c0d0e0;border-radius:8px;padding:14px 18px;line-height:2.1;font-size:12.5px;background:#fdfdfe;}
+/* Auto-évaluation */
+.autoeval{margin:20px 0 12px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;font-size:14px;color:var(--marine);margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;padding:7px 10px;border-bottom:1px solid #e0e8f0;align-items:center;font-size:12px;}
+.ae-header{background:var(--marine);color:#fff;border-radius:6px 6px 0 0;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.ae-row:nth-child(even){background:var(--ciel-bg);}
+/* Footer */
+.footer{display:flex;justify-content:space-between;padding:8px 28px;border-top:1px solid var(--marine);font-size:11px;color:var(--marine);font-family:'Roboto',sans-serif;}
+/* Barre sticky */
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;align-items:center;justify-content:space-between;z-index:100;}
+.send-info{font-size:12px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:background .2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+/* Tableau QCM horizontal */
+.qcm-inline{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px;}
+.qcm-inline label{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:var(--ciel-bg);border:1px solid #c0d0e0;border-radius:5px;padding:4px 10px;}
+.qcm-inline label:hover{border-color:var(--bleu);}
+.qcm-inline input{accent-color:var(--bleu);}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S7 – Cours : DNS et services de nommage</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 2h30 &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Pourquoi a-t-on besoin du DNS ?</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Mise en situation :</strong> L'infrastructure de Provence Évasion est maintenant interconnectée. Le siège d'Apt héberge un serveur NAS accessible à l'adresse <code>192.168.15.2</code>, un NVR à l'adresse <code>192.168.15.3</code>, et bientôt d'autres services. Laurent Ferracci doit retenir ces adresses pour accéder à ses serveurs. Ce n'est pas réaliste — et surtout, si une adresse change, tous les postes qui l'utilisent en dur devront être reconfigurés. La solution : un <strong>serveur DNS</strong>, installé à Apt, qui permet d'accéder à <code>nas.provence-evasion.local</code> au lieu de mémoriser <code>192.168.15.2</code>.
+</div>
+
+<h2>1.1 Le problème des adresses IP</h2>
+<p>Une adresse IP comme <code>192.168.15.2</code> est parfaitement compréhensible pour un équipement réseau, mais elle est difficile à retenir pour un être humain. De plus :</p>
+<ul>
+  <li>Une adresse IP peut changer (renumérotage du réseau, remplacement d'un serveur).</li>
+  <li>Un même service peut être réparti sur plusieurs serveurs avec des adresses différentes.</li>
+  <li>Certaines applications et protocoles nécessitent de connaître un <strong>nom</strong> plutôt qu'une adresse (ex : envoi d'e-mail, certificats SSL, etc.).</li>
+</ul>
+<p>Il fallait donc inventer un système permettant d'associer un <strong>nom lisible</strong> (appelé <strong>nom de domaine</strong>) à une adresse IP. Ce système, c'est le <strong>DNS</strong> — <em>Domain Name System</em>.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Définition du DNS</div>
+  <p>Le <strong>DNS (Domain Name System)</strong> est un service réseau qui traduit des noms de domaine en adresses IP, et inversement. C'est l'annuaire téléphonique d'Internet : vous cherchez un nom, il vous donne le numéro (l'adresse IP).</p>
+  <p>Exemple : quand vous tapez <code>www.google.com</code> dans votre navigateur, le DNS traduit ce nom en une adresse IP (par exemple <code>142.250.185.68</code>) que votre machine utilise pour établir la connexion.</p>
+</div>
+
+<h2>1.2 Un peu d'histoire — avant le DNS</h2>
+<p>Avant 1983, les ordinateurs connectés à ARPANET (l'ancêtre d'Internet) utilisaient un simple fichier texte appelé <strong>HOSTS.TXT</strong>, maintenu manuellement par le Stanford Research Institute. Ce fichier associait chaque nom de machine à son adresse IP.</p>
+<p>Avec la croissance d'Internet, cette approche est devenue ingérable : le fichier était mis à jour plusieurs fois par semaine, chaque machine devait le télécharger régulièrement, et les conflits de noms se multipliaient. Le DNS, inventé en 1983 par Paul Mockapetris, a résolu ce problème en créant un système hiérarchique et distribué.</p>
+
+<div class="attention">
+  <strong>📁 Le fichier hosts existe encore !</strong> Sur chaque machine (Windows, Linux, macOS), le fichier <code>/etc/hosts</code> (ou <code>C:\Windows\System32\drivers\etc\hosts</code>) est consulté <em>avant</em> le DNS. C'est un mécanisme de résolution locale prioritaire. On peut y forcer des associations nom/IP — utile pour les tests, mais dangereux si un logiciel malveillant le modifie.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 1 — Comprendre le besoin</div>
+
+  <label class="qlabel">Q1.1 — Sur l'infrastructure Provence Évasion, citez deux inconvénients concrets d'obliger les techniciens à mémoriser les adresses IP des serveurs plutôt que des noms.</label>
+  <textarea class="rep rep-sm" id="ex1-q1" placeholder="Inconvénient 1 : …&#10;Inconvénient 2 : …"></textarea>
+
+  <label class="qlabel">Q1.2 — QCM — Quel est le rôle principal du DNS ?</label>
+  <div class="qcm-block" id="qcm-1-2">
+    <label class="qcm-opt"><input type="radio" name="qcm-1-2" value="a"> a) Attribuer automatiquement des adresses IP aux machines</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-1-2" value="b"> b) Traduire un nom de domaine en adresse IP</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-1-2" value="c"> c) Sécuriser les communications entre deux sites</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-1-2" value="d"> d) Filtrer le trafic réseau entre VLANs</label>
+  </div>
+
+  <label class="qlabel">Q1.3 — Pourquoi le fichier HOSTS.TXT est-il devenu impraticable à l'échelle d'Internet ?</label>
+  <textarea class="rep rep-sm" id="ex1-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Architecture du DNS — noms de domaine et hiérarchie</h1>
+
+<h2>2.1 La structure hiérarchique des noms de domaine</h2>
+<p>Un nom de domaine complet est appelé <strong>FQDN</strong> (Fully Qualified Domain Name). Il se lit de droite à gauche, du plus général au plus précis :</p>
+
+<div class="schema-box">
+<div class="sch-titre">Décomposition d'un FQDN</div>
+  nas.provence-evasion.local.
+  │   │                 │    └── Point final (racine, souvent implicite)
+  │   │                 └─────── TLD : domaine de premier niveau (.local, .com, .fr…)
+  │   └───────────────────────── Domaine de second niveau (provence-evasion)
+  └───────────────────────────── Sous-domaine / nom d'hôte (nas)
+
+Autre exemple :
+  www.google.com.
+  │   │      │
+  │   │      └── TLD : .com (domaine commercial)
+  │   └────────── Domaine : google
+  └────────────── Hôte : www
+</div>
+
+<h2>2.2 La hiérarchie DNS — des serveurs racines aux serveurs locaux</h2>
+<p>Le DNS est organisé comme un arbre inversé. À sa racine se trouvent les <strong>serveurs racines</strong> (root servers), au nombre de 13 groupes dans le monde, qui connaissent les adresses des serveurs responsables de chaque TLD (<code>.com</code>, <code>.fr</code>, <code>.net</code>…). Ensuite, pour chaque domaine, un <strong>serveur faisant autorité</strong> (authoritative server) possède les enregistrements définitifs.</p>
+<p>Dans la pratique, pour ne pas interroger la racine à chaque demande, les serveurs DNS utilisent un <strong>cache</strong> : ils mémorisent les réponses pendant une durée définie par le <strong>TTL</strong> (Time To Live). Une fois le TTL expiré, l'information est considérée périmée et une nouvelle requête est effectuée.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Résolution récursive vs itérative</div>
+  <p>Quand un client demande à son serveur DNS la résolution d'un nom, deux modes existent :</p>
+  <ul>
+    <li><strong>Résolution récursive :</strong> le serveur DNS prend en charge toute la résolution pour le client — il interroge les autres serveurs DNS jusqu'à obtenir la réponse finale, puis la retourne au client. C'est le mode habituel pour les clients.</li>
+    <li><strong>Résolution itérative :</strong> le serveur répond "je ne sais pas, mais demande à ce serveur-là". Le client (ou un forwarder) enchaîne les requêtes lui-même. C'est le mode utilisé entre serveurs DNS de la hiérarchie.</li>
+  </ul>
+  <p>Dans le projet Provence Évasion, les postes clients interrogent le serveur DNS interne (Apt) en mode <strong>récursif</strong>. Si le serveur d'Apt ne connaît pas la réponse (ex : une adresse externe comme <code>www.google.com</code>), il la transfère (<strong>forwarder</strong>) vers un résolveur public (ex : <code>8.8.8.8</code>).</p>
+</div>
+
+<h2>2.3 DNS interne vs DNS externe</h2>
+<p>On distingue deux types de DNS selon leur périmètre :</p>
+
+<table class="data-table">
+  <tr><th>Critère</th><th>DNS interne (privé)</th><th>DNS externe (public)</th></tr>
+  <tr><td class="left"><strong>Domaine géré</strong></td><td class="left"><code>provence-evasion.local</code></td><td class="left"><code>provence-evasion.fr</code> (si existant)</td></tr>
+  <tr><td class="left"><strong>Accessibilité</strong></td><td class="left">Uniquement depuis le LAN des 4 sites</td><td class="left">Accessible depuis Internet</td></tr>
+  <tr><td class="left"><strong>Rôle</strong></td><td class="left">Résoudre les noms des serveurs internes</td><td class="left">Résoudre les noms publics (sites web, e-mail)</td></tr>
+  <tr><td class="left"><strong>Qui le gère ?</strong></td><td class="left">Axentis / technicien interne</td><td class="left">Bureau d'enregistrement (registrar) + FAI</td></tr>
+  <tr><td class="left"><strong>Extension typique</strong></td><td class="left"><code>.local</code>, <code>.lan</code>, <code>.interne</code></td><td class="left"><code>.com</code>, <code>.fr</code>, <code>.net</code>…</td></tr>
+</table>
+
+<div class="attention">
+  <strong>⚠ Attention — l'extension <code>.local</code></strong> est réservée au réseau local (mDNS/Bonjour chez Apple). Dans Packet Tracer, elle fonctionne parfaitement pour nos exercices. En production réelle, certains techniciens préfèrent <code>.lan</code> ou un sous-domaine interne de leur domaine public (ex : <code>interne.provence-evasion.fr</code>) pour éviter des conflits.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 2 — Hiérarchie et noms de domaine</div>
+
+  <label class="qlabel">Q2.1 — Décomposez le FQDN suivant en indiquant chaque partie :</label>
+  <p style="font-size:12px;background:var(--ciel-bg);padding:8px 12px;border-radius:5px;margin-bottom:8px;font-family:'Courier New',monospace;"><strong>nvr.provence-evasion.local</strong></p>
+  <table class="fill-table">
+    <tr><th>Élément</th><th>Valeur dans ce FQDN</th><th>Rôle</th></tr>
+    <tr><td class="fixed">Hôte (nom de machine)</td><td><input type="text" id="ex2-decomp-host" placeholder="…"></td><td class="fixed">Identifie la machine précise</td></tr>
+    <tr><td class="fixed">Domaine de second niveau</td><td><input type="text" id="ex2-decomp-domain" placeholder="…"></td><td class="fixed">Nom de l'organisation</td></tr>
+    <tr><td class="fixed">TLD (domaine de 1er niveau)</td><td><input type="text" id="ex2-decomp-tld" placeholder="…"></td><td class="fixed">Portée / type de réseau</td></tr>
+  </table>
+
+  <label class="qlabel">Q2.2 — Quel est le TTL ? Pourquoi est-il important pour l'administration DNS ?</label>
+  <textarea class="rep rep-sm" id="ex2-q2" placeholder="Votre réponse…"></textarea>
+
+  <label class="qlabel">Q2.3 — QCM — Sur le site de Roussillon, un poste client demande la résolution de <code>nas.provence-evasion.local</code>. Le serveur DNS interne d'Apt répond directement sans interroger Internet. Comment appelle-t-on ce fonctionnement ?</label>
+  <div class="qcm-block" id="qcm-2-3">
+    <label class="qcm-opt"><input type="radio" name="qcm-2-3" value="a"> a) Résolution itérative</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-2-3" value="b"> b) Résolution récursive</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-2-3" value="c"> c) Résolution par broadcast</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-2-3" value="d"> d) Résolution DHCP</label>
+  </div>
+
+  <label class="qlabel">Q2.4 — Sur l'infrastructure Provence Évasion, quel est l'intérêt d'utiliser l'extension <code>.local</code> pour le domaine interne ?</label>
+  <textarea class="rep rep-sm" id="ex2-q4" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Zones DNS — résolution directe et inverse</h1>
+
+<h2>3.1 La zone de résolution directe</h2>
+
+<div class="zone-card directe">
+  <div class="zc-titre">✅ Zone directe (Forward Lookup Zone)</div>
+  <p>La zone de résolution directe répond à la question : <em>"Quelle est l'adresse IP de ce nom ?"</em></p>
+  <p>C'est la zone la plus utilisée. Elle contient des enregistrements qui associent des noms de domaine à des adresses IP (enregistrements de type <strong>A</strong> principalement).</p>
+  <p><strong>Exemple :</strong> <code>nas.provence-evasion.local</code> → <code>192.168.15.2</code></p>
+</div>
+
+<h2>3.2 La zone de résolution inverse</h2>
+
+<div class="zone-card inverse">
+  <div class="zc-titre">🔁 Zone inverse (Reverse Lookup Zone)</div>
+  <p>La zone de résolution inverse répond à la question : <em>"Quel est le nom associé à cette adresse IP ?"</em></p>
+  <p>C'est l'opération symétrique de la résolution directe. Elle utilise des enregistrements de type <strong>PTR</strong> (Pointer Record). Le nom de la zone inverse est construit en inversant les octets du réseau, suivi de <code>.in-addr.arpa</code>.</p>
+  <p><strong>Exemple :</strong> Pour le réseau <code>192.168.15.0/24</code>, la zone inverse est <code>15.168.192.in-addr.arpa</code>. L'enregistrement PTR associe <code>2</code> (le dernier octet de <code>192.168.15.2</code>) à <code>nas.provence-evasion.local</code>.</p>
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Pourquoi la zone inverse ?</div>
+  <p>La zone inverse est utilisée par :</p>
+  <ul>
+    <li>Les outils de diagnostic réseau (<code>nslookup</code>, <code>dig</code>, <code>ping -a</code>) qui affichent des noms au lieu d'adresses IP.</li>
+    <li>Certains services de messagerie qui vérifient que l'IP d'un serveur correspond bien à un nom (anti-spam).</li>
+    <li>Les journaux (logs) système qui deviennent bien plus lisibles avec des noms que des adresses.</li>
+  </ul>
+  <p>Dans l'atelier Packet Tracer (S7), vous configurerez la zone inverse pour le réseau des serveurs d'Apt : <code>15.168.192.in-addr.arpa</code>.</p>
+</div>
+
+<h2>3.3 Les principaux types d'enregistrements DNS</h2>
+<p>Chaque information dans une zone DNS est stockée sous forme d'<strong>enregistrement de ressource</strong> (Resource Record, RR). Voici les types essentiels :</p>
+
+<table class="rec-table">
+  <tr><th>Type</th><th>Nom</th><th>Rôle</th><th>Exemple dans PE</th></tr>
+  <tr><td class="td-type">A</td><td>Address</td><td>Associe un nom à une adresse IPv4</td><td><code>nas.provence-evasion.local → 192.168.15.2</code></td></tr>
+  <tr><td class="td-type">PTR</td><td>Pointer</td><td>Résolution inverse (IP → nom)</td><td><code>2.15.168.192.in-addr.arpa → nas.provence-evasion.local</code></td></tr>
+  <tr><td class="td-type">CNAME</td><td>Canonical Name</td><td>Alias d'un autre nom (redirection)</td><td><code>fichiers.provence-evasion.local → nas.provence-evasion.local</code></td></tr>
+  <tr><td class="td-type">MX</td><td>Mail Exchanger</td><td>Serveur de messagerie du domaine</td><td><code>provence-evasion.local → mail.provence-evasion.local</code></td></tr>
+  <tr><td class="td-type">NS</td><td>Name Server</td><td>Identifie le(s) serveur(s) DNS faisant autorité pour la zone</td><td><code>provence-evasion.local → dns.provence-evasion.local</code></td></tr>
+  <tr><td class="td-type">SOA</td><td>Start of Authority</td><td>Enregistrement de départ de chaque zone, informations d'administration</td><td>Généré automatiquement par le serveur DNS</td></tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 3 — Zones DNS de Provence Évasion</div>
+
+  <label class="qlabel">Q3.1 — Complétez la table d'enregistrements DNS pour la zone directe <code>provence-evasion.local</code> :</label>
+  <table class="fill-table">
+    <tr><th>Nom d'hôte</th><th>Type</th><th>Valeur (adresse IP)</th><th>Description</th></tr>
+    <tr><td class="fixed">dns</td><td class="fixed">A</td><td><input type="text" id="ex3-dns-ip" placeholder="Ex : 192.168.15.x"></td><td class="fixed">Serveur DNS lui-même</td></tr>
+    <tr><td class="fixed">nas</td><td class="fixed">A</td><td><input type="text" id="ex3-nas-ip" placeholder="Ex : 192.168.15.x"></td><td class="fixed">Serveur de fichiers NAS</td></tr>
+    <tr><td class="fixed">nvr</td><td class="fixed">A</td><td><input type="text" id="ex3-nvr-ip" placeholder="Ex : 192.168.15.x"></td><td class="fixed">Enregistreur caméras</td></tr>
+    <tr><td><input type="text" id="ex3-cname-name" placeholder="Ex : fichiers"></td><td class="fixed">CNAME</td><td class="fixed">nas.provence-evasion.local</td><td class="fixed">Alias pour le NAS</td></tr>
+  </table>
+
+  <label class="qlabel">Q3.2 — Quel est le nom de la zone inverse à créer pour le réseau des serveurs d'Apt (<code>192.168.15.0/24</code>) ? Justifiez la construction de ce nom.</label>
+  <textarea class="rep rep-sm" id="ex3-q2" placeholder="Nom de zone : …&#10;Justification : …"></textarea>
+
+  <label class="qlabel">Q3.3 — QCM — Un technicien veut vérifier depuis la ligne de commande si le nom <code>nvr.provence-evasion.local</code> se résout correctement. Quelle commande utilise-t-il ?</label>
+  <div class="qcm-block" id="qcm-3-3">
+    <label class="qcm-opt"><input type="radio" name="qcm-3-3" value="a"> a) <code>ping nvr.provence-evasion.local</code> uniquement</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-3-3" value="b"> b) <code>nslookup nvr.provence-evasion.local</code></label>
+    <label class="qcm-opt"><input type="radio" name="qcm-3-3" value="c"> c) <code>tracert nvr.provence-evasion.local</code></label>
+    <label class="qcm-opt"><input type="radio" name="qcm-3-3" value="d"> d) <code>ipconfig /displaydns nvr.provence-evasion.local</code></label>
+  </div>
+
+  <label class="qlabel">Q3.4 — Quel type d'enregistrement DNS faudrait-il créer si Provence Évasion décidait d'héberger un serveur de messagerie interne ? Donnez un exemple concret de valeur pour cet enregistrement.</label>
+  <textarea class="rep rep-sm" id="ex3-q4" placeholder="Type d'enregistrement : …&#10;Exemple : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Mécanisme de résolution DNS — étape par étape</h1>
+
+<h2>4.1 Le processus de résolution</h2>
+<p>Voyons en détail ce qui se passe lorsqu'un poste du personnel de Roussillon tente d'accéder au NAS d'Apt en tapant <code>\\nas.provence-evasion.local</code> dans son explorateur Windows :</p>
+
+<div class="resolution-steps">
+  <div class="resolution-step">
+    <div class="step-num">1</div>
+    <div class="step-txt"><strong>Cache local :</strong> Windows vérifie d'abord son propre cache DNS (<code>ipconfig /displaydns</code>). Si le nom a déjà été résolu récemment et que le TTL n'est pas expiré, la réponse est utilisée immédiatement sans aucune requête réseau.</div>
+  </div>
+  <div class="resolution-step">
+    <div class="step-num">2</div>
+    <div class="step-txt"><strong>Fichier hosts :</strong> Windows consulte le fichier <code>C:\Windows\System32\drivers\etc\hosts</code>. Si une entrée manuelle correspond, elle est utilisée (prioritaire sur le DNS).</div>
+  </div>
+  <div class="resolution-step">
+    <div class="step-num">3</div>
+    <div class="step-txt"><strong>Requête DNS vers le résolveur :</strong> Le poste envoie une requête DNS (<strong>UDP, port 53</strong>) au serveur DNS configuré dans ses paramètres IP — ici, <code>192.168.15.1</code> (serveur DNS d'Apt, obtenu via DHCP).</div>
+  </div>
+  <div class="resolution-step">
+    <div class="step-num">4</div>
+    <div class="step-txt"><strong>Le serveur DNS d'Apt répond :</strong> Il est autorité pour la zone <code>provence-evasion.local</code>. Il retrouve l'enregistrement A de <code>nas</code> dans sa zone directe et renvoie <code>192.168.15.2</code>.</div>
+  </div>
+  <div class="resolution-step">
+    <div class="step-num">5</div>
+    <div class="step-txt"><strong>Mise en cache et connexion :</strong> Le poste mémorise la réponse dans son cache pour la durée du TTL. Il utilise ensuite l'adresse <code>192.168.15.2</code> pour se connecter au NAS via le routage inter-sites.</div>
+  </div>
+</div>
+
+<h2>4.2 Et si le nom n'existe pas en interne ?</h2>
+<p>Que se passe-t-il si un employé de Provence Évasion tape <code>www.meteo.fr</code> dans son navigateur ? Le serveur DNS interne d'Apt ne connaît pas ce nom (il n'appartient pas à la zone <code>provence-evasion.local</code>). Dans ce cas :</p>
+
+<div class="schema-box">
+<div class="sch-titre">Résolution d'un nom externe — avec forwarder</div>
+PC-Roussillon ──→ [Serveur DNS Apt : 192.168.15.1]
+                        │
+                        │ "Je ne connais pas www.meteo.fr"
+                        ↓
+               [Forwarder : 8.8.8.8 (Google DNS)]
+                        │
+                        │ Résolution sur Internet (hiérarchie DNS)
+                        ↓
+               Réponse : www.meteo.fr → 217.160.x.x
+                        │
+                        ↓
+PC-Roussillon ←── Réponse : 217.160.x.x
+</div>
+
+<p>Le serveur DNS d'Apt est configuré avec un <strong>forwarder</strong> (redirecteur) — une adresse de serveur DNS externe (ex : <code>8.8.8.8</code> de Google, ou <code>1.1.1.1</code> de Cloudflare) vers lequel il transmet les requêtes qu'il ne peut pas résoudre lui-même.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Le port 53</div>
+  <p>Le DNS utilise le port <strong>53</strong>, en <strong>UDP</strong> pour les requêtes classiques (réponses &lt; 512 octets) et en <strong>TCP</strong> pour les transferts de zone entre serveurs DNS ou les réponses volumineuses. En termes de sécurité réseau, les ACL de Provence Évasion devront autoriser le trafic UDP/TCP port 53 entre les postes clients et le serveur DNS d'Apt.</p>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 4 — Résolution DNS et diagnostics</div>
+
+  <label class="qlabel">Q4.1 — Numérotez dans le bon ordre les étapes de résolution DNS lorsqu'un poste de Saignon demande l'adresse IP de <code>nas.provence-evasion.local</code> :</label>
+  <table class="fill-table">
+    <tr><th>Ordre</th><th>Étape</th></tr>
+    <tr><td><input type="text" id="ex4-ord1" placeholder="N°" style="width:50px;text-align:center;"></td><td class="fixed">Le serveur DNS d'Apt retourne l'adresse IP 192.168.15.2</td></tr>
+    <tr><td><input type="text" id="ex4-ord2" placeholder="N°" style="width:50px;text-align:center;"></td><td class="fixed">Le poste consulte son cache DNS local</td></tr>
+    <tr><td><input type="text" id="ex4-ord3" placeholder="N°" style="width:50px;text-align:center;"></td><td class="fixed">Le poste envoie une requête UDP port 53 au serveur DNS d'Apt</td></tr>
+    <tr><td><input type="text" id="ex4-ord4" placeholder="N°" style="width:50px;text-align:center;"></td><td class="fixed">Le poste consulte le fichier hosts</td></tr>
+    <tr><td><input type="text" id="ex4-ord5" placeholder="N°" style="width:50px;text-align:center;"></td><td class="fixed">Le poste établit la connexion vers 192.168.15.2 et mémorise dans le cache</td></tr>
+  </table>
+
+  <label class="qlabel">Q4.2 — Un employé de Cucuron tape <code>\\reservations.provence-evasion.local</code> dans son explorateur Windows. La résolution échoue. Listez trois causes possibles de cet échec, dans l'ordre le plus probable.</label>
+  <textarea class="rep rep-md" id="ex4-q2" placeholder="Cause 1 : …&#10;Cause 2 : …&#10;Cause 3 : …"></textarea>
+
+  <label class="qlabel">Q4.3 — Sur le serveur DNS d'Apt, vous configurez le forwarder avec l'adresse <code>8.8.8.8</code>. Quel est le rôle de ce forwarder ? Que se passe-t-il si cette adresse est inaccessible ?</label>
+  <textarea class="rep rep-sm" id="ex4-q3" placeholder="Votre réponse…"></textarea>
+
+  <label class="qlabel">Q4.4 — QCM — Le protocole DNS utilise principalement quel port et quel protocole de transport ?</label>
+  <div class="qcm-block" id="qcm-4-4">
+    <label class="qcm-opt"><input type="radio" name="qcm-4-4" value="a"> a) TCP port 80</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-4-4" value="b"> b) UDP port 53</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-4-4" value="c"> c) TCP port 443</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-4-4" value="d"> d) UDP port 67</label>
+  </div>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. Intégration DNS dans l'infrastructure Provence Évasion</h1>
+
+<h2>5.1 Architecture cible du service DNS</h2>
+<p>Pour le projet Provence Évasion, le serveur DNS est hébergé sur le <strong>site d'Apt (siège)</strong>, dans le VLAN 15 (Serveurs). Il est le seul serveur DNS de l'infrastructure — les 3 autres sites (Roussillon, Saignon, Cucuron) lui soumettent leurs requêtes via le routage inter-sites configuré aux séances S5 et S6.</p>
+
+<div class="schema-box">
+<div class="sch-titre">Vue d'ensemble — DNS Provence Évasion</div>
+┌──────────────────────────────────────────────────────────┐
+│              SITE D'APT (SIÈGE)                          │
+│   VLAN 15 — Serveurs (192.168.15.0/24)                   │
+│                                                          │
+│   ┌─────────────────┐    ┌─────────────────┐            │
+│   │ Serveur DNS     │    │ NAS             │            │
+│   │ 192.168.15.1    │    │ 192.168.15.2    │            │
+│   │ dns.prov-ev.lcl │    │ nas.prov-ev.lcl │            │
+│   └────────┬────────┘    └─────────────────┘            │
+│            │ Forwarder vers 8.8.8.8 (Internet)          │
+└────────────┼─────────────────────────────────────────────┘
+             │  Requêtes DNS via routage inter-sites
+    ┌────────┴──────────────────────────────────────┐
+    │          │                    │               │
+┌───┴───┐  ┌──┴────┐  ┌────────┐  ┌┴──────┐
+│ APT   │  │ROUSSIL│  │SAIGNON │  │CUCURON│
+│VLAN 11│  │VLAN 21│  │VLAN 31 │  │VLAN 41│
+│Personnel│ │Personn│  │Personn  │  │Personn│
+└───────┘  └───────┘  └────────┘  └───────┘
+  Tous les postes configurés avec DNS : 192.168.15.1
+</div>
+
+<h2>5.2 Noms DNS prévus dans le projet</h2>
+<p>Voici la liste des enregistrements DNS à créer dans la zone directe <code>provence-evasion.local</code> :</p>
+
+<table class="data-table">
+  <tr><th>FQDN</th><th>Type</th><th>IP / Valeur cible</th><th>Description</th></tr>
+  <tr><td><code>dns.provence-evasion.local</code></td><td class="center">A</td><td class="center"><code>192.168.15.1</code></td><td class="left">Serveur DNS</td></tr>
+  <tr><td><code>nas.provence-evasion.local</code></td><td class="center">A</td><td class="center"><code>192.168.15.2</code></td><td class="left">Serveur de fichiers NAS</td></tr>
+  <tr><td><code>nvr.provence-evasion.local</code></td><td class="center">A</td><td class="center"><code>192.168.15.3</code></td><td class="left">Enregistreur vidéo NVR</td></tr>
+  <tr><td><code>routeur-apt.provence-evasion.local</code></td><td class="center">A</td><td class="center"><code>192.168.11.254</code></td><td class="left">Routeur Apt (interface VLAN 11)</td></tr>
+  <tr><td><code>fichiers.provence-evasion.local</code></td><td class="center">CNAME</td><td class="center"><code>nas.provence-evasion.local</code></td><td class="left">Alias convivial pour le NAS</td></tr>
+</table>
+
+<h2>5.3 Configuration du serveur DNS dans Packet Tracer</h2>
+<p>Dans Packet Tracer, le serveur DNS est configuré via l'onglet <strong>Services → DNS</strong> du serveur. Voici la procédure :</p>
+
+<div class="cli">
+<span class="cm-titre">Configuration DNS dans Packet Tracer — interface graphique</span>
+
+<span class="cm-com">── Sur le serveur (192.168.15.1) ──</span>
+1. Onglet Desktop → IP Configuration
+   Adresse IP  : <span class="cm-val">192.168.15.1</span>
+   Masque      : <span class="cm-val">255.255.255.0</span>
+   Passerelle  : <span class="cm-val">192.168.15.254</span>     <span class="cm-com">(interface VLAN 15 du routeur)</span>
+
+2. Onglet Services → DNS
+   DNS Service : <span class="cm-val">ON</span>
+   Ajouter un enregistrement A :
+     Name    : <span class="cm-val">nas.provence-evasion.local</span>
+     Address : <span class="cm-val">192.168.15.2</span>
+     → Add
+
+   Ajouter un enregistrement A :
+     Name    : <span class="cm-val">nvr.provence-evasion.local</span>
+     Address : <span class="cm-val">192.168.15.3</span>
+     → Add
+
+   Ajouter un enregistrement CNAME :
+     Name   : <span class="cm-val">fichiers.provence-evasion.local</span>
+     CNAME  : <span class="cm-val">nas.provence-evasion.local</span>
+     → Add
+
+<span class="cm-com">── Sur chaque poste client ──</span>
+   Desktop → IP Configuration
+   DNS Server : <span class="cm-val">192.168.15.1</span>
+
+<span class="cm-com">── Test depuis un PC client ──</span>
+PC> <span class="cm-val">nslookup nas.provence-evasion.local</span>
+Server:    [192.168.15.1]
+Address:   192.168.15.1
+
+Non-authoritative answer:
+Name:    nas.provence-evasion.local
+Address: 192.168.15.2
+</div>
+
+<div class="attention">
+  <strong>⚠ Rappel routage inter-sites :</strong> Pour qu'un poste du VLAN 21 (Roussillon) puisse interroger le DNS sur <code>192.168.15.1</code> (VLAN 15, Apt), le routage inter-sites doit être fonctionnel (configuré en S5-S6). Si le ping vers <code>192.168.15.1</code> échoue depuis Roussillon, la résolution DNS échouera aussi.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 5 — Configuration et intégration</div>
+
+  <label class="qlabel">Q5.1 — Sur quel site est hébergé le serveur DNS de Provence Évasion ? Dans quel VLAN ? Justifiez ce choix.</label>
+  <textarea class="rep rep-sm" id="ex5-q1" placeholder="Site : …  VLAN : …&#10;Justification : …"></textarea>
+
+  <label class="qlabel">Q5.2 — Complétez les paramètres IP d'un poste du VLAN Personnel de Saignon (VLAN 31, réseau 192.168.31.0/24) :</label>
+  <table class="fill-table">
+    <tr><th>Paramètre</th><th>Valeur</th></tr>
+    <tr><td class="fixed">Adresse IP (exemple)</td><td><input type="text" id="ex5-ip" placeholder="192.168.31.x"></td></tr>
+    <tr><td class="fixed">Masque de sous-réseau</td><td><input type="text" id="ex5-mask" placeholder="…"></td></tr>
+    <tr><td class="fixed">Passerelle par défaut</td><td><input type="text" id="ex5-gw" placeholder="192.168.31.x"></td></tr>
+    <tr><td class="fixed">Serveur DNS</td><td><input type="text" id="ex5-dns" placeholder="192.168.x.x"></td></tr>
+  </table>
+
+  <label class="qlabel">Q5.3 — Un technicien tape <code>nslookup nas.provence-evasion.local</code> depuis un PC de Roussillon et obtient "Request timed out". Listez les vérifications à effectuer, dans l'ordre logique de diagnostic.</label>
+  <textarea class="rep rep-md" id="ex5-q3" placeholder="1. …&#10;2. …&#10;3. …&#10;4. …"></textarea>
+
+  <label class="qlabel">Q5.4 — QCM — Quelle est la différence entre un enregistrement A et un enregistrement CNAME ?</label>
+  <div class="qcm-block" id="qcm-5-4">
+    <label class="qcm-opt"><input type="radio" name="qcm-5-4" value="a"> a) A pointe vers une IP, CNAME pointe vers un autre nom de domaine</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-5-4" value="b"> b) A est pour IPv6, CNAME est pour IPv4</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-5-4" value="c"> c) A est pour la zone inverse, CNAME est pour la zone directe</label>
+    <label class="qcm-opt"><input type="radio" name="qcm-5-4" value="d"> d) Il n'y a pas de différence, ce sont des synonymes</label>
+  </div>
+
+  <label class="qlabel">Q5.5 — Laurent Ferracci souhaite accéder au NAS depuis son domicile (hors réseau Provence Évasion). Est-ce que le DNS interne (<code>provence-evasion.local</code>) lui sera utile ? Que faudra-t-il prévoir ?</label>
+  <textarea class="rep rep-md" id="ex5-q5" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Synthèse — Complétez les phrases</div>
+
+<div class="conclusion">
+  <p>Le DNS signifie <input class="inline-field" id="synth-1" placeholder="..." style="width:200px"> et permet de traduire un <input class="inline-field" id="synth-2" placeholder="..." style="width:130px"> en <input class="inline-field" id="synth-3" placeholder="..."> .</p>
+
+  <p>Un FQDN (Fully Qualified Domain Name) se lit de <input class="inline-field" id="synth-4" placeholder="..."> à <input class="inline-field" id="synth-5" placeholder="..."> . Par exemple, dans <code>nas.provence-evasion.local</code>, le TLD est <input class="inline-field" id="synth-6" placeholder="..." style="width:80px"> et le nom d'hôte est <input class="inline-field" id="synth-7" placeholder="..." style="width:80px"> .</p>
+
+  <p>La zone de résolution <input class="inline-field" id="synth-8" placeholder="..."> répond à la question "quelle est l'adresse IP de ce nom ?", tandis que la zone de résolution <input class="inline-field" id="synth-9" placeholder="..."> répond à "quel est le nom associé à cette adresse IP ?".</p>
+
+  <p>L'enregistrement de type <input class="inline-field" id="synth-10" placeholder="..." style="width:50px"> associe un nom à une IPv4. L'enregistrement <input class="inline-field" id="synth-11" placeholder="..." style="width:60px"> est un alias pointant vers un autre nom. L'enregistrement <input class="inline-field" id="synth-12" placeholder="..." style="width:50px"> est utilisé pour la résolution inverse.</p>
+
+  <p>Le DNS utilise le port <input class="inline-field" id="synth-13" placeholder="N°" style="width:50px"> en <input class="inline-field" id="synth-14" placeholder="UDP/TCP" style="width:70px"> pour les requêtes classiques. Si le serveur DNS interne ne connaît pas un nom, il transmet la requête à un <input class="inline-field" id="synth-15" placeholder="..." style="width:110px"> .</p>
+
+  <p>Dans le projet Provence Évasion, le serveur DNS est situé sur le site d'<input class="inline-field" id="synth-16" placeholder="..." style="width:80px">, dans le VLAN <input class="inline-field" id="synth-17" placeholder="N°" style="width:50px">, à l'adresse IP <input class="inline-field" id="synth-18" placeholder="..." style="width:120px"> .</p>
+</div>
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval" style="margin-top:22px;">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <script>
+  const criteres = [
+    "J'explique à quoi sert le DNS et pourquoi il est nécessaire",
+    "Je décompose un FQDN en identifiant hôte, domaine et TLD",
+    "Je distingue DNS interne (.local) et DNS externe (.com, .fr…)",
+    "Je comprends la différence entre zone directe et zone inverse",
+    "Je connais les types d'enregistrements A, PTR, CNAME, MX, NS",
+    "Je comprends le mécanisme de résolution récursive et le rôle du cache",
+    "Je sais configurer des enregistrements DNS dans Packet Tracer",
+    "Je sais utiliser nslookup pour tester la résolution DNS",
+    "Je comprends le rôle du forwarder pour les requêtes externes"
+  ];
+  const niveaux = ['maitrise','en_cours','a_revoir','non_traite'];
+  const labels = ['★★★','★★☆','★☆☆','?'];
+  const cont = document.querySelector('.autoeval');
+  criteres.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className='ae-row';
+    let html=`<div>${c}</div>`;
+    niveaux.forEach((n,j)=>{
+      html+=`<div style="text-align:center"><label style="cursor:pointer"><input type="radio" name="ae-${i}" value="${n}" style="accent-color:var(--bleu);margin-right:4px">${labels[j]}</label></div>`;
+    });
+    row.innerHTML=html;
+    cont.appendChild(row);
+  });
+  </script>
+</div>
+
+</div><!-- /content -->
+
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <div><strong style="color:var(--orange)">S7</strong> — Cours : DNS et services de nommage</div>
+  <div>Lycée Louis Lumière – Chelles · Bac Pro CIEL · 2025-2026</div>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+function genererJSON(){
+  const nom    = document.getElementById('eleve-nom').value;
+  const prenom = document.getElementById('eleve-prenom').value;
+  const v  = id => { const el=document.getElementById(id); return el?el.value:''; };
+  const qcm = name => { const r=document.querySelector(`input[name="${name}"]:checked`); return r?r.value:''; };
+
+  // Auto-évaluation
+  const ae = {};
+  [
+    "J'explique à quoi sert le DNS et pourquoi il est nécessaire",
+    "Je décompose un FQDN en identifiant hôte, domaine et TLD",
+    "Je distingue DNS interne (.local) et DNS externe (.com, .fr…)",
+    "Je comprends la différence entre zone directe et zone inverse",
+    "Je connais les types d'enregistrements A, PTR, CNAME, MX, NS",
+    "Je comprends le mécanisme de résolution récursive et le rôle du cache",
+    "Je sais configurer des enregistrements DNS dans Packet Tracer",
+    "Je sais utiliser nslookup pour tester la résolution DNS",
+    "Je comprends le rôle du forwarder pour les requêtes externes"
+  ].forEach((c,i)=>{
+    const r=document.querySelector(`input[name="ae-${i}"]:checked`);
+    ae[`critere_${i+1}`]={critere:c,niveau:r?r.value:'non_traite'};
+  });
+
+  const data = {
+    meta: {
+      devoir: "S7 – Cours : DNS et services de nommage",
+      eleve: { nom, prenom, classe: v('eleve-classe') },
+      date: v('eleve-date'),
+      genere_le: new Date().toISOString()
+    },
+    partie1_besoin_dns: {
+      q1: v('ex1-q1'),
+      qcm_q2: qcm('qcm-1-2'),
+      q3: v('ex1-q3')
+    },
+    partie2_hierarchie: {
+      decomp_fqdn: {
+        hote:   v('ex2-decomp-host'),
+        domaine: v('ex2-decomp-domain'),
+        tld:    v('ex2-decomp-tld')
+      },
+      q2_ttl:       v('ex2-q2'),
+      qcm_q3:       qcm('qcm-2-3'),
+      q4_extension: v('ex2-q4')
+    },
+    partie3_zones_dns: {
+      zone_directe: {
+        dns_ip:      v('ex3-dns-ip'),
+        nas_ip:      v('ex3-nas-ip'),
+        nvr_ip:      v('ex3-nvr-ip'),
+        cname_name:  v('ex3-cname-name')
+      },
+      q2_zone_inverse: v('ex3-q2'),
+      qcm_q3:          qcm('qcm-3-3'),
+      q4_mx:           v('ex3-q4')
+    },
+    partie4_resolution: {
+      ordre_etapes: {
+        etape_reponse_serveur: v('ex4-ord1'),
+        etape_cache_local:     v('ex4-ord2'),
+        etape_requete_udp:     v('ex4-ord3'),
+        etape_fichier_hosts:   v('ex4-ord4'),
+        etape_connexion:       v('ex4-ord5')
+      },
+      q2_causes_echec:  v('ex4-q2'),
+      q3_forwarder:     v('ex4-q3'),
+      qcm_q4:           qcm('qcm-4-4')
+    },
+    partie5_integration: {
+      q1_hebergement:  v('ex5-q1'),
+      config_poste_saignon: {
+        ip:  v('ex5-ip'),
+        mask: v('ex5-mask'),
+        gw:  v('ex5-gw'),
+        dns: v('ex5-dns')
+      },
+      q3_diagnostic:   v('ex5-q3'),
+      qcm_q4:          qcm('qcm-5-4'),
+      q5_acces_distant: v('ex5-q5')
+    },
+    synthese: {
+      s1:  v('synth-1'),  s2:  v('synth-2'),  s3:  v('synth-3'),
+      s4:  v('synth-4'),  s5:  v('synth-5'),  s6:  v('synth-6'),
+      s7:  v('synth-7'),  s8:  v('synth-8'),  s9:  v('synth-9'),
+      s10: v('synth-10'), s11: v('synth-11'), s12: v('synth-12'),
+      s13: v('synth-13'), s14: v('synth-14'), s15: v('synth-15'),
+      s16: v('synth-16'), s17: v('synth-17'), s18: v('synth-18')
+    },
+    auto_evaluation: ae
+  };
+
+  const safeName = (nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${safeName}_S7Cours.json`;
+  a.click();
+  const t = document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

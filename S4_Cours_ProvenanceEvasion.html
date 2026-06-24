@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S4 — Cours : Le protocole DHCP</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+
+/* ── EN-TÊTE ── */
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+
+/* ── PAGE DE GARDE ── */
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+
+/* ── TABLEAU COMPÉTENCES ── */
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+
+/* ── CONTENU ── */
+.content{padding:0 28px 100px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:28px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.75;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.85;}
+strong{font-weight:600;}
+.sep{border:none;border-top:1px solid #d0dde8;margin:22px 0;}
+
+/* ── BLOCS SPÉCIAUX ── */
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.75;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.8;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.attention strong{color:var(--orange);}
+.securite-box{border:2px solid var(--vert);background:#f6fbed;border-radius:8px;padding:12px 16px;margin:12px 0 16px;font-size:12px;line-height:1.75;}
+.securite-box .sec-titre{font-family:'Roboto',sans-serif;font-weight:700;color:#4a7a1a;font-size:13px;margin-bottom:6px;}
+
+/* ── TABLEAUX DONNÉES ── */
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.data-table td input[type="text"]{width:100%;border:1px solid #b0c8e0;border-radius:3px;padding:3px 6px;font-family:'Montserrat',sans-serif;font-size:12px;background:#fff;}
+.data-table td input[type="text"]:focus{outline:none;border-color:var(--bleu);}
+
+/* ── BLOCS CLI ── */
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:2;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.cli .cm-prompt{color:#FF5722;}
+
+/* ── SCHÉMA ASCII ── */
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+
+/* ── DORA timeline ── */
+.dora-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 18px;}
+.dora-card{border-radius:8px;padding:12px 10px;text-align:center;font-size:11px;line-height:1.6;}
+.dora-card .dora-lettre{font-family:'Roboto',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+.dora-card .dora-nom{font-family:'Roboto',sans-serif;font-weight:700;font-size:12px;margin-bottom:6px;}
+.dora-D{background:#e8f8ee;border:2px solid var(--vert);}.dora-D .dora-lettre{color:var(--vert);}
+.dora-O{background:#e8f4fd;border:2px solid var(--bleu);}.dora-O .dora-lettre{color:var(--bleu);}
+.dora-R{background:#fff3ec;border:2px solid var(--orange);}.dora-R .dora-lettre{color:var(--orange);}
+.dora-A{background:#f0f0ff;border:2px solid var(--marine);}.dora-A .dora-lettre{color:var(--marine);}
+
+/* ── COMPARE ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 16px;}
+.compare-card{border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.75;}
+.compare-card.dedie{background:#f0f4ff;border:2px solid var(--bleu);}
+.compare-card.routeur{background:#fff8f0;border:2px solid #f0c080;}
+.compare-card .cc-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;margin-bottom:8px;}
+.compare-card.dedie .cc-titre{color:var(--bleu);}
+.compare-card.routeur .cc-titre{color:var(--orange);}
+
+/* ── EXERCICES ── */
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+
+/* ── ZONES RÉPONSE ── */
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:42px;}.rep-sm{min-height:65px;}.rep-md{min-height:95px;}.rep-lg{min-height:130px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+
+/* ── BADGE VLAN ── */
+.badge-vlan{background:#e8f4fd;color:var(--bleu);border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;margin:1px 2px;}
+.badge-site{display:inline-block;background:var(--marine);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:1px 2px;}
+
+/* ── AUTO-ÉVAL ── */
+.autoeval{border:2px solid var(--marine);border-radius:8px;padding:16px;margin:24px 0;}
+.autoeval-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:14px;margin-bottom:14px;}
+.ae-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #e0e8f4;font-size:12px;}
+.ae-row:last-child{border-bottom:none;}
+.ae-critere{flex:1;}
+.ae-stars label{cursor:pointer;font-size:18px;padding:0 2px;}
+input[type="radio"].ae-radio{display:none;}
+.ae-note{font-size:11px;color:#888;width:90px;text-align:right;}
+
+/* ── PIED DE PAGE ── */
+.footer{text-align:center;font-size:10px;color:#888;padding:12px 28px 6px;border-top:1px solid var(--marine);margin-top:20px;}
+
+/* ── BARRE STICKY ── */
+.send-bar{position:fixed;bottom:0;left:0;width:100%;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:12px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:background .2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+</style>
+</head>
+<body>
+
+<!-- ══ EN-TÊTE ══ -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- ══ PAGE DE GARDE ══ -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S4 – Cours : Le protocole DHCP — automatisation de l'adressage IP</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 2h30 &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <!-- Tableau des compétences -->
+  <table class="comp-table">
+    <tr><th class="th-head">✔</th><th class="th-head">Code</th><th class="th-head">Compétence</th><th class="th-head">Bloc</th></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 1 — Concevoir, réaliser, maintenir</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td><td>Bloc 1</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td><td>Bloc 1</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau informatique</td><td>Bloc 1</td></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 2 — Installer, exploiter, valider</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td><td>Bloc 2</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système électronique ou informatique</td><td>Bloc 2</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td><td>Bloc 2</td></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 3 — Analyser, communiquer, coder</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle (français / anglais)</td><td>Bloc 3</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td><td>Bloc 3</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td><td>Bloc 3</td></tr>
+  </table>
+</div>
+
+<!-- ══ CONTENU ══ -->
+<div class="content">
+
+<!-- ══════════════════════════════════ PARTIE 1 ══════════════════════════════════ -->
+<h1>1. Pourquoi le DHCP ? — Rappels et mise en situation</h1>
+
+<h2>1.1 Le problème de l'adressage manuel</h2>
+
+<div class="mise-en-situation">
+  <strong>🏨 Situation Provence Évasion :</strong> Le groupe dispose de 4 sites (Apt, Roussillon, Saignon, Cucuron). Rien que sur le site d'Apt (le siège), on compte une cinquantaine de postes : PCs du personnel, téléphones IP, imprimantes réseau, tablettes WiFi, caméras IP… Si un technicien devait configurer manuellement l'adresse IP de chaque équipement, il passerait des heures sur chaque site, avec un risque élevé d'erreur ou de doublon d'adresse.
+</div>
+
+<p>Sans DHCP, chaque équipement réseau doit être configuré <strong>à la main</strong> avec :</p>
+<ul>
+  <li>Une adresse IP (unique dans le réseau)</li>
+  <li>Un masque de sous-réseau</li>
+  <li>Une passerelle par défaut</li>
+  <li>L'adresse du serveur DNS</li>
+</ul>
+<p>Cette méthode, appelée <strong>adressage statique</strong>, est acceptable pour les équipements fixes importants (serveurs, routeurs, switches, caméras fixes). Mais elle est <strong>ingérable à grande échelle</strong> pour les postes utilisateurs, les équipements mobiles ou les invités WiFi.</p>
+
+<h2>1.2 La solution : le protocole DHCP</h2>
+
+<p><strong>DHCP</strong> signifie <em>Dynamic Host Configuration Protocol</em> (protocole de configuration dynamique des hôtes). Il a été standardisé par le RFC 2131 en 1997.</p>
+<p>Son rôle est simple : quand un équipement se connecte au réseau, il <strong>demande automatiquement</strong> une configuration IP à un serveur DHCP. Ce serveur lui attribue une adresse disponible, ainsi que toutes les informations nécessaires.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Ce que le DHCP fournit automatiquement</div>
+  Un serveur DHCP distribue à chaque client qui en fait la demande :<br><br>
+  &nbsp;&nbsp;• Une <strong>adresse IP disponible</strong> dans la plage définie<br>
+  &nbsp;&nbsp;• Le <strong>masque de sous-réseau</strong><br>
+  &nbsp;&nbsp;• L'adresse de la <strong>passerelle par défaut</strong> (Default Gateway)<br>
+  &nbsp;&nbsp;• L'adresse du ou des <strong>serveurs DNS</strong><br>
+  &nbsp;&nbsp;• La <strong>durée de bail</strong> (Lease Time) : combien de temps l'adresse est réservée pour cet équipement
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 1 — Analyse du besoin</div>
+  <label class="qlabel">Q1.1 — Sur le site d'Apt (siège), on dénombre 12 PCs administration, 8 PCs accueil, 30 clients WiFi simultanés maximum et 6 caméras IP. Citez deux raisons concrètes pour lesquelles l'adressage statique serait problématique dans ce contexte.</label>
+  <textarea class="rep rep-md" id="q1-1" placeholder="Raison 1 :&#10;Raison 2 :"></textarea>
+  <label class="qlabel">Q1.2 — Parmi les équipements suivants, lesquels devraient selon vous garder une adresse IP fixe (statique), et pourquoi ? Routeur, PC d'un employé, serveur DHCP lui-même, imprimante réseau partagée, tablette invité WiFi, caméra IP.</label>
+  <textarea class="rep rep-md" id="q1-2" placeholder="Adresse statique : …&#10;Raison : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════ PARTIE 2 ══════════════════════════════════ -->
+<h1>2. Le protocole DORA — Comment le DHCP fonctionne</h1>
+
+<h2>2.1 Les 4 étapes du protocole</h2>
+
+<p>Quand un équipement se connecte au réseau sans adresse IP configurée, il déclenche automatiquement un échange en <strong>4 étapes</strong>, résumé par l'acronyme <strong>DORA</strong> :</p>
+
+<div class="dora-grid">
+  <div class="dora-card dora-D">
+    <div class="dora-lettre">D</div>
+    <div class="dora-nom">DISCOVER</div>
+    Le client envoie un message en <strong>broadcast</strong> (diffusion générale) pour trouver un serveur DHCP disponible.<br><br>
+    <em>Adresse source : 0.0.0.0<br>Adresse dest. : 255.255.255.255</em>
+  </div>
+  <div class="dora-card dora-O">
+    <div class="dora-lettre">O</div>
+    <div class="dora-nom">OFFER</div>
+    Le serveur DHCP répond en proposant une adresse IP disponible ainsi que le masque, la passerelle et la durée de bail.<br><br>
+    <em>La proposition est encore en broadcast</em>
+  </div>
+  <div class="dora-card dora-R">
+    <div class="dora-lettre">R</div>
+    <div class="dora-nom">REQUEST</div>
+    Le client accepte l'offre et envoie une demande officielle d'utilisation de l'adresse proposée (toujours en broadcast, pour prévenir les autres serveurs).<br><br>
+    <em>Il peut y avoir plusieurs serveurs DHCP</em>
+  </div>
+  <div class="dora-card dora-A">
+    <div class="dora-lettre">A</div>
+    <div class="dora-nom">ACKNOWLEDGE</div>
+    Le serveur confirme l'attribution. Le client peut désormais utiliser l'adresse IP. Le bail démarre.<br><br>
+    <em>Le serveur enregistre le bail dans sa table</em>
+  </div>
+</div>
+
+<h2>2.2 Schéma de l'échange DORA</h2>
+
+<div class="schema-box">
+  <div class="sch-titre">Échange DORA — Client DHCP ↔ Serveur DHCP (site d'Apt)</div>
+<pre>
+  CLIENT (PC-Accueil-1)                    SERVEUR DHCP (Apt)
+  [Pas encore d'adresse IP]                [192.168.11.1 — VLAN Administration]
+
+         │                                         │
+         │──── DISCOVER ──────────────────────────►│
+         │     src: 0.0.0.0  dst: 255.255.255.255  │
+         │     "Y a-t-il un serveur DHCP ?"        │
+         │                                         │
+         │◄─── OFFER ──────────────────────────────│
+         │     "Je te propose 192.168.12.10"       │
+         │     Masque / GW / DNS / Bail : 8h       │
+         │                                         │
+         │──── REQUEST ───────────────────────────►│
+         │     "J'accepte l'adresse 192.168.12.10" │
+         │     (broadcast pour annuler autres srv) │
+         │                                         │
+         │◄─── ACKNOWLEDGE ────────────────────────│
+         │     "C'est confirmé, bail accordé."     │
+         │     Le client peut l'utiliser.          │
+         │                                         │
+</pre>
+</div>
+
+<h2>2.3 La notion de bail (Lease Time)</h2>
+
+<p>Une adresse DHCP n'est pas attribuée <strong>définitivement</strong>. Elle est accordée pour une durée limitée appelée <strong>bail</strong> (<em>lease</em> en anglais).</p>
+<ul>
+  <li>Quand <strong>50 %</strong> du bail est écoulé, le client tente de le <strong>renouveler</strong> auprès du serveur.</li>
+  <li>Quand <strong>87,5 %</strong> du bail est écoulé, le client envoie un Discover en broadcast pour trouver n'importe quel serveur.</li>
+  <li>Si le bail expire sans renouvellement, l'adresse est <strong>libérée</strong> et redevient disponible.</li>
+</ul>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Durée de bail recommandée selon l'usage</div>
+  &nbsp;&nbsp;• <strong>Courte (1h à 4h)</strong> : VLAN clients WiFi (nombreux appareils éphémères, forte rotation)<br>
+  &nbsp;&nbsp;• <strong>Moyenne (8h)</strong> : VLAN personnel (journée de travail, poste souvent le même)<br>
+  &nbsp;&nbsp;• <strong>Longue (24h à 7j)</strong> : équipements quasi-fixes (imprimantes réseau par exemple)<br>
+  &nbsp;&nbsp;• <strong>Très longue ou statique</strong> : serveurs, routeurs, switches, caméras
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 2 — Comprendre DORA</div>
+  <label class="qlabel">Q2.1 — Pourquoi le message DISCOVER est-il envoyé en broadcast (vers 255.255.255.255) et non vers l'adresse du serveur DHCP directement ?</label>
+  <textarea class="rep rep-sm" id="q2-1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q2.2 — Que se passe-t-il si deux serveurs DHCP répondent simultanément à un DISCOVER ? Quelle étape du protocole permet de gérer ce cas ?</label>
+  <textarea class="rep rep-sm" id="q2-2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q2.3 — Pour le VLAN Clients-WiFi du site d'Apt, on attend des clients de passage (touristes, visiteurs d'une journée). Quelle durée de bail recommandez-vous ? Justifiez.</label>
+  <textarea class="rep rep-sm" id="q2-3" placeholder="Durée recommandée :&#10;Justification :"></textarea>
+  <label class="qlabel">Q2.4 — Vrai ou Faux ? « Un client DHCP ne peut obtenir qu'une seule adresse IP pendant toute la durée de vie de son équipement. » Expliquez.</label>
+  <textarea class="rep rep-sm" id="q2-4" placeholder="Vrai / Faux — Explication :"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════ PARTIE 3 ══════════════════════════════════ -->
+<h1>3. Serveur DHCP dédié vs DHCP sur routeur</h1>
+
+<h2>3.1 Deux façons de déployer le DHCP</h2>
+
+<div class="compare-grid">
+  <div class="compare-card dedie">
+    <div class="cc-titre">🖥 Serveur DHCP dédié</div>
+    Un équipement (PC, NAS, machine virtuelle…) est configuré spécifiquement pour faire office de serveur DHCP sur le réseau.<br><br>
+    <strong>Avantages :</strong><br>
+    &nbsp;• Performances et fiabilité élevées<br>
+    &nbsp;• Gestion centralisée de nombreux baux<br>
+    &nbsp;• Journaux détaillés, statistiques<br>
+    &nbsp;• Peut gérer plusieurs VLANs<br><br>
+    <strong>Inconvénients :</strong><br>
+    &nbsp;• Nécessite un équipement supplémentaire<br>
+    &nbsp;• Plus complexe à configurer au départ
+  </div>
+  <div class="compare-card routeur">
+    <div class="cc-titre">🔌 DHCP sur routeur Cisco IOS</div>
+    Le routeur Cisco intègre une fonction DHCP native. Aucun serveur supplémentaire n'est nécessaire.<br><br>
+    <strong>Avantages :</strong><br>
+    &nbsp;• Pas d'équipement supplémentaire<br>
+    &nbsp;• Simple à déployer sur petits réseaux<br>
+    &nbsp;• Intégré à la configuration IOS<br><br>
+    <strong>Inconvénients :</strong><br>
+    &nbsp;• Limité en nombre de baux<br>
+    &nbsp;• Charge supplémentaire sur le routeur<br>
+    &nbsp;• Journaux moins détaillés
+  </div>
+</div>
+
+<div class="mise-en-situation">
+  <strong>🏨 Choix pour Provence Évasion :</strong> Dans le cadre de ce projet, nous utiliserons la <strong>fonction DHCP intégrée aux routeurs Cisco IOS</strong> (émulés dans Packet Tracer). Dans une infrastructure réelle de la taille de Provence Évasion, Axentis préconiserait un serveur DHCP dédié (type Windows Server DHCP ou ISC DHCP sous Linux) pour plus de fiabilité.
+</div>
+
+<h2>3.2 Le problème du broadcast et les VLANs</h2>
+
+<p>Rappel important : un message DHCP Discover est un <strong>broadcast</strong>. Or, les broadcasts sont bloqués aux frontières des VLANs et des sous-réseaux. Si un client dans le VLAN 12 (Accueil Apt) envoie un Discover, ce message n'atteindra pas naturellement un serveur DHCP situé dans le VLAN 11 (Administration Apt).</p>
+
+<p>La solution : le <strong>DHCP Relay Agent</strong> (aussi appelé <em>ip helper-address</em> sur Cisco). On configure le routeur pour qu'il <strong>relaye</strong> les broadcasts DHCP vers l'adresse unicast du serveur DHCP centralisé.</p>
+
+<div class="schema-box">
+  <div class="sch-titre">DHCP Relay — Fonctionnement multi-VLAN (site d'Apt)</div>
+<pre>
+  VLAN 12 — Accueil                    ROUTEUR APT                  VLAN 11 — Admin
+  [PC-Accueil-1]                       [interface Gi0/0.12]         [Serveur DHCP]
+  [0.0.0.0]                            ip helper-address            [192.168.11.5]
+       │                               192.168.11.5                        │
+       │──── DISCOVER (broadcast) ───►│                                    │
+       │                              │──── REQUEST (unicast) ────────────►│
+       │                              │◄─── OFFER (unicast) ───────────────│
+       │◄─── OFFER ───────────────────│                                    │
+</pre>
+</div>
+
+<p>Dans Packet Tracer, comme nous configurons le DHCP directement <strong>sur le routeur</strong>, le relay n'est pas nécessaire : le routeur est à la fois le relay et le serveur.</p>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 3 — DHCP et VLANs</div>
+  <label class="qlabel">Q3.1 — Expliquez en vos propres mots pourquoi un client dans le VLAN 12 ne reçoit pas directement les réponses DHCP d'un serveur placé dans le VLAN 11.</label>
+  <textarea class="rep rep-sm" id="q3-1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q3.2 — Quelle est l'utilité de la commande ip helper-address sur un routeur Cisco ?</label>
+  <textarea class="rep rep-sm" id="q3-2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q3.3 — Dans notre maquette Packet Tracer, le routeur joue à la fois le rôle de… (complétez)</label>
+  <textarea class="rep rep-xs" id="q3-3" placeholder="Il joue le rôle de… et de…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════ PARTIE 4 ══════════════════════════════════ -->
+<h1>4. Configuration DHCP sur Cisco IOS — Commandes complètes</h1>
+
+<h2>4.1 Structure du plan d'adressage d'Apt (rappel)</h2>
+
+<p>Pour configurer correctement le DHCP, il faut connaître parfaitement le plan d'adressage du site. Voici un rappel des VLANs du <span class="badge-site">Site d'Apt</span> (siège social) :</p>
+
+<table class="data-table">
+  <tr>
+    <th>VLAN</th><th>Nom</th><th>Réseau</th><th>Masque</th><th>Passerelle (.1)</th><th>Plage DHCP</th><th>Bail</th>
+  </tr>
+  <tr>
+    <td class="center"><span class="badge-vlan">11</span></td>
+    <td class="left">Administration</td>
+    <td class="center">192.168.11.0</td>
+    <td class="center">/28</td>
+    <td class="center">192.168.11.1</td>
+    <td class="center">192.168.11.10 – .14</td>
+    <td class="center">8h</td>
+  </tr>
+  <tr>
+    <td class="center"><span class="badge-vlan">12</span></td>
+    <td class="left">Personnel Accueil</td>
+    <td class="center">192.168.12.0</td>
+    <td class="center">/27</td>
+    <td class="center">192.168.12.1</td>
+    <td class="center">192.168.12.10 – .30</td>
+    <td class="center">8h</td>
+  </tr>
+  <tr>
+    <td class="center"><span class="badge-vlan">13</span></td>
+    <td class="left">Clients WiFi</td>
+    <td class="center">192.168.13.0</td>
+    <td class="center">/25</td>
+    <td class="center">192.168.13.1</td>
+    <td class="center">192.168.13.10 – .126</td>
+    <td class="center">2h</td>
+  </tr>
+  <tr>
+    <td class="center"><span class="badge-vlan">14</span></td>
+    <td class="left">Caméras IP</td>
+    <td class="center">192.168.14.0</td>
+    <td class="center">/28</td>
+    <td class="center">192.168.14.1</td>
+    <td class="center">—</td>
+    <td class="center">Statique</td>
+  </tr>
+  <tr>
+    <td class="center"><span class="badge-vlan">15</span></td>
+    <td class="left">Serveurs</td>
+    <td class="center">192.168.15.0</td>
+    <td class="center">/28</td>
+    <td class="center">192.168.15.1</td>
+    <td class="center">—</td>
+    <td class="center">Statique</td>
+  </tr>
+</table>
+
+<div class="attention">
+  <strong>⚠ Important :</strong> Les caméras IP et les serveurs ont des adresses statiques. On ne configure pas de pool DHCP pour ces VLANs. Les adresses de la passerelle (.1) et des équipements fixes sont également <strong>exclues</strong> de la distribution DHCP pour éviter tout conflit.
+</div>
+
+<h2>4.2 Étape 1 — Exclure les adresses réservées</h2>
+
+<p>Avant de définir un pool DHCP, on commence <strong>toujours</strong> par exclure les adresses qui ne doivent pas être distribuées automatiquement : la passerelle, les serveurs, les imprimantes avec IP fixe, etc.</p>
+
+<div class="cli">
+<span class="cm-titre">Exclusions DHCP — Routeur d'Apt (Cisco IOS)</span>
+
+Router# <span class="cm-val">configure terminal</span>
+
+<span class="cm-com">─── Exclusions VLAN 11 Administration ───</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.11.1 192.168.11.9</span>   <span class="cm-com">← passerelle + adresses réservées</span>
+
+<span class="cm-com">─── Exclusions VLAN 12 Personnel Accueil ───</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.12.1 192.168.12.9</span>
+
+<span class="cm-com">─── Exclusions VLAN 13 Clients WiFi ───</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.13.1 192.168.13.9</span>   <span class="cm-com">← passerelle + AP WiFi</span>
+
+Router(config)# <span class="cm-val">end</span>
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Syntaxe — ip dhcp excluded-address</div>
+  <code>ip dhcp excluded-address [première adresse] [dernière adresse]</code><br><br>
+  Si une seule adresse est à exclure : <code>ip dhcp excluded-address 192.168.11.1</code><br>
+  Si une plage : <code>ip dhcp excluded-address 192.168.11.1 192.168.11.9</code>
+</div>
+
+<h2>4.3 Étape 2 — Créer les pools DHCP par VLAN</h2>
+
+<p>Un <strong>pool DHCP</strong> définit les paramètres attribués aux clients d'un VLAN donné. On crée un pool distinct pour chaque VLAN qui utilise DHCP.</p>
+
+<div class="cli">
+<span class="cm-titre">Pool DHCP — VLAN 11 Administration Apt</span>
+
+Router(config)# <span class="cm-val">ip dhcp pool VLAN11-Admin-Apt</span>           <span class="cm-com">← nom du pool (sans espace)</span>
+Router(dhcp-config)# <span class="cm-val">network 192.168.11.0 255.255.255.240</span>  <span class="cm-com">← réseau concerné + masque</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.11.1</span>           <span class="cm-com">← passerelle distribuée aux clients</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 192.168.15.2</span>               <span class="cm-com">← serveur DNS interne (VLAN Serveurs)</span>
+Router(dhcp-config)# <span class="cm-val">lease 0 8 0</span>                           <span class="cm-com">← bail : 0 jours, 8 heures, 0 minutes</span>
+Router(dhcp-config)# <span class="cm-val">exit</span>
+</div>
+
+<div class="cli">
+<span class="cm-titre">Pool DHCP — VLAN 12 Personnel Accueil Apt</span>
+
+Router(config)# <span class="cm-val">ip dhcp pool VLAN12-Accueil-Apt</span>
+Router(dhcp-config)# <span class="cm-val">network 192.168.12.0 255.255.255.224</span>  <span class="cm-com">← /27 = 255.255.255.224</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.12.1</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 192.168.15.2</span>
+Router(dhcp-config)# <span class="cm-val">lease 0 8 0</span>
+Router(dhcp-config)# <span class="cm-val">exit</span>
+</div>
+
+<div class="cli">
+<span class="cm-titre">Pool DHCP — VLAN 13 Clients WiFi Apt</span>
+
+Router(config)# <span class="cm-val">ip dhcp pool VLAN13-WiFi-Apt</span>
+Router(dhcp-config)# <span class="cm-val">network 192.168.13.0 255.255.255.128</span>  <span class="cm-com">← /25 = 255.255.255.128</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.13.1</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 8.8.8.8</span>                   <span class="cm-com">← DNS public pour les invités WiFi</span>
+Router(dhcp-config)# <span class="cm-val">lease 0 2 0</span>                           <span class="cm-com">← bail court : 2h pour les clients de passage</span>
+Router(dhcp-config)# <span class="cm-val">exit</span>
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Syntaxe de la commande lease</div>
+  <code>lease [jours] [heures] [minutes]</code><br><br>
+  Exemples :<br>
+  &nbsp;• <code>lease 0 8 0</code> → bail de 8 heures<br>
+  &nbsp;• <code>lease 1 0 0</code> → bail de 1 jour<br>
+  &nbsp;• <code>lease 7</code> → bail de 7 jours<br>
+  &nbsp;• <code>lease infinite</code> → bail infini (déconseillé en production)
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 4 — Rédiger des commandes DHCP</div>
+  <label class="qlabel">Q4.1 — Rédigez la commande d'exclusion pour le VLAN 13 Clients WiFi, en excluant la passerelle (.1), l'adresse du point d'accès WiFi (.2) et les 7 adresses suivantes.</label>
+  <textarea class="rep rep-xs" id="q4-1" placeholder="ip dhcp excluded-address …"></textarea>
+  <label class="qlabel">Q4.2 — Complétez les commandes manquantes pour créer le pool DHCP du VLAN 12 (Personnel Accueil Apt, réseau 192.168.12.0/27, passerelle .1, DNS interne 192.168.15.2, bail 8h) :</label>
+  <textarea class="rep rep-md" id="q4-2" placeholder="Router(config)# ip dhcp pool …&#10;Router(dhcp-config)# network …&#10;Router(dhcp-config)# default-router …&#10;Router(dhcp-config)# dns-server …&#10;Router(dhcp-config)# lease …"></textarea>
+  <label class="qlabel">Q4.3 — Pourquoi utilise-t-on le DNS public 8.8.8.8 pour le VLAN Clients WiFi, alors qu'on utilise le DNS interne 192.168.15.2 pour le personnel ?</label>
+  <textarea class="rep rep-sm" id="q4-3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════ PARTIE 5 ══════════════════════════════════ -->
+<h1>5. Réservations DHCP — Attribuer une adresse fixe via DHCP</h1>
+
+<h2>5.1 Principe de la réservation</h2>
+
+<p>Certains équipements ont besoin d'une <strong>adresse IP toujours identique</strong> (imprimante réseau, NAS, caméra IP gérée dynamiquement…), mais on veut quand même que cette adresse soit attribuée <strong>automatiquement via DHCP</strong> sans intervenir manuellement sur l'équipement.</p>
+
+<p>La solution : la <strong>réservation DHCP</strong>. On associe l'<strong>adresse MAC</strong> (l'identifiant matériel unique) d'un équipement à une adresse IP fixe. Chaque fois que cet équipement demande une adresse, le serveur DHCP lui donne toujours la même.</p>
+
+<div class="mise-en-situation">
+  <strong>🏨 Exemple Provence Évasion :</strong> L'imprimante réseau du VLAN 12 (Accueil Apt) doit toujours avoir l'adresse 192.168.12.5 pour que tous les postes puissent l'atteindre. Son adresse MAC est <code>0050.7966.6800</code>. On crée une réservation DHCP pour garantir cette attribution.
+</div>
+
+<h2>5.2 Commandes de réservation sur Cisco IOS</h2>
+
+<p>Dans Packet Tracer et sur IOS, une réservation se configure comme un pool DHCP spécial, avec la commande <strong>host</strong> (à la place de <em>network</em>) et la commande <strong>hardware-address</strong> pour préciser l'adresse MAC.</p>
+
+<div class="cli">
+<span class="cm-titre">Réservation DHCP — Imprimante VLAN 12 (Accueil Apt)</span>
+
+Router(config)# <span class="cm-val">ip dhcp pool RESERV-Imprimante-Accueil</span>
+Router(dhcp-config)# <span class="cm-val">host 192.168.12.5 255.255.255.224</span>       <span class="cm-com">← adresse réservée + masque</span>
+Router(dhcp-config)# <span class="cm-val">hardware-address 0050.7966.6800</span>          <span class="cm-com">← adresse MAC de l'imprimante</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.12.1</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 192.168.15.2</span>
+Router(dhcp-config)# <span class="cm-val">exit</span>
+</div>
+
+<div class="attention">
+  <strong>⚠ Important :</strong> L'adresse réservée (ici 192.168.12.5) doit <strong>aussi figurer dans les exclusions</strong> du pool général du VLAN 12, sinon le routeur pourrait l'attribuer à un autre client avant que l'imprimante ne se connecte. Vérifiez toujours la cohérence entre exclusions et réservations.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 5 — Créer une réservation</div>
+  <label class="qlabel">Q5.1 — Une caméra IP de surveillance du hall d'Apt (VLAN 14, adresse MAC 0060.3E9A.1200) doit toujours recevoir l'adresse 192.168.14.10 via DHCP. Rédigez les commandes IOS complètes pour créer cette réservation.</label>
+  <textarea class="rep rep-md" id="q5-1" placeholder="Router(config)# ip dhcp pool …&#10;Router(dhcp-config)# host …&#10;Router(dhcp-config)# hardware-address …&#10;…"></textarea>
+  <label class="qlabel">Q5.2 — Quelle commande d'exclusion complémentaire faudra-t-il ajouter (ou vérifier) pour que cette adresse 192.168.14.10 ne soit jamais attribuée à un autre équipement ?</label>
+  <textarea class="rep rep-xs" id="q5-2" placeholder="ip dhcp excluded-address …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════ PARTIE 6 ══════════════════════════════════ -->
+<h1>6. Vérification et dépannage DHCP</h1>
+
+<h2>6.1 Commandes de vérification</h2>
+
+<p>Une fois la configuration DHCP en place, il faut <strong>vérifier</strong> qu'elle fonctionne correctement. Cisco IOS propose plusieurs commandes <em>show</em> très utiles.</p>
+
+<div class="cli">
+<span class="cm-titre">Commandes de vérification DHCP — Routeur Apt</span>
+
+<span class="cm-com">─── Voir tous les baux actifs (adresses actuellement attribuées) ───</span>
+Router# <span class="cm-val">show ip dhcp binding</span>
+<span class="cm-com">
+IP address       Client-ID / HW addr   Lease expiration        Type
+192.168.12.10    0060.3E9A.1100        Jun 15 2026 10:00 AM    Automatic
+192.168.12.11    0060.3E9A.1101        Jun 15 2026 10:05 AM    Automatic
+192.168.12.5     0050.7966.6800        Infinite                Manual
+192.168.13.10    0060.5C4A.0001        Jun 15 2026 09:00 AM    Automatic</span>
+
+<span class="cm-com">─── Voir les statistiques DHCP (paquets échangés, erreurs) ───</span>
+Router# <span class="cm-val">show ip dhcp statistics</span>
+
+<span class="cm-com">─── Voir les pools DHCP configurés ───</span>
+Router# <span class="cm-val">show ip dhcp pool</span>
+
+<span class="cm-com">─── Voir les conflits d'adresses détectés ───</span>
+Router# <span class="cm-val">show ip dhcp conflict</span>
+
+<span class="cm-com">─── Supprimer tous les conflits enregistrés ───</span>
+Router# <span class="cm-val">clear ip dhcp conflict *</span>
+</div>
+
+<h2>6.2 Vérification côté client</h2>
+
+<p>Sur un PC connecté au réseau, on peut vérifier l'adresse IP obtenue via DHCP dans Packet Tracer depuis l'onglet <strong>Desktop → IP Configuration</strong> (mode DHCP sélectionné). On peut aussi utiliser la commande <strong>ipconfig</strong> dans l'invite de commandes du PC simulé.</p>
+
+<div class="cli">
+<span class="cm-titre">Vérification côté client — Invite de commandes Packet Tracer</span>
+
+C:\> <span class="cm-val">ipconfig</span>
+<span class="cm-com">
+FastEthernet0 Connection:(default port)
+   Connection-specific DNS Suffix..:
+   Link-local IPv6 Address.........: FE80::201:97FF:FE5E:B401
+   IPv6 Address....................: ::
+   IPv4 Address....................: 192.168.12.10
+   Subnet Mask.....................: 255.255.255.224
+   Default Gateway.................: 192.168.12.1</span>
+
+C:\> <span class="cm-val">ipconfig /release</span>   <span class="cm-com">← libère le bail actuel (force un renouvellement)</span>
+C:\> <span class="cm-val">ipconfig /renew</span>    <span class="cm-com">← demande un nouveau bail (redéclenche DORA)</span>
+</div>
+
+<h2>6.3 Problèmes courants et diagnostic</h2>
+
+<table class="data-table">
+  <tr>
+    <th>Symptôme</th><th>Cause probable</th><th>Action corrective</th>
+  </tr>
+  <tr>
+    <td class="left">Le client obtient 169.254.x.x (APIPA)</td>
+    <td class="left">Aucun serveur DHCP joignable</td>
+    <td class="left">Vérifier la configuration du pool, les VLANs et le trunk</td>
+  </tr>
+  <tr>
+    <td class="left">Conflit d'adresse (ping échoue)</td>
+    <td class="left">Adresse non exclue attribuée deux fois</td>
+    <td class="left"><code>show ip dhcp conflict</code> puis <code>clear ip dhcp conflict *</code></td>
+  </tr>
+  <tr>
+    <td class="left">Pool DHCP vide (no addresses)</td>
+    <td class="left">Toutes les adresses sont épuisées ou trop d'exclusions</td>
+    <td class="left">Revoir les exclusions ou agrandir le pool (augmenter /masque)</td>
+  </tr>
+  <tr>
+    <td class="left">Client DHCP d'un VLAN obtient l'adresse d'un autre VLAN</td>
+    <td class="left">Pool mal configuré (mauvais réseau déclaré)</td>
+    <td class="left">Vérifier la commande <code>network</code> de chaque pool</td>
+  </tr>
+</table>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 APIPA — 169.254.x.x</div>
+  Quand un client ne reçoit aucune réponse DHCP après plusieurs tentatives, il s'attribue <strong>automatiquement</strong> une adresse dans la plage <strong>169.254.0.0/16</strong> (APIPA — Automatic Private IP Addressing). C'est le signe que le serveur DHCP est inaccessible ou mal configuré.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 6 — Lecture de show ip dhcp binding</div>
+  <label class="qlabel">Q6.1 — Après avoir configuré les pools DHCP du site d'Apt, vous tapez <code>show ip dhcp binding</code> et vous observez que l'adresse 192.168.12.5 est marquée "Manual" alors que toutes les autres sont "Automatic". Qu'est-ce que cela signifie ?</label>
+  <textarea class="rep rep-sm" id="q6-1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q6.2 — Un PC du VLAN 12 démarre et obtient l'adresse 169.254.87.33. Listez les causes possibles et les vérifications à effectuer (au moins 3).</label>
+  <textarea class="rep rep-md" id="q6-2" placeholder="1. …&#10;2. …&#10;3. …"></textarea>
+  <label class="qlabel">Q6.3 — Vous souhaitez forcer un client Packet Tracer à redemander une adresse IP au serveur DHCP. Quelle séquence de commandes utilisez-vous dans l'invite de commandes du PC ?</label>
+  <textarea class="rep rep-xs" id="q6-3" placeholder="Commandes …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════ PARTIE 7 ══════════════════════════════════ -->
+<h1>7. Synthèse — Configuration complète pour le site d'Apt</h1>
+
+<h2>7.1 Récapitulatif des commandes dans l'ordre</h2>
+
+<p>Voici la séquence complète à appliquer sur le routeur du site d'Apt pour configurer le DHCP de tous les VLANs actifs :</p>
+
+<div class="cli">
+<span class="cm-titre">Configuration DHCP complète — Routeur Apt (ordre recommandé)</span>
+
+Router# <span class="cm-val">configure terminal</span>
+
+<span class="cm-com">══ ÉTAPE 1 : Exclusions ══</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.11.1 192.168.11.9</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.12.1 192.168.12.9</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.13.1 192.168.13.9</span>
+
+<span class="cm-com">══ ÉTAPE 2 : Pool VLAN 11 Administration ══</span>
+Router(config)# <span class="cm-val">ip dhcp pool VLAN11-Admin-Apt</span>
+Router(dhcp-config)# <span class="cm-val">network 192.168.11.0 255.255.255.240</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.11.1</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 192.168.15.2</span>
+Router(dhcp-config)# <span class="cm-val">lease 0 8 0</span>
+Router(dhcp-config)# <span class="cm-val">exit</span>
+
+<span class="cm-com">══ ÉTAPE 3 : Pool VLAN 12 Accueil ══</span>
+Router(config)# <span class="cm-val">ip dhcp pool VLAN12-Accueil-Apt</span>
+Router(dhcp-config)# <span class="cm-val">network 192.168.12.0 255.255.255.224</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.12.1</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 192.168.15.2</span>
+Router(dhcp-config)# <span class="cm-val">lease 0 8 0</span>
+Router(dhcp-config)# <span class="cm-val">exit</span>
+
+<span class="cm-com">══ ÉTAPE 4 : Pool VLAN 13 Clients WiFi ══</span>
+Router(config)# <span class="cm-val">ip dhcp pool VLAN13-WiFi-Apt</span>
+Router(dhcp-config)# <span class="cm-val">network 192.168.13.0 255.255.255.128</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.13.1</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 8.8.8.8</span>
+Router(dhcp-config)# <span class="cm-val">lease 0 2 0</span>
+Router(dhcp-config)# <span class="cm-val">exit</span>
+
+<span class="cm-com">══ ÉTAPE 5 : Réservation imprimante VLAN 12 ══</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.12.5</span>          <span class="cm-com">← exclure avant de réserver</span>
+Router(config)# <span class="cm-val">ip dhcp pool RESERV-Imprimante-Accueil</span>
+Router(dhcp-config)# <span class="cm-val">host 192.168.12.5 255.255.255.224</span>
+Router(dhcp-config)# <span class="cm-val">hardware-address 0050.7966.6800</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.12.1</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 192.168.15.2</span>
+Router(dhcp-config)# <span class="cm-val">exit</span>
+
+<span class="cm-com">══ ÉTAPE 6 : Sauvegarde ══</span>
+Router(config)# <span class="cm-val">end</span>
+Router# <span class="cm-val">write memory</span>                                            <span class="cm-com">← sauvegarde obligatoire !</span>
+Router# <span class="cm-val">show ip dhcp pool</span>                                        <span class="cm-com">← vérification finale</span>
+</div>
+
+<h2>7.2 Tableau récapitulatif des commandes clés</h2>
+
+<table class="data-table">
+  <tr>
+    <th>Commande</th><th>Mode</th><th>Effet</th>
+  </tr>
+  <tr>
+    <td class="left"><code>ip dhcp excluded-address X.X.X.X Y.Y.Y.Y</code></td>
+    <td class="center">Config globale</td>
+    <td class="left">Exclut une plage d'adresses de la distribution DHCP</td>
+  </tr>
+  <tr>
+    <td class="left"><code>ip dhcp pool NOM</code></td>
+    <td class="center">Config globale</td>
+    <td class="left">Crée un pool DHCP et entre en mode dhcp-config</td>
+  </tr>
+  <tr>
+    <td class="left"><code>network X.X.X.X M.M.M.M</code></td>
+    <td class="center">dhcp-config</td>
+    <td class="left">Définit le réseau et le masque du pool</td>
+  </tr>
+  <tr>
+    <td class="left"><code>default-router X.X.X.X</code></td>
+    <td class="center">dhcp-config</td>
+    <td class="left">Définit la passerelle à distribuer aux clients</td>
+  </tr>
+  <tr>
+    <td class="left"><code>dns-server X.X.X.X</code></td>
+    <td class="center">dhcp-config</td>
+    <td class="left">Définit le serveur DNS à distribuer aux clients</td>
+  </tr>
+  <tr>
+    <td class="left"><code>lease J H M</code></td>
+    <td class="center">dhcp-config</td>
+    <td class="left">Définit la durée du bail (jours, heures, minutes)</td>
+  </tr>
+  <tr>
+    <td class="left"><code>host X.X.X.X M.M.M.M</code></td>
+    <td class="center">dhcp-config</td>
+    <td class="left">Réservation — adresse fixe pour un équipement</td>
+  </tr>
+  <tr>
+    <td class="left"><code>hardware-address AAAA.BBBB.CCCC</code></td>
+    <td class="center">dhcp-config</td>
+    <td class="left">Lie la réservation à l'adresse MAC de l'équipement</td>
+  </tr>
+  <tr>
+    <td class="left"><code>show ip dhcp binding</code></td>
+    <td class="center">Privilégié</td>
+    <td class="left">Affiche tous les baux actifs (adresses distribuées)</td>
+  </tr>
+  <tr>
+    <td class="left"><code>show ip dhcp pool</code></td>
+    <td class="center">Privilégié</td>
+    <td class="left">Affiche les pools configurés et leur utilisation</td>
+  </tr>
+  <tr>
+    <td class="left"><code>show ip dhcp conflict</code></td>
+    <td class="center">Privilégié</td>
+    <td class="left">Affiche les conflits d'adresses détectés</td>
+  </tr>
+  <tr>
+    <td class="left"><code>clear ip dhcp binding *</code></td>
+    <td class="center">Privilégié</td>
+    <td class="left">Supprime tous les baux actifs (réinitialisation)</td>
+  </tr>
+</table>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════ EXERCICE SYNTHÈSE ══════════════════════════════════ -->
+<div class="exercice-synth">
+  <div class="exercice-titre">📋 Exercice de synthèse — Site de Roussillon</div>
+  <p style="margin-bottom:12px;">Le site de <span class="badge-site">Roussillon</span> possède les VLANs suivants avec le plan d'adressage ci-dessous. Vous devez configurer le DHCP complet sur le routeur de Roussillon.</p>
+
+  <table class="data-table" style="margin-bottom:14px;">
+    <tr>
+      <th>VLAN</th><th>Nom</th><th>Réseau</th><th>Masque</th><th>Passerelle</th><th>Plage DHCP souhaitée</th><th>Bail</th>
+    </tr>
+    <tr>
+      <td class="center"><span class="badge-vlan">21</span></td>
+      <td class="left">Personnel</td>
+      <td class="center">192.168.21.0</td>
+      <td class="center">/26</td>
+      <td class="center">192.168.21.1</td>
+      <td class="center">.10 à .60</td>
+      <td class="center">8h</td>
+    </tr>
+    <tr>
+      <td class="center"><span class="badge-vlan">22</span></td>
+      <td class="left">Clients WiFi</td>
+      <td class="center">192.168.22.0</td>
+      <td class="center">/25</td>
+      <td class="center">192.168.22.1</td>
+      <td class="center">.10 à .126</td>
+      <td class="center">2h</td>
+    </tr>
+    <tr>
+      <td class="center"><span class="badge-vlan">23</span></td>
+      <td class="left">Caméras IP</td>
+      <td class="center">192.168.23.0</td>
+      <td class="center">/28</td>
+      <td class="center">192.168.23.1</td>
+      <td class="center">Adresses statiques</td>
+      <td class="center">—</td>
+    </tr>
+    <tr>
+      <td class="center"><span class="badge-vlan">24</span></td>
+      <td class="left">Administration</td>
+      <td class="center">192.168.24.0</td>
+      <td class="center">/28</td>
+      <td class="center">192.168.24.1</td>
+      <td class="center">.10 à .14</td>
+      <td class="center">8h</td>
+    </tr>
+  </table>
+
+  <label class="qlabel">ES.1 — Rédigez toutes les commandes d'exclusion nécessaires (VLANs 21, 22, 24 — pensez à la passerelle et aux adresses réservées avant la plage DHCP).</label>
+  <textarea class="rep rep-md" id="es1" placeholder="ip dhcp excluded-address …&#10;ip dhcp excluded-address …&#10;ip dhcp excluded-address …"></textarea>
+
+  <label class="qlabel">ES.2 — Rédigez la configuration complète du pool DHCP pour le VLAN 21 (Personnel Roussillon). DNS interne : 192.168.15.2 (site d'Apt).</label>
+  <textarea class="rep rep-md" id="es2" placeholder="Router(config)# ip dhcp pool …&#10;…"></textarea>
+
+  <label class="qlabel">ES.3 — Rédigez la configuration complète du pool DHCP pour le VLAN 22 (Clients WiFi Roussillon). DNS : 8.8.8.8 pour les invités.</label>
+  <textarea class="rep rep-md" id="es3" placeholder="Router(config)# ip dhcp pool …&#10;…"></textarea>
+
+  <label class="qlabel">ES.4 — Rédigez la configuration complète du pool DHCP pour le VLAN 24 (Administration Roussillon). DNS interne : 192.168.15.2.</label>
+  <textarea class="rep rep-md" id="es4" placeholder="Router(config)# ip dhcp pool …&#10;…"></textarea>
+
+  <label class="qlabel">ES.5 — Le NAS (stockage réseau) du VLAN 21 doit toujours recevoir l'adresse 192.168.21.5. Son adresse MAC est 0090.2B3C.4D01. Créez la réservation DHCP complète.</label>
+  <textarea class="rep rep-md" id="es5" placeholder="Router(config)# ip dhcp excluded-address …&#10;Router(config)# ip dhcp pool …&#10;…"></textarea>
+
+  <label class="qlabel">ES.6 — Après avoir appliqué votre configuration, quelle commande tapez-vous pour vérifier que les baux sont bien attribués ? Que devriez-vous observer pour le NAS ?</label>
+  <textarea class="rep rep-sm" id="es6" placeholder="Commande : …&#10;Résultat attendu pour le NAS : …"></textarea>
+
+  <label class="qlabel">ES.7 — Pourquoi ne crée-t-on pas de pool DHCP pour le VLAN 23 Caméras IP ?</label>
+  <textarea class="rep rep-sm" id="es7" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══════════════════════════════════ AUTO-ÉVALUATION ══════════════════════════════════ -->
+<div class="autoeval">
+  <div class="autoeval-titre">⭐ Auto-évaluation — S4 Cours DHCP</div>
+  <div id="ae-container"></div>
+</div>
+
+</div><!-- /content -->
+
+<!-- ══ PIED DE PAGE ══ -->
+<div class="footer">
+  Projet Provence Évasion — S4 Cours : Le protocole DHCP &nbsp;|&nbsp; Lycée Louis Lumière – Chelles &nbsp;|&nbsp; Bac Pro CIEL · Terminale · 2025-2026
+</div>
+
+<!-- ══ BARRE STICKY ══ -->
+<div class="send-bar">
+  <div class="send-info">Remplissez toutes les zones avant de télécharger vos réponses.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+/* ── Date du jour ── */
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+/* ── Auto-évaluation ── */
+const criteres = [
+  "Je sais expliquer le rôle du protocole DHCP dans un réseau",
+  "Je connais les 4 étapes du protocole DORA (Discover, Offer, Request, Acknowledge)",
+  "Je comprends la notion de bail DHCP et sais choisir une durée adaptée",
+  "Je sais configurer des exclusions DHCP sur un routeur Cisco IOS",
+  "Je sais créer un pool DHCP complet (network, default-router, dns-server, lease)",
+  "Je sais créer une réservation DHCP liée à une adresse MAC",
+  "Je sais utiliser show ip dhcp binding pour vérifier les baux attribués",
+  "Je comprends pourquoi certains VLANs n'ont pas de pool DHCP (adresses statiques)",
+  "Je sais diagnostiquer une adresse APIPA (169.254.x.x) et ses causes"
+];
+
+const niveaux = [
+  {val:"maitrise",  label:"★★★", title:"Maîtrisé",  color:"#8BC34A"},
+  {val:"en_cours",  label:"★★☆", title:"En cours",   color:"#FF9800"},
+  {val:"a_revoir",  label:"★☆☆", title:"À revoir",   color:"#FF5722"},
+  {val:"non_traite",label:"?",   title:"Non traité", color:"#aaa"}
+];
+
+const aeData = {};
+const container = document.getElementById('ae-container');
+
+criteres.forEach((crit, i) => {
+  aeData['ae_' + i] = {critere: crit, niveau: 'non_traite'};
+  const row = document.createElement('div');
+  row.className = 'ae-row';
+  row.innerHTML = `<div class="ae-critere">${crit}</div><div class="ae-stars" id="stars-${i}"></div><div class="ae-note" id="note-${i}" style="color:#aaa">Non traité</div>`;
+  container.appendChild(row);
+
+  const starsDiv = document.getElementById('stars-' + i);
+  niveaux.forEach(n => {
+    const lbl = document.createElement('label');
+    lbl.title = n.title;
+    lbl.style.color = '#ccc';
+    lbl.style.cursor = 'pointer';
+    lbl.innerHTML = n.label;
+    lbl.addEventListener('click', () => {
+      aeData['ae_' + i].niveau = n.val;
+      starsDiv.querySelectorAll('label').forEach((l, li) => {
+        l.style.color = li === niveaux.indexOf(n) ? n.color : '#ccc';
+      });
+      const noteDiv = document.getElementById('note-' + i);
+      noteDiv.textContent = n.title;
+      noteDiv.style.color = n.color;
+    });
+    starsDiv.appendChild(lbl);
+  });
+});
+
+/* ── Génération JSON ── */
+function genererJSON() {
+  const nom    = document.getElementById('eleve-nom').value.trim() || 'NomInconnu';
+  const prenom = document.getElementById('eleve-prenom').value.trim() || 'PrenomInconnu';
+  const classe = document.getElementById('eleve-classe').value.trim();
+  const date   = document.getElementById('eleve-date').value;
+
+  const data = {
+    meta: {
+      devoir: "S4 — Cours : Le protocole DHCP",
+      seance: "S4",
+      eleve: {nom, prenom, classe},
+      date,
+      genere_le: new Date().toISOString()
+    },
+    partie1_besoin_dhcp: {
+      q1_1: document.getElementById('q1-1').value,
+      q1_2: document.getElementById('q1-2').value
+    },
+    partie2_protocole_dora: {
+      q2_1: document.getElementById('q2-1').value,
+      q2_2: document.getElementById('q2-2').value,
+      q2_3: document.getElementById('q2-3').value,
+      q2_4: document.getElementById('q2-4').value
+    },
+    partie3_dhcp_vlan: {
+      q3_1: document.getElementById('q3-1').value,
+      q3_2: document.getElementById('q3-2').value,
+      q3_3: document.getElementById('q3-3').value
+    },
+    partie4_commandes_ios: {
+      q4_1: document.getElementById('q4-1').value,
+      q4_2: document.getElementById('q4-2').value,
+      q4_3: document.getElementById('q4-3').value
+    },
+    partie5_reservations: {
+      q5_1: document.getElementById('q5-1').value,
+      q5_2: document.getElementById('q5-2').value
+    },
+    partie6_verification: {
+      q6_1: document.getElementById('q6-1').value,
+      q6_2: document.getElementById('q6-2').value,
+      q6_3: document.getElementById('q6-3').value
+    },
+    exercice_synthese_roussillon: {
+      es1: document.getElementById('es1').value,
+      es2: document.getElementById('es2').value,
+      es3: document.getElementById('es3').value,
+      es4: document.getElementById('es4').value,
+      es5: document.getElementById('es5').value,
+      es6: document.getElementById('es6').value,
+      es7: document.getElementById('es7').value
+    },
+    auto_evaluation: aeData
+  };
+
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const safe = (nom + prenom).replace(/[^a-zA-Z0-9]/g, '') || 'Eleve';
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `${safe}_S4_Cours_DHCP.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  const toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>

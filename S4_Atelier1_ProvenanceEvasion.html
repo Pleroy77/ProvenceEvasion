@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S4 — Atelier 1 : Configuration DHCP — Site d'Apt</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 100px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:28px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.75;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.85;}
+strong{font-weight:600;}
+.sep{border:none;border-top:1px solid #d0dde8;margin:22px 0;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.75;}
+.mise-en-situation strong{color:#4a7a1a;}
+.consigne{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.consigne strong{color:var(--orange);}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.attention strong{color:var(--orange);}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.8;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.data-table td input[type="text"]{width:100%;border:1px solid #b0c8e0;border-radius:3px;padding:3px 6px;font-family:'Montserrat',sans-serif;font-size:12px;}
+.data-table td input[type="text"]:focus{outline:none;border-color:var(--bleu);}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:2;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}.cli .cm-val{color:#FFD54F;}.cli .cm-titre{color:#5BB8E8;font-weight:700;}.cli .cm-prompt{color:#FF5722;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.pt-step{background:var(--ciel-bg);border-left:4px solid var(--bleu);padding:10px 14px;margin:8px 0;border-radius:0 6px 6px 0;font-size:12px;line-height:1.75;}
+.pt-num{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-right:8px;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.dossier-section{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:16px 18px;margin:16px 0;}
+.dossier-titre{display:flex;justify-content:space-between;align-items:center;font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:12px;border-bottom:2px solid var(--bleu);padding-bottom:6px;}
+.dossier-num{background:var(--bleu);color:#fff;border-radius:4px;padding:2px 10px;font-size:11px;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:42px;}.rep-sm{min-height:65px;}.rep-md{min-height:95px;}.rep-lg{min-height:130px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.badge-vlan{background:#e8f4fd;color:var(--bleu);border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;display:inline-block;margin:1px 2px;}
+.badge-site{display:inline-block;background:var(--marine);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:1px 2px;}
+.upload-zone{border:2px dashed var(--bleu);border-radius:8px;padding:18px;text-align:center;background:var(--ciel-bg);cursor:pointer;margin:6px 0 10px;}
+.upload-zone input[type=file]{display:none;}
+.upload-text{font-weight:600;color:var(--bleu);margin-bottom:4px;}
+.upload-hint{font-size:11px;color:#888;}
+.autoeval{border:2px solid var(--marine);border-radius:8px;padding:16px;margin:24px 0;}
+.autoeval-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:14px;margin-bottom:14px;}
+.ae-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #e0e8f4;font-size:12px;}
+.ae-row:last-child{border-bottom:none;}
+.ae-critere{flex:1;}
+.ae-stars label{cursor:pointer;font-size:18px;padding:0 2px;}
+.ae-note{font-size:11px;color:#888;width:90px;text-align:right;}
+.footer{text-align:center;font-size:10px;color:#888;padding:12px 28px 6px;border-top:1px solid var(--marine);margin-top:20px;}
+.send-bar{position:fixed;bottom:0;left:0;width:100%;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:12px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:background .2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S4 – Atelier 1 : Configuration DHCP sur le routeur — Site d'Apt</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Année 2025-2026</div>
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+  <table class="comp-table">
+    <tr><th class="th-head">✔</th><th class="th-head">Code</th><th class="th-head">Compétence</th><th class="th-head">Bloc</th></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 1 — Concevoir, réaliser, maintenir</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td><td>Bloc 1</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td><td>Bloc 1</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau informatique</td><td>Bloc 1</td></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 2 — Installer, exploiter, valider</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td><td>Bloc 2</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système électronique ou informatique</td><td>Bloc 2</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td><td>Bloc 2</td></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 3 — Analyser, communiquer, coder</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle (français / anglais)</td><td>Bloc 3</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td><td>Bloc 3</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td><td>Bloc 3</td></tr>
+  </table>
+</div>
+
+<div class="content">
+
+<h1>1. Contexte et objectifs de l'atelier</h1>
+
+<div class="mise-en-situation">
+  <strong>🏨 Mission Axentis :</strong> Le site d'Apt (siège de Provence Évasion) compte 3 VLANs actifs nécessitant une distribution automatique d'adresses IP : VLAN 11 (Administration), VLAN 12 (Accueil) et VLAN 13 (Clients WiFi). Votre mission est de configurer le service DHCP directement sur le routeur Cisco du site, à partir du fichier Packet Tracer fourni par votre professeur.
+</div>
+
+<p><strong>À l'issue de cet atelier, vous serez capable de :</strong></p>
+<ul>
+  <li>Configurer des exclusions DHCP sur un routeur Cisco IOS</li>
+  <li>Créer des pools DHCP par VLAN avec les bons paramètres</li>
+  <li>Vérifier l'attribution automatique des adresses sur les postes clients</li>
+  <li>Créer une réservation DHCP liée à une adresse MAC</li>
+  <li>Utiliser les commandes de vérification DHCP</li>
+</ul>
+
+<div class="consigne">
+  <strong>📋 Fichier de départ :</strong> Ouvrez le fichier <strong>PE_Apt_S3_Atelier2.pkt</strong> (topology d'Apt avec VLANs et trunk déjà configurés). Sauvegardez-le immédiatement sous <strong>PE_Apt_S4_Atelier1.pkt</strong> avant toute modification.
+</div>
+
+<h2>1.1 Rappel de la topologie d'Apt</h2>
+
+<div class="schema-box">
+  <div class="sch-titre">Topologie réseau — Site d'Apt (Siège Provence Évasion)</div>
+<pre>
+                    ROUTEUR Cisco (sous-interfaces)
+                    Gi0/0.11 — 192.168.11.1  (VLAN 11 Admin)
+                    Gi0/0.12 — 192.168.12.1  (VLAN 12 Accueil)
+                    Gi0/0.13 — 192.168.13.1  (VLAN 13 WiFi)
+                         │ Gi0/0 (Trunk)
+                         │
+               ┌─────────────────────────────┐
+               │      SWITCH Cisco 2960       │
+               │                             │
+  PC-Admin-1   ┤─ Fa0/1  (Access VLAN 11)   │
+  PC-Admin-2   ┤─ Fa0/2  (Access VLAN 11)   │
+  PC-Accueil-1 ┤─ Fa0/5  (Access VLAN 12)   │
+  PC-Accueil-2 ┤─ Fa0/6  (Access VLAN 12)   │
+  AP-WiFi      ┤─ Fa0/9  (Access VLAN 13)   │
+  PC-WiFi-1    ┤─ (connecté à l'AP WiFi)    │
+  Imprimante   ┤─ Fa0/8  (Access VLAN 12)   │
+               └─────────────────────────────┘
+</pre>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Prise en main — Avant de commencer</div>
+  <label class="qlabel">Q1.1 — Vérifiez sur votre maquette Packet Tracer que les VLANs et les ports sont bien configurés. Tapez <code>show vlan brief</code> sur le switch. Copiez ici le résultat obtenu.</label>
+  <textarea class="rep rep-md" id="q1-1" placeholder="Coller le résultat de show vlan brief…"></textarea>
+  <label class="qlabel">Q1.2 — Tapez <code>show interfaces trunk</code> sur le switch. Le port trunk vers le routeur est-il bien actif ? Notez le port et le mode observé.</label>
+  <textarea class="rep rep-sm" id="q1-2" placeholder="Port trunk : … Mode : …"></textarea>
+  <label class="qlabel">Q1.3 — Actuellement, quelle adresse IP possède PC-Admin-1 ? (regardez sa config IP dans Packet Tracer). Expliquez pourquoi elle sera différente après cet atelier.</label>
+  <textarea class="rep rep-sm" id="q1-3" placeholder="Adresse actuelle : …&#10;Différence après atelier : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<h1>2. Préparation — Passage des PCs en mode DHCP</h1>
+
+<p>Avant de configurer le serveur DHCP sur le routeur, il faut d'abord passer tous les PC clients en mode DHCP dans Packet Tracer, pour qu'ils demandent automatiquement leur configuration réseau.</p>
+
+<div class="pt-step"><span class="pt-num">Étape 1</span> Cliquez sur <strong>PC-Admin-1</strong> → onglet <strong>Desktop</strong> → <strong>IP Configuration</strong>.</div>
+<div class="pt-step"><span class="pt-num">Étape 2</span> Sélectionnez l'option <strong>DHCP</strong> (au lieu de Static). Le PC affiche immédiatement <em>"DHCP request failed"</em> — c'est normal, le serveur n'est pas encore configuré.</div>
+<div class="pt-step"><span class="pt-num">Étape 3</span> Répétez pour <strong>PC-Admin-2</strong>, <strong>PC-Accueil-1</strong>, <strong>PC-Accueil-2</strong> et <strong>PC-WiFi-1</strong>.</div>
+<div class="pt-step"><span class="pt-num">Étape 4</span> L'imprimante réseau reste en IP statique (192.168.12.5 — elle aura une réservation).</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Question intermédiaire</div>
+  <label class="qlabel">Q2.1 — Après avoir passé les PC en mode DHCP (avant toute config routeur), quelle adresse affichent-ils ? Pourquoi cette adresse particulière ?</label>
+  <textarea class="rep rep-sm" id="q2-1" placeholder="Adresse observée : …&#10;Explication : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<h1>3. Configuration des exclusions DHCP sur le routeur</h1>
+
+<div class="consigne">
+  <strong>📋 Consigne :</strong> Connectez-vous au routeur via le port Console (cliquez sur le routeur → onglet CLI). Entrez en mode configuration globale avec <code>enable</code> puis <code>configure terminal</code>.
+</div>
+
+<h2>3.1 Plan des exclusions à appliquer</h2>
+
+<table class="data-table">
+  <tr><th>VLAN</th><th>Réseau</th><th>Adresses à exclure</th><th>Raison</th></tr>
+  <tr><td class="center"><span class="badge-vlan">11</span></td><td class="center">192.168.11.0/28</td><td class="center">192.168.11.1 – .9</td><td class="left">Passerelle (.1), adresses réservées futures</td></tr>
+  <tr><td class="center"><span class="badge-vlan">12</span></td><td class="center">192.168.12.0/27</td><td class="center">192.168.12.1 – .9</td><td class="left">Passerelle (.1), imprimante (.5) incluse dans cette plage</td></tr>
+  <tr><td class="center"><span class="badge-vlan">13</span></td><td class="center">192.168.13.0/25</td><td class="center">192.168.13.1 – .9</td><td class="left">Passerelle (.1), point d'accès WiFi (.2)</td></tr>
+</table>
+
+<div class="dossier-section">
+  <div class="dossier-titre">Dossier de travail 1 — Saisie des exclusions <span class="dossier-num">À faire</span></div>
+  <p>Saisissez les commandes d'exclusion suivantes sur le routeur :</p>
+  <div class="cli"><span class="cm-titre">Exclusions DHCP — Routeur Apt</span>
+
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.11.1 192.168.11.9</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.12.1 192.168.12.9</span>
+Router(config)# <span class="cm-val">ip dhcp excluded-address 192.168.13.1 192.168.13.9</span></div>
+  <label class="qlabel">DT1.1 — Après avoir saisi les exclusions, comment pouvez-vous vérifier qu'elles sont bien enregistrées dans la configuration ? (indice : commande show running-config)</label>
+  <textarea class="rep rep-sm" id="dt1-1" placeholder="Commande utilisée : …&#10;Ce que vous observez : …"></textarea>
+  <label class="qlabel">DT1.2 — Pourquoi exclut-on les adresses .1 à .9 et non seulement .1 (la passerelle) ?</label>
+  <textarea class="rep rep-sm" id="dt1-2" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<h1>4. Création des pools DHCP par VLAN</h1>
+
+<h2>4.1 Pool VLAN 11 — Administration</h2>
+
+<div class="dossier-section">
+  <div class="dossier-titre">Dossier de travail 2 — Pool VLAN 11 Administration <span class="dossier-num">À faire</span></div>
+  <p>Créez le pool DHCP pour le VLAN Administration :</p>
+  <div class="cli"><span class="cm-titre">Pool DHCP — VLAN 11 Administration Apt</span>
+
+Router(config)# <span class="cm-val">ip dhcp pool VLAN11-Admin-Apt</span>
+Router(dhcp-config)# <span class="cm-val">network 192.168.11.0 255.255.255.240</span>
+Router(dhcp-config)# <span class="cm-val">default-router 192.168.11.1</span>
+Router(dhcp-config)# <span class="cm-val">dns-server 192.168.15.2</span>
+Router(dhcp-config)# <span class="cm-val">lease 0 8 0</span>
+Router(dhcp-config)# <span class="cm-val">exit</span></div>
+  <label class="qlabel">DT2.1 — Après avoir créé ce pool, revenez sur PC-Admin-1 (Desktop → IP Configuration → DHCP). Notez l'adresse IP obtenue, le masque, la passerelle et le DNS.</label>
+  <table class="data-table">
+    <tr><th>Paramètre</th><th>Valeur obtenue sur PC-Admin-1</th></tr>
+    <tr><td class="left">Adresse IP</td><td><input type="text" id="dt2-ip" placeholder="192.168.11.…"></td></tr>
+    <tr><td class="left">Masque de sous-réseau</td><td><input type="text" id="dt2-mask" placeholder="255.255.255.…"></td></tr>
+    <tr><td class="left">Passerelle par défaut</td><td><input type="text" id="dt2-gw" placeholder="192.168.11.…"></td></tr>
+    <tr><td class="left">Serveur DNS</td><td><input type="text" id="dt2-dns" placeholder="192.168.…"></td></tr>
+  </table>
+  <label class="qlabel">DT2.2 — L'adresse obtenue est-elle dans la bonne plage (entre .10 et .14) ? Si non, qu'est-ce qui pourrait en être la cause ?</label>
+  <textarea class="rep rep-sm" id="dt2-2" placeholder="Adresse dans la bonne plage ? Oui/Non — Explication si Non…"></textarea>
+</div>
+
+<h2>4.2 Pool VLAN 12 — Accueil</h2>
+
+<div class="dossier-section">
+  <div class="dossier-titre">Dossier de travail 3 — Pool VLAN 12 Accueil <span class="dossier-num">À compléter</span></div>
+  <p>À vous de jouer ! Complétez les commandes manquantes pour créer le pool du VLAN 12 (réseau 192.168.12.0/27, passerelle .1, DNS interne 192.168.15.2, bail 8h) :</p>
+  <label class="qlabel">DT3.1 — Rédigez ici les commandes complètes avant de les saisir dans Packet Tracer :</label>
+  <textarea class="rep rep-md" id="dt3-1" placeholder="Router(config)# ip dhcp pool …&#10;Router(dhcp-config)# network …&#10;Router(dhcp-config)# default-router …&#10;Router(dhcp-config)# dns-server …&#10;Router(dhcp-config)# lease …&#10;Router(dhcp-config)# exit"></textarea>
+  <label class="qlabel">DT3.2 — Saisissez les commandes dans PT. Notez les adresses obtenues sur PC-Accueil-1 et PC-Accueil-2 :</label>
+  <table class="data-table">
+    <tr><th>PC</th><th>Adresse IP obtenue</th><th>Masque</th><th>Passerelle</th></tr>
+    <tr><td class="center">PC-Accueil-1</td><td><input type="text" id="dt3-pc1-ip" placeholder="192.168.12.…"></td><td><input type="text" id="dt3-pc1-mask" placeholder="255.255.255.…"></td><td><input type="text" id="dt3-pc1-gw" placeholder="192.168.12.…"></td></tr>
+    <tr><td class="center">PC-Accueil-2</td><td><input type="text" id="dt3-pc2-ip" placeholder="192.168.12.…"></td><td><input type="text" id="dt3-pc2-mask" placeholder="255.255.255.…"></td><td><input type="text" id="dt3-pc2-gw" placeholder="192.168.12.…"></td></tr>
+  </table>
+</div>
+
+<h2>4.3 Pool VLAN 13 — Clients WiFi</h2>
+
+<div class="dossier-section">
+  <div class="dossier-titre">Dossier de travail 4 — Pool VLAN 13 Clients WiFi <span class="dossier-num">À compléter</span></div>
+  <p>Créez maintenant le pool pour le VLAN 13 (réseau 192.168.13.0/25, passerelle .1, DNS public 8.8.8.8, bail 2h) :</p>
+  <label class="qlabel">DT4.1 — Rédigez les commandes complètes :</label>
+  <textarea class="rep rep-md" id="dt4-1" placeholder="Router(config)# ip dhcp pool …&#10;…"></textarea>
+  <label class="qlabel">DT4.2 — Pourquoi le DNS est-il différent pour ce VLAN (8.8.8.8 au lieu de 192.168.15.2) ?</label>
+  <textarea class="rep rep-sm" id="dt4-2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">DT4.3 — Notez l'adresse obtenue sur PC-WiFi-1 :</label>
+  <textarea class="rep rep-xs" id="dt4-3" placeholder="IP : … / Masque : … / GW : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<h1>5. Réservation DHCP — L'imprimante réseau</h1>
+
+<div class="mise-en-situation">
+  <strong>🖨️ Contexte :</strong> L'imprimante réseau du VLAN 12 (Accueil) doit toujours recevoir l'adresse <strong>192.168.12.5</strong> pour que tous les postes puissent l'atteindre via un raccourci fixe. Dans Packet Tracer, vous trouverez son adresse MAC dans l'onglet Config → FastEthernet0 → Physical Address.
+</div>
+
+<div class="dossier-section">
+  <div class="dossier-titre">Dossier de travail 5 — Réservation imprimante <span class="dossier-num">À faire</span></div>
+  <label class="qlabel">DT5.1 — Notez l'adresse MAC de l'imprimante (trouvée dans Packet Tracer) :</label>
+  <textarea class="rep rep-xs" id="dt5-1" placeholder="Adresse MAC : 00XX.XXXX.XXXX"></textarea>
+  <label class="qlabel">DT5.2 — Rédigez les commandes complètes pour créer la réservation (n'oubliez pas d'exclure d'abord l'adresse .5 si ce n'est pas déjà dans la plage d'exclusion) :</label>
+  <textarea class="rep rep-md" id="dt5-2" placeholder="Router(config)# ip dhcp excluded-address …   ← si nécessaire&#10;Router(config)# ip dhcp pool …&#10;Router(dhcp-config)# host …&#10;Router(dhcp-config)# hardware-address …&#10;…"></textarea>
+  <label class="qlabel">DT5.3 — Après avoir saisi les commandes, passez l'imprimante en DHCP dans PT (Config → FastEthernet0 → DHCP). Quelle adresse obtient-elle ?</label>
+  <textarea class="rep rep-xs" id="dt5-3" placeholder="Adresse obtenue : …"></textarea>
+  <label class="qlabel">DT5.4 — Tapez <code>show ip dhcp binding</code> sur le routeur. Copiez le résultat ici et identifiez la ligne correspondant à l'imprimante. Quel est son type (Automatic ou Manual) ?</label>
+  <textarea class="rep rep-md" id="dt5-4" placeholder="Résultat de show ip dhcp binding :&#10;…&#10;&#10;Ligne imprimante : … Type : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<h1>6. Vérification globale et tests de connectivité</h1>
+
+<h2>6.1 Vérification des pools</h2>
+
+<div class="dossier-section">
+  <div class="dossier-titre">Dossier de travail 6 — Vérifications et tests <span class="dossier-num">À faire</span></div>
+  <label class="qlabel">DT6.1 — Tapez <code>show ip dhcp pool</code> sur le routeur. Combien de pools sont listés ? Lesquels ?</label>
+  <textarea class="rep rep-sm" id="dt6-1" placeholder="Nombre de pools : …&#10;Noms : …"></textarea>
+  <label class="qlabel">DT6.2 — Tapez <code>show ip dhcp binding</code>. Combien de baux actifs voyez-vous ? Sont-ils tous dans les bonnes plages d'adresses ?</label>
+  <textarea class="rep rep-sm" id="dt6-2" placeholder="Nombre de baux : …&#10;Observations : …"></textarea>
+
+  <h2 style="margin-top:16px;">6.2 Tests de ping intra-VLAN</h2>
+  <p>Depuis l'invite de commandes de chaque PC, testez la connectivité vers la passerelle et vers un autre PC du même VLAN.</p>
+
+  <table class="data-table">
+    <tr><th>Source</th><th>Destination</th><th>Commande ping</th><th>Résultat (OK / Échec)</th></tr>
+    <tr><td class="center">PC-Admin-1</td><td class="center">192.168.11.1 (GW)</td><td class="left"><code>ping 192.168.11.1</code></td><td><input type="text" id="t1" placeholder="OK / Échec"></td></tr>
+    <tr><td class="center">PC-Admin-1</td><td class="center">PC-Admin-2</td><td class="left"><code>ping 192.168.11.xx</code></td><td><input type="text" id="t2" placeholder="OK / Échec"></td></tr>
+    <tr><td class="center">PC-Accueil-1</td><td class="center">192.168.12.1 (GW)</td><td class="left"><code>ping 192.168.12.1</code></td><td><input type="text" id="t3" placeholder="OK / Échec"></td></tr>
+    <tr><td class="center">PC-Accueil-1</td><td class="center">Imprimante .5</td><td class="left"><code>ping 192.168.12.5</code></td><td><input type="text" id="t4" placeholder="OK / Échec"></td></tr>
+    <tr><td class="center">PC-Admin-1</td><td class="center">PC-Accueil-1</td><td class="left"><code>ping 192.168.12.xx</code></td><td><input type="text" id="t5" placeholder="OK / Échec"></td></tr>
+  </table>
+  <label class="qlabel">DT6.3 — Le ping entre PC-Admin-1 et PC-Accueil-1 (deux VLANs différents) fonctionne-t-il ? Pourquoi (ou pourquoi pas) ?</label>
+  <textarea class="rep rep-sm" id="dt6-3" placeholder="Résultat : OK / Échec&#10;Explication : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<h1>7. Capture d'écran et documentation</h1>
+
+<div class="dossier-section">
+  <div class="dossier-titre">Dossier de travail 7 — Documentation de l'atelier <span class="dossier-num">À fournir</span></div>
+
+  <label class="qlabel">DT7.1 — Capture : résultat de <code>show ip dhcp binding</code> (tous les baux)</label>
+  <div class="upload-zone" onclick="document.getElementById('img-binding').click()">
+    <input type="file" id="img-binding" accept="image/*" onchange="compresserImage(this,'prev-binding','hint-binding',function(b){imgs['binding']=b;})">
+    <div class="upload-text">📎 Déposer la capture show ip dhcp binding</div>
+    <div class="upload-hint" id="hint-binding">Formats : JPG, PNG – compression automatique</div>
+    <img id="prev-binding" style="display:none;max-width:100%;margin-top:10px;">
+  </div>
+
+  <label class="qlabel">DT7.2 — Capture : résultat de <code>show ip dhcp pool</code></label>
+  <div class="upload-zone" onclick="document.getElementById('img-pool').click()">
+    <input type="file" id="img-pool" accept="image/*" onchange="compresserImage(this,'prev-pool','hint-pool',function(b){imgs['pool']=b;})">
+    <div class="upload-text">📎 Déposer la capture show ip dhcp pool</div>
+    <div class="upload-hint" id="hint-pool">Formats : JPG, PNG – compression automatique</div>
+    <img id="prev-pool" style="display:none;max-width:100%;margin-top:10px;">
+  </div>
+
+  <label class="qlabel">DT7.3 — Capture : vue Packet Tracer complète du site d'Apt avec les adresses IP affichées sur les PC</label>
+  <div class="upload-zone" onclick="document.getElementById('img-topo').click()">
+    <input type="file" id="img-topo" accept="image/*" onchange="compresserImage(this,'prev-topo','hint-topo',function(b){imgs['topo']=b;})">
+    <div class="upload-text">📎 Déposer la capture de la topologie PT</div>
+    <div class="upload-hint" id="hint-topo">Formats : JPG, PNG – compression automatique</div>
+    <img id="prev-topo" style="display:none;max-width:100%;margin-top:10px;">
+  </div>
+
+  <label class="qlabel">DT7.4 — Bilan : Quelles difficultés avez-vous rencontrées durant cet atelier ? Comment les avez-vous surmontées ?</label>
+  <textarea class="rep rep-md" id="dt7-4" placeholder="Difficultés rencontrées :&#10;Solutions trouvées :"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-titre">⭐ Auto-évaluation — S4 Atelier 1</div>
+  <div id="ae-container"></div>
+</div>
+
+</div><!-- /content -->
+
+<div class="footer">
+  Projet Provence Évasion — S4 Atelier 1 : Configuration DHCP – Site d'Apt &nbsp;|&nbsp; Lycée Louis Lumière – Chelles &nbsp;|&nbsp; Bac Pro CIEL · Terminale · 2025-2026
+</div>
+
+<div class="send-bar">
+  <div class="send-info">Remplissez toutes les zones et déposez vos captures avant de télécharger.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+const imgs = {};
+
+function compresserImage(input, idPrev, idHint, callback) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const MAX = 900; let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) { if (w > h) { h = Math.round(h*MAX/w); w = MAX; } else { w = Math.round(w*MAX/h); h = MAX; } }
+      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const b64 = canvas.toDataURL('image/jpeg', 0.72);
+      document.getElementById(idPrev).src = b64; document.getElementById(idPrev).style.display = 'block';
+      const kb = Math.round(b64.length * 0.75 / 1024);
+      document.getElementById(idHint).textContent = `Image compressée : ${w}×${h}px – environ ${kb} Ko`;
+      callback(b64);
+    }; img.src = ev.target.result;
+  }; reader.readAsDataURL(file);
+}
+
+const criteres = [
+  "J'ai su passer les PC en mode DHCP dans Packet Tracer",
+  "J'ai configuré les exclusions DHCP sans erreur",
+  "J'ai créé le pool VLAN 11 (Administration) de façon autonome",
+  "J'ai créé le pool VLAN 12 (Accueil) sans aide",
+  "J'ai créé le pool VLAN 13 (WiFi) sans aide",
+  "J'ai créé une réservation DHCP liée à une adresse MAC",
+  "J'ai utilisé show ip dhcp binding pour vérifier les baux",
+  "J'ai réalisé et interprété les tests de ping intra-VLAN",
+  "J'ai documenté mon travail avec des captures d'écran"
+];
+const niveaux = [
+  {val:"maitrise",label:"★★★",title:"Maîtrisé",color:"#8BC34A"},
+  {val:"en_cours",label:"★★☆",title:"En cours",color:"#FF9800"},
+  {val:"a_revoir",label:"★☆☆",title:"À revoir",color:"#FF5722"},
+  {val:"non_traite",label:"?",title:"Non traité",color:"#aaa"}
+];
+const aeData = {};
+const container = document.getElementById('ae-container');
+criteres.forEach((crit, i) => {
+  aeData['ae_'+i] = {critere: crit, niveau: 'non_traite'};
+  const row = document.createElement('div'); row.className = 'ae-row';
+  row.innerHTML = `<div class="ae-critere">${crit}</div><div class="ae-stars" id="stars-${i}"></div><div class="ae-note" id="note-${i}" style="color:#aaa">Non traité</div>`;
+  container.appendChild(row);
+  const starsDiv = document.getElementById('stars-'+i);
+  niveaux.forEach(n => {
+    const lbl = document.createElement('label'); lbl.title = n.title; lbl.style.color='#ccc'; lbl.style.cursor='pointer'; lbl.innerHTML = n.label;
+    lbl.addEventListener('click', () => {
+      aeData['ae_'+i].niveau = n.val;
+      starsDiv.querySelectorAll('label').forEach((l,li) => { l.style.color = li===niveaux.indexOf(n)?n.color:'#ccc'; });
+      const nd = document.getElementById('note-'+i); nd.textContent=n.title; nd.style.color=n.color;
+    }); starsDiv.appendChild(lbl);
+  });
+});
+
+function g(id){ const el=document.getElementById(id); return el?el.value:''; }
+
+function genererJSON() {
+  const nom=g('eleve-nom').trim()||'NomInconnu', prenom=g('eleve-prenom').trim()||'PrenomInconnu';
+  const data = {
+    meta:{devoir:"S4 — Atelier 1 : Configuration DHCP – Site d'Apt",seance:"S4-A1",eleve:{nom,prenom,classe:g('eleve-classe')},date:g('eleve-date'),genere_le:new Date().toISOString()},
+    partie1_prise_en_main:{q1_1:g('q1-1'),q1_2:g('q1-2'),q1_3:g('q1-3')},
+    partie2_mode_dhcp:{q2_1:g('q2-1')},
+    dt1_exclusions:{dt1_1:g('dt1-1'),dt1_2:g('dt1-2')},
+    dt2_pool_vlan11:{ip:g('dt2-ip'),mask:g('dt2-mask'),gw:g('dt2-gw'),dns:g('dt2-dns'),dt2_2:g('dt2-2')},
+    dt3_pool_vlan12:{commandes:g('dt3-1'),pc1_ip:g('dt3-pc1-ip'),pc1_mask:g('dt3-pc1-mask'),pc1_gw:g('dt3-pc1-gw'),pc2_ip:g('dt3-pc2-ip'),pc2_mask:g('dt3-pc2-mask'),pc2_gw:g('dt3-pc2-gw')},
+    dt4_pool_vlan13:{commandes:g('dt4-1'),dt4_2:g('dt4-2'),dt4_3:g('dt4-3')},
+    dt5_reservation:{mac:g('dt5-1'),commandes:g('dt5-2'),adresse_obtenue:g('dt5-3'),binding:g('dt5-4')},
+    dt6_verification:{pools:g('dt6-1'),baux:g('dt6-2'),test1:g('t1'),test2:g('t2'),test3:g('t3'),test4:g('t4'),test5:g('t5'),analyse_inter_vlan:g('dt6-3')},
+    dt7_documentation:{bilan:g('dt7-4'),capture_binding:imgs['binding']||'',capture_pool:imgs['pool']||'',capture_topo:imgs['topo']||''},
+    auto_evaluation:aeData
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const safe=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const a=document.createElement('a'); a.href=url; a.download=`${safe}_S4_Atelier1_DHCP_Apt.json`; a.click();
+  URL.revokeObjectURL(url);
+  const toast=document.getElementById('toast'); toast.style.display='block'; setTimeout(()=>toast.style.display='none',3000);
+}
+</script>
+</body>
+</html>

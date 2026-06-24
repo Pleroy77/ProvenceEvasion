@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S10 — Cours : Accès distant sécurisé — SSH et VPN</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:120px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.0;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.cli .cm-prompt{color:#FF5722;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.securite-box{border:2px solid var(--vert);background:#f6fbed;border-radius:8px;padding:12px 16px;margin:12px 0 16px;font-size:12px;line-height:1.75;}
+.securite-box .sec-titre{font-family:'Roboto',sans-serif;font-weight:700;color:#4a7a1a;font-size:13px;margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S10 – Cours : Accès distant sécurisé — SSH et VPN</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 2h30 &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Une faille de sécurité identifiée depuis l'audit</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Mise en situation :</strong> Depuis S1, vous administrez tous les équipements de Provence Évasion (switches, routeurs) en local, sur le réseau de l'établissement. Mais l'audit initial d'Axentis Informatique pointait déjà un manque : <em>« Aucun accès distant sécurisé — Laurent Ferracci ne peut pas consulter les données de ses sites depuis l'extérieur. »</em> Et il y a un problème plus immédiat encore : jusqu'à présent, vous vous êtes connectés aux équipements via <strong>Telnet</strong>, un protocole vieux de plus de 40 ans qui ne chiffre rien. Aujourd'hui, on corrige les deux problèmes : sécuriser l'administration locale (SSH) et préparer l'accès distant sécurisé (VPN).
+</div>
+
+<h2>1.1 Telnet : un protocole non sécurisé</h2>
+<p>Telnet (port TCP 23) permet d'ouvrir une session d'administration à distance sur un équipement réseau. Il a été conçu dans les années 1970, à une époque où la sécurité n'était pas une priorité : <strong>toutes les données transitent en clair</strong>, y compris les identifiants et mots de passe.</p>
+
+<div class="attention">
+  <strong>⚠ Danger concret :</strong> Si un attaquant a accès à un point quelconque du chemin réseau entre le poste d'administration et l'équipement (un commutateur compromis, un point d'accès WiFi mal sécurisé, un câble sur lequel on branche un répéteur réseau...), il peut utiliser un analyseur de trames (sniffer) comme Wireshark et lire directement le mot de passe administrateur dans les paquets capturés. Une fois ce mot de passe obtenu, il peut prendre le contrôle total de l'équipement.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 1 — Comprendre le risque Telnet</div>
+  <label class="qlabel">Q1.1 — Sur quel port TCP fonctionne Telnet ? Les données échangées (y compris les mots de passe) sont-elles chiffrées ?</label>
+  <textarea class="rep rep-xs" id="ex1-q1" placeholder="Port : … — Chiffrement : …"></textarea>
+  <label class="qlabel">Q1.2 — Un attaquant capture une session Telnet avec Wireshark. Quelles informations sensibles risque-t-il de récupérer en clair ?</label>
+  <textarea class="rep rep-sm" id="ex1-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q1.3 — Dans le contexte de Provence Évasion, tous les switches et routeurs des 4 sites sont actuellement administrés en Telnet via le VLAN d'administration. Si un client WiFi malveillant parvenait à atteindre ce VLAN, quel serait le risque concret pour l'ensemble du réseau ?</label>
+  <textarea class="rep rep-sm" id="ex1-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. SSH — Secure Shell</h1>
+
+<h2>2.1 Principe de fonctionnement</h2>
+<p>SSH (port TCP 22) remplace Telnet en apportant ce qui lui manque totalement : la sécurité. À l'ouverture d'une session SSH, le client et l'équipement négocient d'abord un échange de clés (chiffrement asymétrique) qui permet de générer une clé de session partagée, sans jamais la faire transiter en clair sur le réseau. Toute la suite de la session est ensuite chiffrée avec cette clé (chiffrement symétrique, plus rapide). SSH garantit ainsi trois choses : la confidentialité (personne ne peut lire les échanges), l'intégrité (les données ne peuvent pas être modifiées sans être détectées) et l'authentification (on peut vérifier l'identité de l'équipement et de l'utilisateur).</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 SSH vs Telnet</div>
+  <p><strong>Telnet</strong> : port 23, aucun chiffrement, données en clair, à proscrire sur un équipement de production.<br>
+  <strong>SSH</strong> : port 22, chiffrement des échanges (clés asymétriques puis symétriques), authentification renforcée, standard actuel pour toute administration à distance.</p>
+</div>
+
+<h2>2.2 Pré-requis à la configuration SSH sur un équipement Cisco</h2>
+<p>Avant d'activer SSH, l'équipement a besoin de générer sa propre paire de clés RSA. Pour cela, IOS exige trois éléments préalables : un <strong>nom d'hôte</strong> unique, un <strong>nom de domaine</strong>, et une base d'utilisateurs locaux pour l'authentification.</p>
+
+<div class="cli"><span class="cm-titre"># Pré-requis et activation de SSH sur un routeur Cisco</span>
+<span class="cm-prompt">Router&gt;</span> enable
+<span class="cm-prompt">Router#</span> configure terminal
+<span class="cm-prompt">Router(config)#</span> hostname R-Apt
+<span class="cm-prompt">R-Apt(config)#</span> ip domain-name provence-evasion.local
+<span class="cm-prompt">R-Apt(config)#</span> crypto key generate rsa
+<span class="cm-com">% Choose a key modulus between 360 and 2048</span>
+How many bits in the modulus [512]: <span class="cm-val">1024</span>
+<span class="cm-prompt">R-Apt(config)#</span> username admin secret <span class="cm-val">MotDePasse_Solide!</span>
+<span class="cm-prompt">R-Apt(config)#</span> ip ssh version 2
+<span class="cm-prompt">R-Apt(config)#</span> line vty 0 4
+<span class="cm-prompt">R-Apt(config-line)#</span> transport input ssh
+<span class="cm-prompt">R-Apt(config-line)#</span> login local
+<span class="cm-prompt">R-Apt(config-line)#</span> exec-timeout 5 0
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 2 — Activer SSH sur le routeur du siège</div>
+  <label class="qlabel">Écrivez la séquence complète de commandes pour activer SSH version 2 sur le routeur <strong>R-Apt</strong>, avec le nom de domaine <code>provence-evasion.local</code>, un utilisateur <code>admin</code>, une clé RSA de 1024 bits, et l'interdiction explicite du Telnet sur les lignes vty :</label>
+  <textarea class="rep rep-lg" id="ex2-cmd" placeholder="Router&gt; enable&#10;Router# configure terminal&#10;…"></textarea>
+  <label class="qlabel">Q2.1 — Pourquoi la commande <code>crypto key generate rsa</code> nécessite-t-elle que le <code>hostname</code> et le <code>domain-name</code> soient déjà configurés ?</label>
+  <textarea class="rep rep-sm" id="ex2-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q2.2 — Quelle est la différence entre <code>username admin password ...</code> et <code>username admin secret ...</code> ?</label>
+  <textarea class="rep rep-sm" id="ex2-q2" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Le VPN — chiffrer les communications sur un réseau non maîtrisé</h1>
+
+<h2>3.1 Pourquoi un VPN ?</h2>
+<p>SSH sécurise l'administration locale, mais ne résout pas tout. Deux besoins identifiés chez Provence Évasion impliquent de faire transiter des données <strong>en dehors du réseau local de l'entreprise</strong>, potentiellement via Internet : la liaison entre les sites (Apt, Roussillon, Saignon, Cucuron) si elle passe par un opérateur public, et l'accès de Laurent Ferracci à ses données depuis l'extérieur. Un <strong>VPN</strong> (Virtual Private Network) crée un tunnel chiffré entre deux points, garantissant que les données restent confidentielles même si elles traversent un réseau non maîtrisé.</p>
+
+<h2>3.2 Deux grandes familles de VPN</h2>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 VPN site-à-site</div>
+  <p>Relie de façon <strong>permanente</strong> deux réseaux d'entreprise à travers un équipement de passerelle à chaque extrémité (typiquement deux routeurs). Aucune action n'est requise côté utilisateur final : la communication est automatiquement chiffrée dès qu'elle traverse le tunnel. C'est la solution adaptée pour relier en continu le réseau d'Apt à celui de Roussillon, par exemple.</p>
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 VPN d'accès distant (client-to-site)</div>
+  <p>Permet à un utilisateur <strong>isolé</strong> (un poste, un smartphone) de se connecter <strong>temporairement</strong> au réseau de l'entreprise via un logiciel client VPN. C'est la solution adaptée pour Laurent Ferracci, qui souhaite consulter les données du siège depuis son domicile de façon occasionnelle.</p>
+</div>
+
+<div class="attention">
+  <strong>⚠ Limite pédagogique :</strong> Cisco Packet Tracer permet de configurer un véritable tunnel <strong>VPN site-à-site IPsec</strong> en CLI sur les routeurs, mais ne simule pas correctement un client VPN d'accès distant (type Cisco AnyConnect). C'est pourquoi, dans l'atelier de cette séance, vous configurerez uniquement le <strong>VPN site-à-site entre Apt et Roussillon</strong>. Le cas d'usage de Laurent Ferracci reste traité ici au niveau conceptuel : vous devez en comprendre le principe, sans le configurer dans Packet Tracer.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 3 — Site-à-site ou accès distant ?</div>
+  <label class="qlabel">Q3.1 — Quelle est la différence fondamentale entre un VPN site-à-site et un VPN d'accès distant ?</label>
+  <textarea class="rep rep-sm" id="ex3-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q3.2 — Pour relier en permanence le réseau d'Apt à celui de Roussillon à travers Internet, quel type de VPN faut-il mettre en place ?</label>
+  <textarea class="rep rep-xs" id="ex3-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q3.3 — Pourquoi le cas d'usage de Laurent Ferracci (consultation depuis son domicile) ne sera-t-il pas configuré dans l'atelier Packet Tracer ?</label>
+  <textarea class="rep rep-sm" id="ex3-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Le VPN IPsec site-à-site — les deux phases de négociation</h1>
+
+<p>La mise en place d'un tunnel VPN IPsec entre deux routeurs Cisco se déroule en deux phases successives, normalisées par le protocole <strong>IKE</strong> (Internet Key Exchange), qui s'appuie sur <strong>ISAKMP</strong>.</p>
+
+<h2>4.1 Phase 1 — ISAKMP/IKE</h2>
+<p>La phase 1 établit un canal sécurisé entre les deux routeurs, avant même de chiffrer les données utilisateur. Les deux équipements négocient une <strong>politique de sécurité</strong> commune (algorithme de chiffrement, fonction de hachage, groupe Diffie-Hellman, durée de vie) puis s'authentifient mutuellement, le plus souvent via une <strong>clé pré-partagée</strong> (pre-shared key) identique configurée sur les deux routeurs.</p>
+
+<h2>4.2 Phase 2 — IPsec</h2>
+<p>Une fois le canal sécurisé établi, la phase 2 négocie les paramètres de chiffrement <strong>des données utilisateur elles-mêmes</strong>, via un <strong>transform-set</strong> (algorithme de chiffrement + algorithme d'intégrité). Trois éléments supplémentaires sont nécessaires :</p>
+<ul>
+  <li>Une <strong>ACL de « trafic intéressant »</strong> : elle définit précisément quel trafic doit être chiffré dans le tunnel (par exemple : du réseau d'Apt vers le réseau de Roussillon, et inversement). Tout le reste du trafic continue de circuler normalement, sans chiffrement.</li>
+  <li>Une <strong>crypto map</strong> : elle assemble l'ACL de trafic intéressant, l'adresse du routeur distant (peer) et le transform-set en une seule configuration.</li>
+  <li>L'<strong>application de la crypto map sur l'interface WAN</strong> du routeur (celle qui fait face au réseau non maîtrisé), pour que le chiffrement s'applique au bon trafic sortant.</li>
+</ul>
+
+<div class="schema-box">
+  <div class="sch-titre">Schéma — Tunnel VPN IPsec site-à-site Apt ↔ Roussillon</div>
+   [ LAN Apt ]                                              [ LAN Roussillon ]
+        │                                                          │
+   [ R-Apt ] ── interface WAN ══════ Tunnel IPsec ══════ interface WAN ── [ R-Roussillon ]
+                          (chiffré : trafic LAN Apt ↔ LAN Roussillon
+                           "intéressant" selon l'ACL — Phase 1 ISAKMP
+                           puis Phase 2 IPsec, crypto map appliquée
+                           sur chaque interface WAN)
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 4 — Comprendre les deux phases</div>
+  <label class="qlabel">Q4.1 — À quoi sert la phase 1 (ISAKMP/IKE) d'une négociation IPsec ? Que se passe-t-il si les deux routeurs n'ont pas la même clé pré-partagée ?</label>
+  <textarea class="rep rep-sm" id="ex4-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q4.2 — Quel est le rôle exact de l'ACL « trafic intéressant » dans une configuration IPsec site-à-site ? Que devient le trafic qui ne correspond pas à cette ACL ?</label>
+  <textarea class="rep rep-sm" id="ex4-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q4.3 — Sur quelle interface du routeur la crypto map doit-elle être appliquée ? Pourquoi pas sur l'interface du réseau local (LAN) ?</label>
+  <textarea class="rep rep-sm" id="ex4-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. Application au contexte Provence Évasion</h1>
+
+<div class="securite-box">
+  <div class="sec-titre">🔒 Plan de sécurisation des accès — S10</div>
+  <p>Ce que vous allez mettre en place dans les deux ateliers de cette séance :</p>
+</div>
+
+<table class="data-table">
+  <tr><th>Atelier</th><th>Objectif</th><th>Équipements concernés</th></tr>
+  <tr><td class="center"><strong>Atelier 1</strong></td><td class="left">Activer SSH et désactiver Telnet</td><td class="left">Tous les routeurs et switches des 4 sites (Apt, Roussillon, Saignon, Cucuron)</td></tr>
+  <tr><td class="center"><strong>Atelier 2</strong></td><td class="left">Configurer un tunnel VPN IPsec site-à-site</td><td class="left">Routeurs R-Apt et R-Roussillon (liaison WAN)</td></tr>
+</table>
+
+<p>Ce travail correspond à la <strong>Section 11 du dossier de déploiement</strong> : « Sécurisation des accès d'administration ». Elle sera complétée à la fin de l'Atelier 2.</p>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice 5 — Se projeter sur les ateliers</div>
+  <label class="qlabel">Q5.1 — Combien d'équipements au total seront concernés par le passage à SSH en Atelier 1 (en comptant routeurs et switches sur les 4 sites) ?</label>
+  <textarea class="rep rep-xs" id="ex5-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q5.2 — Pourquoi le choix s'est-il porté sur Apt et Roussillon pour le tunnel VPN de l'Atelier 2, plutôt que sur un autre couple de sites ?</label>
+  <textarea class="rep rep-sm" id="ex5-q2" placeholder="Votre réponse…"></textarea>
+</div>
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Synthèse de la séance</div>
+
+<div class="conclusion">
+  <p>Telnet transmet les données en clair, ce qui en fait un protocole <input class="inline-field" id="synth-1" placeholder="dangereux / sécurisé">. SSH chiffre les échanges grâce à un <input class="inline-field" id="synth-2" style="width:170px" placeholder="échange de clés..."> initial, puis un chiffrement <input class="inline-field" id="synth-3" placeholder="symétrique"> de la session.</p>
+  <p>Un VPN <input class="inline-field" id="synth-4" placeholder="site-à-site"> relie deux réseaux de façon permanente, tandis qu'un VPN <input class="inline-field" id="synth-5" style="width:160px" placeholder="d'accès distant"> permet à un utilisateur isolé de se connecter temporairement.</p>
+  <p>La négociation IPsec se déroule en deux phases : <input class="inline-field" id="synth-6" placeholder="ISAKMP/IKE"> puis <input class="inline-field" id="synth-7" placeholder="IPsec">. L'élément qui définit quel trafic doit être chiffré est une <input class="inline-field" id="synth-8" placeholder="ACL">, assemblée avec le transform-set dans une <input class="inline-field" id="synth-9" placeholder="crypto map">.</p>
+  <p>Dans le projet Provence Évasion, le tunnel VPN site-à-site sera mis en place entre les sites de <input class="inline-field" id="synth-10" placeholder="..."> et <input class="inline-field" id="synth-11" placeholder="...">.</p>
+</div>
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <script>
+  const criteres = [
+    "Je comprends pourquoi Telnet est dangereux et SSH sécurisé",
+    "Je sais écrire les commandes pour activer SSH sur un équipement Cisco",
+    "Je distingue un VPN site-à-site d'un VPN d'accès distant",
+    "Je comprends le rôle des deux phases d'une négociation IPsec (ISAKMP/IKE et IPsec)",
+    "Je comprends le rôle d'une ACL de trafic intéressant et d'une crypto map",
+    "Je sais relier ces notions au contexte Provence Évasion (Section 11 du dossier)"
+  ];
+  const niveaux = ['maitrise','en_cours','a_revoir','non_traite'];
+  const labels = ['★★★','★★☆','★☆☆','?'];
+  const cont = document.querySelector('.autoeval');
+  criteres.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className='ae-row';
+    let html=`<div>${c}</div>`;
+    niveaux.forEach((n,j)=>{
+      html+=`<div style="text-align:center"><label style="cursor:pointer"><input type="radio" name="ae-${i}" value="${n}" style="accent-color:var(--bleu);margin-right:4px">${labels[j]}</label></div>`;
+    });
+    row.innerHTML=html;
+    cont.appendChild(row);
+  });
+  </script>
+</div>
+
+</div><!-- /content -->
+
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <div><strong style="color:var(--orange)">S10</strong> — Cours : Accès distant sécurisé — SSH et VPN</div>
+  <div>Lycée Louis Lumière – Chelles · Bac Pro CIEL · 2025-2026</div>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+function genererJSON(){
+  const nom = document.getElementById('eleve-nom').value;
+  const prenom = document.getElementById('eleve-prenom').value;
+  const v = id => { const el=document.getElementById(id); return el?el.value:''; };
+  const ae = {};
+  [
+    "Je comprends pourquoi Telnet est dangereux et SSH sécurisé",
+    "Je sais écrire les commandes pour activer SSH sur un équipement Cisco",
+    "Je distingue un VPN site-à-site d'un VPN d'accès distant",
+    "Je comprends le rôle des deux phases d'une négociation IPsec (ISAKMP/IKE et IPsec)",
+    "Je comprends le rôle d'une ACL de trafic intéressant et d'une crypto map",
+    "Je sais relier ces notions au contexte Provence Évasion (Section 11 du dossier)"
+  ].forEach((c,i)=>{
+    const r=document.querySelector(`input[name="ae-${i}"]:checked`);
+    ae[`critere_${i+1}`]={critere:c,niveau:r?r.value:'non_traite'};
+  });
+  const data={
+    meta:{devoir:"S10 – Cours : Accès distant sécurisé — SSH et VPN",eleve:{nom,prenom,classe:v('eleve-classe')},date:v('eleve-date'),genere_le:new Date().toISOString()},
+    partie1_telnet:{q1:v('ex1-q1'),q2:v('ex1-q2'),q3:v('ex1-q3')},
+    partie2_ssh:{cmd:v('ex2-cmd'),q1:v('ex2-q1'),q2:v('ex2-q2')},
+    partie3_vpn_types:{q1:v('ex3-q1'),q2:v('ex3-q2'),q3:v('ex3-q3')},
+    partie4_ipsec_phases:{q1:v('ex4-q1'),q2:v('ex4-q2'),q3:v('ex4-q3')},
+    partie5_application:{q1:v('ex5-q1'),q2:v('ex5-q2')},
+    synthese:{s1:v('synth-1'),s2:v('synth-2'),s3:v('synth-3'),s4:v('synth-4'),s5:v('synth-5'),s6:v('synth-6'),s7:v('synth-7'),s8:v('synth-8'),s9:v('synth-9'),s10:v('synth-10'),s11:v('synth-11')},
+    auto_evaluation:ae
+  };
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${safeName}_S10Cours.json`;
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S10 — Atelier 2 : VPN IPsec site-à-site Apt ↔ Roussillon</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.consigne{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.dossier-section{background:#f0f4ff;border:2px solid var(--bleu);border-radius:8px;padding:16px 18px;margin:20px 0;}
+.dossier-titre{display:flex;justify-content:space-between;align-items:center;font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:12px;border-bottom:2px solid var(--bleu);padding-bottom:6px;}
+.dossier-num{background:var(--bleu);color:#fff;border-radius:4px;padding:2px 10px;font-size:11px;}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:120px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.0;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.cli .cm-prompt{color:#FF5722;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.pt-step{background:var(--ciel-bg);border-left:4px solid var(--bleu);padding:10px 14px;margin:8px 0;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.pt-num{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-right:8px;}
+.test-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:12px;}
+.test-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);text-align:left;}
+.test-table td{border:1px solid #c0d0e0;padding:6px 8px;vertical-align:middle;}
+.test-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.test-table td select,.test-table td input[type=text]{width:100%;border:1px solid #c8d8e8;border-radius:3px;padding:3px 6px;font-family:'Montserrat',sans-serif;font-size:11px;}
+.dossier-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.dossier-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 10px;border:1px solid var(--marine);}
+.dossier-table td{border:1px solid #c0d0e0;padding:6px 8px;}
+.dossier-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.dossier-table td input[type=text],.dossier-table td select,.dossier-table td textarea{width:100%;border:1px solid #c8d8e8;border-radius:3px;padding:3px 6px;font-family:'Montserrat',sans-serif;font-size:11px;}
+.dossier-table td.td-fixe{font-family:'Roboto',sans-serif;font-weight:600;color:var(--marine);}
+.approf{background:#fff8f0;border:2px solid var(--orange);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.approf-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S10 – Atelier 2 : VPN IPsec site-à-site Apt ↔ Roussillon</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 4h &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Contexte — pourquoi chiffrer aussi la liaison inter-sites</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Mise en situation :</strong> En Atelier 1, vous avez sécurisé l'administration locale des 8 équipements grâce à SSH. Mais la communication entre les VLANs d'Administration d'Apt et de Roussillon transite par la liaison WAN inter-sites établie en S5-S6 — une liaison qui, dans un déploiement réel, traverserait Internet via les box des opérateurs. Aujourd'hui, vous allez chiffrer cette liaison grâce à un tunnel <strong>VPN IPsec site-à-site</strong> entre les routeurs R-Apt et R-Roussillon. En fin de séance, vous compléterez la <strong>Section 11 du dossier de déploiement</strong>.
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">🎯 Objectifs de l'Atelier 2</div>
+  <ul>
+    <li>Identifier les interfaces WAN de R-Apt et R-Roussillon utilisées comme extrémités du tunnel</li>
+    <li>Configurer la Phase 1 ISAKMP/IKE (politique de sécurité + clé pré-partagée) sur les deux routeurs</li>
+    <li>Configurer la Phase 2 IPsec (transform-set, ACL de trafic intéressant, crypto map) sur les deux routeurs</li>
+    <li>Appliquer la crypto map sur l'interface WAN de chaque routeur</li>
+    <li>Vérifier l'établissement du tunnel et tester la connectivité chiffrée</li>
+    <li>Diagnostiquer une panne de tunnel VPN</li>
+    <li>Rédiger la Section 11 du dossier de déploiement</li>
+  </ul>
+</div>
+
+<div class="consigne">
+  <strong>📋 Consigne :</strong> Ouvrez votre fichier <strong>PE_Complet_S10_Atelier1.pkt</strong> (créé en Atelier 1). Sauvegardez-le immédiatement sous le nouveau nom <strong>PE_Complet_S10_Atelier2.pkt</strong> avant toute modification.
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Préparation — identification des interfaces WAN</h1>
+
+<div class="schema-box">
+  <div class="sch-titre">Schéma — Tunnel VPN IPsec site-à-site Apt ↔ Roussillon</div>
+   [ LAN Apt — VLAN Admin 192.168.14.0/28 ]              [ LAN Roussillon — VLAN Admin 192.168.24.0/28 ]
+                    │                                                    │
+              [ R-Apt ] ── interface WAN ═══ Tunnel IPsec ═══ interface WAN ── [ R-Roussillon ]
+                                  (Phase 1 ISAKMP/IKE puis Phase 2 IPsec
+                                   ACL trafic intéressant : VLAN Admin Apt ↔ VLAN Admin Roussillon
+                                   crypto map appliquée sur chaque interface WAN)
+</div>
+
+<p>Le tunnel s'appuie sur les interfaces WAN déjà configurées lors de l'interconnexion des sites (S5-S6). Retrouvez vos propres adresses pour les renseigner ci-dessous.</p>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice — Retrouvez vos adresses WAN</div>
+  <label class="qlabel">Sur R-Apt, exécutez <code>show ip interface brief</code>. Identifiez l'interface qui relie le routeur vers Roussillon (liaison WAN inter-sites établie en S5-S6) et notez son adresse IP et son nom (ex. Serial0/0/0, GigabitEthernet0/1...) :</label>
+  <textarea class="rep rep-sm" id="ex2-wan-apt" placeholder="Interface : … — Adresse IP : …"></textarea>
+  <label class="qlabel">Sur R-Roussillon, faites de même pour l'interface WAN qui le relie vers Apt :</label>
+  <textarea class="rep rep-sm" id="ex2-wan-rou" placeholder="Interface : … — Adresse IP : …"></textarea>
+  <label class="qlabel">Q2.1 — Pour configurer le tunnel, c'est l'adresse de l'interface WAN du routeur distant qui sert de « peer ». Pourquoi utilise-t-on l'adresse WAN et non l'adresse de la passerelle LAN (192.168.x4.1) ?</label>
+  <textarea class="rep rep-sm" id="ex2-q1" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Phase 1 — Configuration ISAKMP/IKE</h1>
+
+<p>La phase 1 doit être configurée de façon strictement symétrique sur les deux routeurs : mêmes paramètres de chiffrement, de hachage et de groupe Diffie-Hellman, et même clé pré-partagée.</p>
+
+<div class="cli"><span class="cm-titre"># Phase 1 ISAKMP/IKE — squelette de configuration (à adapter)</span>
+<span class="cm-prompt">Router(config)#</span> crypto isakmp policy 10
+<span class="cm-prompt">Router(config-isakmp)#</span> encryption aes
+<span class="cm-prompt">Router(config-isakmp)#</span> hash sha
+<span class="cm-prompt">Router(config-isakmp)#</span> authentication pre-share
+<span class="cm-prompt">Router(config-isakmp)#</span> group 2
+<span class="cm-prompt">Router(config-isakmp)#</span> lifetime 86400
+<span class="cm-prompt">Router(config-isakmp)#</span> exit
+<span class="cm-prompt">Router(config)#</span> crypto isakmp key <span class="cm-val">ProvenceVPN2026!</span> address <span class="cm-val">&lt;adresse WAN du routeur distant&gt;</span>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice — Phase 1 sur R-Apt et R-Roussillon</div>
+  <label class="qlabel">Écrivez la configuration complète de la Phase 1 sur <strong>R-Apt</strong> (la clé pré-partagée est <code>ProvenceVPN2026!</code>, le peer est l'adresse WAN de R-Roussillon que vous avez notée en partie 2) :</label>
+  <textarea class="rep rep-lg" id="ex3-cmd-apt" placeholder="R-Apt(config)# crypto isakmp policy 10&#10;…"></textarea>
+  <label class="qlabel">Écrivez la configuration complète et symétrique de la Phase 1 sur <strong>R-Roussillon</strong> (peer = adresse WAN de R-Apt) :</label>
+  <textarea class="rep rep-lg" id="ex3-cmd-rou" placeholder="R-Roussillon(config)# crypto isakmp policy 10&#10;…"></textarea>
+  <label class="qlabel">Q3.1 — Pourquoi les paramètres <code>encryption</code>, <code>hash</code> et <code>group</code> doivent-ils être identiques sur les deux routeurs ? Que se passe-t-il si ce n'est pas le cas ?</label>
+  <textarea class="rep rep-sm" id="ex3-q1" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Phase 2 — IPsec : transform-set, ACL et crypto map</h1>
+
+<p>La phase 2 définit comment chiffrer les données utilisateur, et surtout <strong>quel trafic</strong> doit transiter dans le tunnel. Pour cet atelier, seul le trafic entre les VLANs d'Administration d'Apt (192.168.14.0/28) et de Roussillon (192.168.24.0/28) sera considéré comme « intéressant » et donc chiffré.</p>
+
+<div class="cli"><span class="cm-titre"># Phase 2 IPsec — squelette de configuration sur R-Apt</span>
+<span class="cm-prompt">R-Apt(config)#</span> access-list 110 permit ip 192.168.14.0 0.0.0.15 192.168.24.0 0.0.0.15
+<span class="cm-prompt">R-Apt(config)#</span> crypto ipsec transform-set TS-PE esp-aes esp-sha-hmac
+<span class="cm-prompt">R-Apt(config)#</span> crypto map CMAP-PE 10 ipsec-isakmp
+<span class="cm-prompt">R-Apt(config-crypto-map)#</span> set peer <span class="cm-val">&lt;adresse WAN R-Roussillon&gt;</span>
+<span class="cm-prompt">R-Apt(config-crypto-map)#</span> set transform-set TS-PE
+<span class="cm-prompt">R-Apt(config-crypto-map)#</span> match address 110
+<span class="cm-prompt">R-Apt(config-crypto-map)#</span> exit
+<span class="cm-prompt">R-Apt(config)#</span> interface <span class="cm-val">&lt;interface WAN&gt;</span>
+<span class="cm-prompt">R-Apt(config-if)#</span> crypto map CMAP-PE
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice — Phase 2 sur R-Apt</div>
+  <label class="qlabel">Écrivez la configuration complète de la Phase 2 sur <strong>R-Apt</strong> (ACL, transform-set, crypto map, application sur l'interface WAN identifiée en partie 2) :</label>
+  <textarea class="rep rep-lg" id="ex4-cmd-apt" placeholder="R-Apt(config)# access-list 110 permit ip 192.168.14.0 0.0.0.15 192.168.24.0 0.0.0.15&#10;…"></textarea>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">📝 Exercice — Phase 2 sur R-Roussillon</div>
+  <label class="qlabel">Écrivez la configuration complète et <strong>symétrique</strong> de la Phase 2 sur <strong>R-Roussillon</strong> (attention au sens de l'ACL et à l'adresse du peer) :</label>
+  <textarea class="rep rep-lg" id="ex4-cmd-rou" placeholder="R-Roussillon(config)# access-list 110 permit ip 192.168.24.0 0.0.0.15 192.168.14.0 0.0.0.15&#10;…"></textarea>
+  <label class="qlabel">Q4.1 — Pourquoi l'ACL 110 de R-Roussillon doit-elle inverser l'ordre des réseaux source et destination par rapport à celle de R-Apt ?</label>
+  <textarea class="rep rep-sm" id="ex4-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q4.2 — Si l'on voulait, dans un second temps, chiffrer également le trafic entre les VLANs Personnel d'Apt et de Roussillon, que faudrait-il modifier dans cette configuration ?</label>
+  <textarea class="rep rep-sm" id="ex4-q2" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. Vérification et tests</h1>
+
+<div class="pt-step"><span class="pt-num">Étape 1</span> Depuis un PC du VLAN Administration d'Apt, envoyez un ping vers l'adresse de gestion d'un équipement du VLAN Administration de Roussillon (192.168.24.2). Ce trafic correspond à l'ACL de trafic intéressant et doit déclencher la négociation du tunnel.</div>
+
+<div class="pt-step"><span class="pt-num">Étape 2</span> Sur R-Apt, exécutez successivement <code>show crypto isakmp sa</code> puis <code>show crypto ipsec sa</code>.</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🔍 Vérification de l'établissement du tunnel</div>
+  <table class="test-table">
+    <tr><th>Commande</th><th>Résultat attendu</th><th>Observé chez vous</th></tr>
+    <tr><td><code>show crypto isakmp sa</code></td><td>Une SA à l'état QM_IDLE</td>
+      <td><select id="v1-res"><option value="">—</option><option>✅ Conforme</option><option>❌ Différent</option></select></td>
+    </tr>
+    <tr><td><code>show crypto ipsec sa</code></td><td>Compteurs « pkts encaps/decaps » non nuls</td>
+      <td><select id="v2-res"><option value="">—</option><option>✅ Conforme</option><option>❌ Différent</option></select></td>
+    </tr>
+  </table>
+  <label class="qlabel">Q5.1 — Que signifie l'état <code>QM_IDLE</code> dans le résultat de <code>show crypto isakmp sa</code> ?</label>
+  <textarea class="rep rep-sm" id="ex5-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q5.2 — Dans <code>show crypto ipsec sa</code>, à quoi correspondent les compteurs « pkts encaps » et « pkts decaps » ?</label>
+  <textarea class="rep rep-sm" id="ex5-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q5.3 — Un ping depuis le VLAN Personnel d'Apt (192.168.11.x) vers le VLAN Personnel de Roussillon (192.168.21.x) — non couvert par l'ACL 110 — passe-t-il par le tunnel chiffré ? Justifiez.</label>
+  <textarea class="rep rep-sm" id="ex5-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 6 ══ -->
+<h1>6. Scénario de dépannage</h1>
+
+<div class="approf">
+  <div class="approf-titre">🛠 Diagnostic d'une panne de tunnel VPN</div>
+  <p>Cette partie vous demande de réfléchir comme un technicien face à un dysfonctionnement, sans avoir la configuration complète sous les yeux.</p>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🛠 Scénario — Tunnel qui ne s'établit pas</div>
+  <p style="font-size:12px;margin-bottom:10px;">Un collègue a configuré le tunnel VPN entre Apt et Roussillon, mais le ping entre les deux VLANs Administration échoue toujours. Voici ce qu'il vous transmet :</p>
+  <ul style="font-size:12px;margin-bottom:10px;">
+    <li>Sur R-Apt, <code>crypto isakmp key ProvenceVPN2026! address &lt;WAN Roussillon&gt;</code> a bien été saisi.</li>
+    <li>Sur R-Roussillon, <code>crypto isakmp key ProvenceVPN2026 address &lt;WAN Apt&gt;</code> a été saisi (sans le point d'exclamation final).</li>
+    <li><code>show crypto isakmp sa</code> ne montre aucune SA active sur les deux routeurs.</li>
+  </ul>
+  <label class="qlabel">Q6.1 — Quel est le problème exact ? Quelle commande permet de le corriger sur R-Roussillon ?</label>
+  <textarea class="rep rep-sm" id="ex6-q1" placeholder="Problème : … — Commande corrective : …"></textarea>
+  <label class="qlabel">Q6.2 — Un second cas se présente : la Phase 1 réussit (SA visible), mais <code>show crypto ipsec sa</code> affiche toujours 0 paquet encapsulé après un ping. La crypto map a bien été créée sur les deux routeurs. Quelles sont, dans l'ordre, les deux vérifications les plus probables à effectuer ?</label>
+  <textarea class="rep rep-md" id="ex6-q2" placeholder="1. Vérifier que la crypto map est bien appliquée à l'interface WAN (show crypto map) …&#10;2. …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 7 ══ -->
+<h1>7. Dossier de déploiement — Section 11</h1>
+
+<div class="dossier-section">
+  <div class="dossier-titre">
+    <span>📄 Dossier de déploiement Provence Évasion</span>
+    <span class="dossier-num">Section 11</span>
+  </div>
+
+  <p style="font-size:12px;margin-bottom:12px;"><strong>Objet :</strong> Sécurisation des accès d'administration — SSH et VPN<br>
+  <strong>Rédigé par :</strong> <input type="text" id="dos11-redacteur" style="border:none;border-bottom:1px solid #999;font-family:'Montserrat',sans-serif;font-size:12px;width:200px;padding:1px 4px;"> &nbsp;|&nbsp; <strong>Date :</strong> <input type="date" id="dos11-date" style="border:none;border-bottom:1px solid #999;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;"></p>
+
+  <h2>11.1 Justification des choix de sécurisation</h2>
+  <label class="qlabel">Rédigez en 4 à 6 phrases la justification des choix techniques retenus : pourquoi SSH sur tous les équipements, pourquoi un VPN site-à-site entre Apt et Roussillon en priorité, et pourquoi l'accès distant du PDG reste pour l'instant au stade de recommandation théorique :</label>
+  <textarea class="rep rep-lg" id="dos11-justif" placeholder="Suite à l'audit Axentis, qui a révélé l'absence totale d'accès distant sécurisé et l'usage généralisé de Telnet…"></textarea>
+
+  <h2>11.2 Tableau de sécurisation des accès — par équipement</h2>
+  <table class="dossier-table">
+    <tr><th>Site</th><th>Équipement</th><th>SSH activé</th><th>Méthode d'authentification</th><th>VPN site-à-site concerné</th></tr>
+    <tr>
+      <td class="td-fixe" rowspan="2">Apt (Siège)</td>
+      <td class="td-fixe">R-Apt</td>
+      <td><select id="dos11-rapt-ssh"><option value="">—</option><option>Oui</option><option>Non</option></select></td>
+      <td><input type="text" id="dos11-rapt-auth" placeholder="Locale (username/secret)"></td>
+      <td><select id="dos11-rapt-vpn"><option value="">—</option><option>Oui — vers Roussillon</option><option>Non</option></select></td>
+    </tr>
+    <tr>
+      <td class="td-fixe">SW-Apt</td>
+      <td><select id="dos11-swapt-ssh"><option value="">—</option><option>Oui</option><option>Non</option></select></td>
+      <td><input type="text" id="dos11-swapt-auth"></td>
+      <td><select id="dos11-swapt-vpn"><option value="">—</option><option>Non — VPN au niveau routeur</option></select></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" rowspan="2">Roussillon</td>
+      <td class="td-fixe">R-Roussillon</td>
+      <td><select id="dos11-rrou-ssh"><option value="">—</option><option>Oui</option><option>Non</option></select></td>
+      <td><input type="text" id="dos11-rrou-auth"></td>
+      <td><select id="dos11-rrou-vpn"><option value="">—</option><option>Oui — vers Apt</option><option>Non</option></select></td>
+    </tr>
+    <tr>
+      <td class="td-fixe">SW-Roussillon</td>
+      <td><select id="dos11-swrou-ssh"><option value="">—</option><option>Oui</option><option>Non</option></select></td>
+      <td><input type="text" id="dos11-swrou-auth"></td>
+      <td><select id="dos11-swrou-vpn"><option value="">—</option><option>Non — VPN au niveau routeur</option></select></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" rowspan="2">Saignon</td>
+      <td class="td-fixe">R-Saignon</td>
+      <td><select id="dos11-rsai-ssh"><option value="">—</option><option>Oui</option><option>Non</option></select></td>
+      <td><input type="text" id="dos11-rsai-auth"></td>
+      <td><select id="dos11-rsai-vpn"><option value="">—</option><option>Non — pas encore concerné</option></select></td>
+    </tr>
+    <tr>
+      <td class="td-fixe">SW-Saignon</td>
+      <td><select id="dos11-swsai-ssh"><option value="">—</option><option>Oui</option><option>Non</option></select></td>
+      <td><input type="text" id="dos11-swsai-auth"></td>
+      <td><select id="dos11-swsai-vpn"><option value="">—</option><option>Non — pas encore concerné</option></select></td>
+    </tr>
+    <tr>
+      <td class="td-fixe" rowspan="2">Cucuron</td>
+      <td class="td-fixe">R-Cucuron</td>
+      <td><select id="dos11-rcuc-ssh"><option value="">—</option><option>Oui</option><option>Non</option></select></td>
+      <td><input type="text" id="dos11-rcuc-auth"></td>
+      <td><select id="dos11-rcuc-vpn"><option value="">—</option><option>Non — pas encore concerné</option></select></td>
+    </tr>
+    <tr>
+      <td class="td-fixe">SW-Cucuron</td>
+      <td><select id="dos11-swcuc-ssh"><option value="">—</option><option>Oui</option><option>Non</option></select></td>
+      <td><input type="text" id="dos11-swcuc-auth"></td>
+      <td><select id="dos11-swcuc-vpn"><option value="">—</option><option>Non — pas encore concerné</option></select></td>
+    </tr>
+  </table>
+
+  <h2>11.3 Recommandation théorique — accès distant du PDG</h2>
+  <label class="qlabel">Rédigez une recommandation pour l'accès distant de Laurent Ferracci depuis son domicile : quel type de VPN, quelles limites de Packet Tracer pour le tester, et quelles seraient les prochaines étapes pour un déploiement réel :</label>
+  <textarea class="rep rep-lg" id="dos11-reco-pdg" placeholder="Pour l'accès distant occasionnel de Laurent Ferracci, un VPN d'accès distant (client-to-site) est recommandé…"></textarea>
+
+  <h2>11.4 Extension future envisagée</h2>
+  <label class="qlabel">Le tunnel VPN actuel ne relie qu'Apt et Roussillon. Proposez une extension du maillage VPN aux deux autres sites (Saignon, Cucuron) et justifiez l'ordre de priorité que vous proposeriez :</label>
+  <textarea class="rep rep-md" id="dos11-extension" placeholder="Votre proposition…"></textarea>
+</div>
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Synthèse de l'Atelier 2</div>
+
+<div class="conclusion">
+  <p>Le tunnel VPN IPsec relie les routeurs <input class="inline-field" id="synth-1" placeholder="R-Apt"> et <input class="inline-field" id="synth-2" placeholder="R-Roussillon">, en sécurisant le trafic du VLAN <input class="inline-field" id="synth-3" placeholder="Administration"> entre les deux sites.</p>
+  <p>La Phase 1 négocie une politique <input class="inline-field" id="synth-4" placeholder="ISAKMP/IKE"> et une clé <input class="inline-field" id="synth-5" placeholder="pré-partagée">. La Phase 2 s'appuie sur un <input class="inline-field" id="synth-6" placeholder="transform-set">, une ACL de trafic <input class="inline-field" id="synth-7" placeholder="intéressant"> et une <input class="inline-field" id="synth-8" placeholder="crypto map"> appliquée sur l'interface <input class="inline-field" id="synth-9" placeholder="WAN">.</p>
+  <p>La Section 11 du dossier de déploiement décrit la <input class="inline-field" id="synth-10" placeholder="sécurisation des accès d'administration"> du projet Provence Évasion.</p>
+</div>
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <script>
+  const criteres = [
+    "Je comprends pourquoi sécuriser aussi la liaison inter-sites avec un VPN",
+    "Je sais configurer la Phase 1 ISAKMP/IKE (politique + clé pré-partagée)",
+    "Je sais configurer la Phase 2 IPsec (transform-set, ACL de trafic intéressant, crypto map)",
+    "Je sais appliquer une crypto map sur l'interface WAN d'un routeur",
+    "Je sais vérifier l'établissement d'un tunnel VPN (show crypto isakmp sa / show crypto ipsec sa)",
+    "Je sais diagnostiquer une panne de tunnel VPN",
+    "J'ai complété la Section 11 du dossier de déploiement"
+  ];
+  const niveaux = ['maitrise','en_cours','a_revoir','non_traite'];
+  const labels = ['★★★','★★☆','★☆☆','?'];
+  const cont = document.querySelector('.autoeval');
+  criteres.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className='ae-row';
+    let html=`<div>${c}</div>`;
+    niveaux.forEach((n,j)=>{
+      html+=`<div style="text-align:center"><label style="cursor:pointer"><input type="radio" name="ae-${i}" value="${n}" style="accent-color:var(--bleu);margin-right:4px">${labels[j]}</label></div>`;
+    });
+    row.innerHTML=html;
+    cont.appendChild(row);
+  });
+  </script>
+</div>
+
+</div><!-- /content -->
+
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <div><strong style="color:var(--orange)">S10</strong> — Atelier 2 : VPN IPsec site-à-site, Dossier Section 11</div>
+  <div>Lycée Louis Lumière – Chelles · Bac Pro CIEL · 2025-2026</div>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+function genererJSON(){
+  const nom=document.getElementById('eleve-nom').value;
+  const prenom=document.getElementById('eleve-prenom').value;
+  const v=id=>{const el=document.getElementById(id);return el?el.value:''};
+  const ae={};
+  ["Je comprends pourquoi sécuriser aussi la liaison inter-sites avec un VPN","Je sais configurer la Phase 1 ISAKMP/IKE (politique + clé pré-partagée)","Je sais configurer la Phase 2 IPsec (transform-set, ACL de trafic intéressant, crypto map)","Je sais appliquer une crypto map sur l'interface WAN d'un routeur","Je sais vérifier l'établissement d'un tunnel VPN (show crypto isakmp sa / show crypto ipsec sa)","Je sais diagnostiquer une panne de tunnel VPN","J'ai complété la Section 11 du dossier de déploiement"].forEach((c,i)=>{
+    const r=document.querySelector(`input[name="ae-${i}"]:checked`);
+    ae[`critere_${i+1}`]={critere:c,niveau:r?r.value:'non_traite'};
+  });
+  const data={
+    meta:{devoir:"S10 – Atelier 2 : VPN IPsec site-à-site Apt ↔ Roussillon",eleve:{nom,prenom,classe:v('eleve-classe')},date:v('eleve-date'),genere_le:new Date().toISOString()},
+    partie2_wan:{wan_apt:v('ex2-wan-apt'),wan_rou:v('ex2-wan-rou'),q1:v('ex2-q1')},
+    partie3_phase1:{cmd_apt:v('ex3-cmd-apt'),cmd_rou:v('ex3-cmd-rou'),q1:v('ex3-q1')},
+    partie4_phase2:{cmd_apt:v('ex4-cmd-apt'),cmd_rou:v('ex4-cmd-rou'),q1:v('ex4-q1'),q2:v('ex4-q2')},
+    partie5_verification:{
+      isakmp_sa:v('v1-res'),ipsec_sa:v('v2-res'),
+      q1:v('ex5-q1'),q2:v('ex5-q2'),q3:v('ex5-q3')
+    },
+    partie6_depannage:{q1:v('ex6-q1'),q2:v('ex6-q2')},
+    partie7_dossier_section11:{
+      redacteur:v('dos11-redacteur'),date:v('dos11-date'),
+      justification:v('dos11-justif'),
+      tableau:{
+        r_apt:{ssh:v('dos11-rapt-ssh'),auth:v('dos11-rapt-auth'),vpn:v('dos11-rapt-vpn')},
+        sw_apt:{ssh:v('dos11-swapt-ssh'),auth:v('dos11-swapt-auth'),vpn:v('dos11-swapt-vpn')},
+        r_roussillon:{ssh:v('dos11-rrou-ssh'),auth:v('dos11-rrou-auth'),vpn:v('dos11-rrou-vpn')},
+        sw_roussillon:{ssh:v('dos11-swrou-ssh'),auth:v('dos11-swrou-auth'),vpn:v('dos11-swrou-vpn')},
+        r_saignon:{ssh:v('dos11-rsai-ssh'),auth:v('dos11-rsai-auth'),vpn:v('dos11-rsai-vpn')},
+        sw_saignon:{ssh:v('dos11-swsai-ssh'),auth:v('dos11-swsai-auth'),vpn:v('dos11-swsai-vpn')},
+        r_cucuron:{ssh:v('dos11-rcuc-ssh'),auth:v('dos11-rcuc-auth'),vpn:v('dos11-rcuc-vpn')},
+        sw_cucuron:{ssh:v('dos11-swcuc-ssh'),auth:v('dos11-swcuc-auth'),vpn:v('dos11-swcuc-vpn')}
+      },
+      recommandation_pdg:v('dos11-reco-pdg'),
+      extension_future:v('dos11-extension')
+    },
+    synthese:{s1:v('synth-1'),s2:v('synth-2'),s3:v('synth-3'),s4:v('synth-4'),s5:v('synth-5'),s6:v('synth-6'),s7:v('synth-7'),s8:v('synth-8'),s9:v('synth-9'),s10:v('synth-10')},
+    auto_evaluation:ae
+  };
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${safeName}_S10Atelier2.json`;
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

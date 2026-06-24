@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S8 — Atelier 1 : Serveurs de fichiers et tests inter-sites</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.consigne{border-left:4px solid var(--orange);background:#fffbf0;padding:12px 16px;margin:14px 0;font-size:12px;line-height:1.75;}
+.consigne strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.etape{background:#fff;border:2px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.etape-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);margin-bottom:10px;font-size:13px;display:flex;align-items:center;gap:10px;}
+.etape-num{background:var(--bleu);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.upload-zone{border:2px dashed var(--bleu);border-radius:8px;padding:16px;text-align:center;margin:8px 0 12px;cursor:pointer;background:var(--ciel-bg);}
+.upload-zone:hover{border-color:var(--marine);}
+.upload-text{color:var(--bleu);font-weight:600;margin-bottom:4px;}
+.upload-hint{font-size:11px;color:#888;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}.cli .cm-val{color:#FFD54F;}.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 16px;}
+.compare-card{border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.75;}
+.compare-card.bleu{background:var(--ciel-bg);border:2px solid var(--bleu);}
+.compare-card.vert{background:#f6fbed;border:2px solid var(--vert);}
+.compare-card .cc-titre{font-family:'Roboto',sans-serif;font-weight:700;margin-bottom:6px;font-size:13px;}
+.compare-card.bleu .cc-titre{color:var(--bleu);}
+.compare-card.vert .cc-titre{color:#4a7a1a;}
+.recette-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:11.5px;}
+.recette-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 8px;border:1px solid #aac;text-align:center;}
+.recette-table td{border:1px solid #c0d0e8;padding:5px 7px;vertical-align:top;}
+.recette-table tr:nth-child(even){background:var(--ciel-bg);}
+.recette-table select{width:100%;border:1px solid #c0d0e0;border-radius:4px;padding:3px 5px;font-family:'Montserrat',sans-serif;font-size:11px;color:var(--marine);}
+.phys-zone{background:#fff8f0;border:2px solid var(--orange);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.phys-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:8px;font-size:13px;}
+.duree-badge{display:inline-block;background:var(--vert);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;padding:3px 10px;border-radius:12px;margin-left:10px;}
+
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div><div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S8 – Atelier 1 : Configuration des serveurs de fichiers et tests inter-sites</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Lycée Louis Lumière – Chelles &nbsp;|&nbsp; 2025-2026</div>
+  <div class="eleve-box">
+    <input id="eleve-nom" placeholder="Nom">
+    <input id="eleve-prenom" placeholder="Prénom">
+    <input id="eleve-classe" placeholder="Classe">
+    <input id="eleve-date" type="date">
+  </div><table class="comp-table"><tr><th class="th-head">Code</th><th class="th-head">Compétence</th><th class="th-head">Bloc</th><th class="th-head">✓</th></tr><tr class="tr-bloc"><td colspan="4">Bloc 1 — Réaliser</td></tr><tr class="tr-even"><td class="td-code">C03</td><td>Participer à un projet</td><td>Bloc 1</td><td class="td-check"><span class="chk-off">☐</span></td></tr><tr class="tr-odd"><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td><td>Bloc 1</td><td class="td-check"><span class="chk-on">☑</span></td></tr><tr class="tr-even"><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau informatique</td><td>Bloc 1</td><td class="td-check"><span class="chk-off">☐</span></td></tr><tr class="tr-bloc"><td colspan="4">Bloc 2 — Déployer</td></tr><tr class="tr-odd"><td class="td-code">C06</td><td>Valider la conformité d'une installation</td><td>Bloc 2</td><td class="td-check"><span class="chk-on">☑</span></td></tr><tr class="tr-even"><td class="td-code">C09</td><td>Installer les éléments d'un système électronique ou informatique</td><td>Bloc 2</td><td class="td-check"><span class="chk-on">☑</span></td></tr><tr class="tr-odd"><td class="td-code">C10</td><td>Exploiter un réseau informatique</td><td>Bloc 2</td><td class="td-check"><span class="chk-on">☑</span></td></tr><tr class="tr-bloc"><td colspan="4">Bloc 3 — Analyser</td></tr><tr class="tr-even"><td class="td-code">C01</td><td>Communiquer en situation professionnelle (français / anglais)</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr><tr class="tr-odd"><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr><tr class="tr-even"><td class="td-code">C08</td><td>Coder</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr></table></div>
+
+<div class="content">
+
+<div class="consigne">
+  <strong>📋 Consignes générales :</strong> Tu travailles en autonomie sur ta maquette Packet Tracer Provence Évasion issue de S7 (4 sites opérationnels, DNS fonctionnel). Tu suis les étapes dans l'ordre. Durée : 4h. Travail individuel.
+</div>
+
+<!-- ══ PHASE A ══ -->
+<h1>Phase A — Préparation et vérification de la topologie S7 <span class="duree-badge">~30 min</span></h1>
+
+<div class="mise-en-situation">
+  <strong>🎯 Objectif :</strong> Avant d'ajouter quoi que ce soit, s'assurer que la maquette S7 est pleinement fonctionnelle : routage inter-sites opérationnel, DNS résolvant les noms, et VLAN 15 (Serveurs) accessible depuis tous les sites.
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">1</div>Vérification du routage inter-sites</div>
+  <p>Effectue les 4 pings suivants et note les résultats. En cas d'échec, corrige avant de continuer.</p>
+  <table class="data-table">
+    <tr><th>Source</th><th>Destination</th><th>Résultat attendu</th><th>Résultat obtenu</th></tr>
+    <tr><td>PC-Personnel-Apt (VLAN 11)</td><td>PC-Personnel-Roussillon (VLAN 21)</td><td>Succès</td><td><input type="text" id="v1" style="width:100%;border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-size:12px;"></td></tr>
+    <tr><td>PC-Personnel-Apt (VLAN 11)</td><td>PC-Personnel-Saignon (VLAN 31)</td><td>Succès</td><td><input type="text" id="v2" style="width:100%;border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-size:12px;"></td></tr>
+    <tr><td>PC-Personnel-Apt (VLAN 11)</td><td>PC-Personnel-Cucuron (VLAN 41)</td><td>Succès</td><td><input type="text" id="v3" style="width:100%;border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-size:12px;"></td></tr>
+    <tr><td>PC-Personnel-Roussillon (VLAN 21)</td><td>Serveur DNS (192.168.15.3)</td><td>Succès</td><td><input type="text" id="v4" style="width:100%;border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-size:12px;"></td></tr>
+  </table>
+  <label class="qlabel">A1.1 — Si un ping échoue, quelle est la cause la plus probable et comment la corriger ?</label>
+  <textarea class="rep rep-sm" id="a1-1" placeholder="Cause probable : …&#10;Correction : …"></textarea>
+<div class="upload-zone" onclick="document.getElementById('img-1').click()">
+  <input type="file" id="img-1" accept="image/*" onchange="compresserImage(this.files[0],'prev-1','hint-1',d=>imgData['img1']=d)" style="display:none;">
+  <div class="upload-text">📎 Capture : 4 pings réussis depuis PC-Apt vers les 3 sites</div>
+  <div class="upload-hint" id="hint-1">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-1" style="display:none; max-width:100%; margin-top:10px">
+</div>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">2</div>Vérification du VLAN 15 (Serveurs)</div>
+  <p>Depuis PC-Personnel-Apt (VLAN 11), ping vers le serveur DNS/DHCP (192.168.15.3). Ce ping doit réussir car le routeur d'Apt assure le routage entre VLAN 11 et VLAN 15.</p>
+  <label class="qlabel">A1.2 — Le ping vers 192.168.15.3 fonctionne-t-il depuis VLAN 11 ? Et depuis VLAN 12 (Clients WiFi) ? Explique la différence.</label>
+  <textarea class="rep rep-sm" id="a1-2" placeholder="Depuis VLAN 11 : …&#10;Depuis VLAN 12 : …&#10;Différence : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PHASE B ══ -->
+<h1>Phase B — Configuration de NAS-APT (siège d'Apt) <span class="duree-badge">~50 min</span></h1>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">3</div>Ajouter le serveur NAS-APT dans la topologie</div>
+  <p>Dans la zone du siège d'Apt, ajoute un serveur générique (Server-PT). Nomme-le <strong>NAS-APT</strong>. Branche-le sur le switch d'Apt via un câble droit. Affecte le port au VLAN 15.</p>
+  <label class="qlabel">B1.1 — Quelles commandes entres-tu sur le switch d'Apt pour affecter le port connecté à NAS-APT au VLAN 15 en mode Access ?</label>
+  <div class="cli">Switch-Apt(config)# interface <input type="text" id="b1-if" style="background:transparent;border:none;border-bottom:1px solid #5BB8E8;color:#FFD54F;width:90px;font-family:'Courier New';font-size:12px;">
+Switch-Apt(config-if)# <input type="text" id="b1-mode" style="background:transparent;border:none;border-bottom:1px solid #5BB8E8;color:#FFD54F;width:180px;font-family:'Courier New';font-size:12px;">
+Switch-Apt(config-if)# <input type="text" id="b1-vlan" style="background:transparent;border:none;border-bottom:1px solid #5BB8E8;color:#FFD54F;width:180px;font-family:'Courier New';font-size:12px;">
+Switch-Apt(config-if)# no shutdown
+Switch-Apt(config-if)# exit
+Switch-Apt(config)# end
+Switch-Apt# write memory</div>
+  <label class="qlabel">B1.2 — Vérifie que le VLAN 15 existe bien sur le switch. Quelle commande utilises-tu ?</label>
+  <textarea class="rep rep-xs" id="b1-2" placeholder="Commande…"></textarea>
+<div class="upload-zone" onclick="document.getElementById('img-2').click()">
+  <input type="file" id="img-2" accept="image/*" onchange="compresserImage(this.files[0],'prev-2','hint-2',d=>imgData['img2']=d)" style="display:none;">
+  <div class="upload-text">📎 Capture : show vlan brief sur le switch d'Apt</div>
+  <div class="upload-hint" id="hint-2">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-2" style="display:none; max-width:100%; margin-top:10px">
+</div>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">4</div>Configurer l'adresse IP statique de NAS-APT</div>
+  <p>Dans Desktop → IP Configuration du serveur NAS-APT :</p>
+  <table class="data-table">
+    <tr><th>Paramètre</th><th>Valeur</th><th>Justification</th></tr>
+    <tr><td>Adresse IP</td><td class="center">192.168.15.4</td><td>Convention .4 = NAS (serveur critique)</td></tr>
+    <tr><td>Masque</td><td class="center">255.255.255.0</td><td>/24 comme tout le VLAN 15</td></tr>
+    <tr><td>Passerelle</td><td class="center">192.168.15.1</td><td>Interface routeur sur VLAN 15</td></tr>
+    <tr><td>DNS</td><td class="center">192.168.15.3</td><td>Serveur DNS interne</td></tr>
+  </table>
+  <label class="qlabel">B2.1 — Après configuration, ping depuis NAS-APT vers la passerelle (192.168.15.1). Résultat ?</label>
+  <textarea class="rep rep-xs" id="b2-1" placeholder="Succès / Échec — si échec : cause probable ?"></textarea>
+  <label class="qlabel">B2.2 — Ping depuis PC-Personnel-Apt (192.168.11.x) vers NAS-APT (192.168.15.4). Résultat ? Explique le chemin réseau parcouru.</label>
+  <textarea class="rep rep-sm" id="b2-2" placeholder="Résultat : …&#10;Chemin : PC-Apt → Switch Apt (VLAN 11) → Routeur Apt (192.168.11.1 → 192.168.15.1) → Switch Apt (VLAN 15) → NAS-APT"></textarea>
+<div class="upload-zone" onclick="document.getElementById('img-3').click()">
+  <input type="file" id="img-3" accept="image/*" onchange="compresserImage(this.files[0],'prev-3','hint-3',d=>imgData['img3']=d)" style="display:none;">
+  <div class="upload-text">📎 Capture : IP Configuration de NAS-APT + ping vers passerelle</div>
+  <div class="upload-hint" id="hint-3">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-3" style="display:none; max-width:100%; margin-top:10px">
+</div>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">5</div>Activer le service FTP et créer les comptes utilisateurs</div>
+  <p>Dans Services → FTP du serveur NAS-APT, active le service et crée exactement ces 3 comptes :</p>
+  <table class="data-table">
+    <tr><th>Compte</th><th>Mot de passe</th><th>Write</th><th>Read</th><th>Delete</th><th>Rename</th><th>List</th><th>Profil</th></tr>
+    <tr><td><strong>employe</strong></td><td>ciel2026</td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">✓</td><td class="center">✓</td><td>Personnel – R/W (sans suppression)</td></tr>
+    <tr><td><strong>direction</strong></td><td>directeurApt</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td>Direction – Contrôle total</td></tr>
+    <tr><td><strong>lecture</strong></td><td>readonly2026</td><td class="center">✗</td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">✓</td><td>Accès lecture seule (tarifs, modèles)</td></tr>
+  </table>
+  <label class="qlabel">B3.1 — Pourquoi le compte <code>employe</code> n'a-t-il pas le droit Delete ? Cite un exemple concret où cela protège les données de Provence Évasion.</label>
+  <textarea class="rep rep-sm" id="b3-1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">B3.2 — Quel compte Laurent Ferracci (PDG) doit-il utiliser pour accéder au NAS ? Justifie.</label>
+  <textarea class="rep rep-xs" id="b3-2" placeholder="Compte : …  — Justification : …"></textarea>
+<div class="upload-zone" onclick="document.getElementById('img-4').click()">
+  <input type="file" id="img-4" accept="image/*" onchange="compresserImage(this.files[0],'prev-4','hint-4',d=>imgData['img4']=d)" style="display:none;">
+  <div class="upload-text">📎 Capture : service FTP avec les 3 comptes configurés sur NAS-APT</div>
+  <div class="upload-hint" id="hint-4">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-4" style="display:none; max-width:100%; margin-top:10px">
+</div>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PHASE C ══ -->
+<h1>Phase C — Configuration de NAS-Roussillon (site secondaire) <span class="duree-badge">~40 min</span></h1>
+
+<div class="mise-en-situation">
+  <strong>🎯 Objectif :</strong> Axentis a prévu un deuxième NAS à Roussillon pour stocker les données locales de ce site (réservations Roussillon, plannings locaux). Il doit être accessible depuis Roussillon mais aussi depuis le siège d'Apt.
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">6</div>Ajouter NAS-Roussillon dans la topologie</div>
+  <p>Dans la zone du site de Roussillon, ajoute un serveur générique. Nomme-le <strong>NAS-Roussillon</strong>. Il se place dans le <strong>VLAN 25 (Serveurs Roussillon)</strong> avec l'IP <strong>192.168.25.4</strong>.</p>
+  <label class="qlabel">C1.1 — Si le VLAN 25 n'existe pas encore sur le switch de Roussillon, quelles commandes dois-tu entrer pour le créer ?</label>
+  <div class="cli">Switch-Roussillon(config)# <input type="text" id="c1-vlan" style="background:transparent;border:none;border-bottom:1px solid #5BB8E8;color:#FFD54F;width:80px;font-family:'Courier New';font-size:12px;">
+Switch-Roussillon(config-vlan)# name <input type="text" id="c1-name" style="background:transparent;border:none;border-bottom:1px solid #5BB8E8;color:#FFD54F;width:160px;font-family:'Courier New';font-size:12px;">
+Switch-Roussillon(config-vlan)# exit</div>
+  <label class="qlabel">C1.2 — Configure l'adresse IP de NAS-Roussillon. Complète le tableau :</label>
+  <table class="data-table">
+    <tr><th>Paramètre</th><th>Valeur à entrer</th></tr>
+    <tr><td>Adresse IP</td><td><input type="text" id="c1-ip" style="width:150px;border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-size:12px;"></td></tr>
+    <tr><td>Masque</td><td><input type="text" id="c1-mask" style="width:150px;border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-size:12px;"></td></tr>
+    <tr><td>Passerelle</td><td><input type="text" id="c1-gw" style="width:150px;border:1px solid #c0d0e0;border-radius:4px;padding:3px 6px;font-size:12px;"></td></tr>
+  </table>
+  <label class="qlabel">C1.3 — Quelle route statique doit-on ajouter sur le routeur d'Apt pour qu'il puisse atteindre le réseau 192.168.25.0/24 ?</label>
+  <textarea class="rep rep-xs" id="c1-3" placeholder="ip route 192.168.25.0 255.255.255.0 …"></textarea>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">7</div>Configurer le service FTP de NAS-Roussillon</div>
+  <p>Active le service FTP sur NAS-Roussillon avec les mêmes 3 comptes que NAS-APT (mêmes identifiants et droits). Crée ensuite un fichier test : dans un PC de Roussillon, crée un fichier texte nommé <code>planning-roussillon.txt</code> et envoie-le sur NAS-Roussillon.</p>
+  <div class="cli">
+<span class="cm-com">─── Depuis PC-Personnel-Roussillon (192.168.21.x) ───</span>
+PC> <span class="cm-val">ftp 192.168.25.4</span>           <span class="cm-com">← NAS local de Roussillon</span>
+Username: <span class="cm-val">employe</span>
+Password: <span class="cm-val">ciel2026</span>
+ftp> <span class="cm-val">put planning-roussillon.txt</span>
+ftp> <span class="cm-val">dir</span>                       <span class="cm-com">← vérifie la présence du fichier</span>
+ftp> <span class="cm-val">quit</span>
+</div>
+  <label class="qlabel">C2.1 — La connexion FTP locale (Roussillon → NAS-Roussillon) a-t-elle réussi ?</label>
+  <textarea class="rep rep-xs" id="c2-1" placeholder="Succès / Échec"></textarea>
+  <label class="qlabel">C2.2 — Depuis PC-Personnel-Apt (siège), accède maintenant à NAS-Roussillon (192.168.25.4). Pourquoi cette connexion inter-sites fonctionne-t-elle ?</label>
+  <textarea class="rep rep-sm" id="c2-2" placeholder="Votre réponse…"></textarea>
+<div class="upload-zone" onclick="document.getElementById('img-5').click()">
+  <input type="file" id="img-5" accept="image/*" onchange="compresserImage(this.files[0],'prev-5','hint-5',d=>imgData['img5']=d)" style="display:none;">
+  <div class="upload-text">📎 Capture : FTP local Roussillon → NAS-Roussillon + connexion depuis Apt</div>
+  <div class="upload-hint" id="hint-5">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-5" style="display:none; max-width:100%; margin-top:10px">
+</div>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PHASE D ══ -->
+<h1>Phase D — Tests d'accès complets depuis les 4 sites <span class="duree-badge">~60 min</span></h1>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">8</div>Tests FTP depuis Apt vers NAS-APT</div>
+  <div class="cli">
+<span class="cm-com">─── Test 1 : Apt → NAS-APT avec compte employe ───</span>
+PC-Apt> <span class="cm-val">ftp 192.168.15.4</span>
+Username: <span class="cm-val">employe</span>  Password: <span class="cm-val">ciel2026</span>
+ftp> <span class="cm-val">put rapport-apt.txt</span>
+ftp> <span class="cm-val">dir</span>
+ftp> <span class="cm-val">quit</span>
+
+<span class="cm-com">─── Test 2 : Apt → NAS-APT avec compte direction ───</span>
+PC-Apt> <span class="cm-val">ftp 192.168.15.4</span>
+Username: <span class="cm-val">direction</span>  Password: <span class="cm-val">directeurApt</span>
+ftp> <span class="cm-val">delete rapport-apt.txt</span>   <span class="cm-com">← seul direction peut supprimer</span>
+ftp> <span class="cm-val">dir</span>                      <span class="cm-com">← fichier doit avoir disparu</span>
+ftp> <span class="cm-val">quit</span>
+
+<span class="cm-com">─── Test 3 : Apt → NAS-APT avec compte lecture (put doit échouer) ───</span>
+PC-Apt> <span class="cm-val">ftp 192.168.15.4</span>
+Username: <span class="cm-val">lecture</span>  Password: <span class="cm-val">readonly2026</span>
+ftp> <span class="cm-val">put test.txt</span>           <span class="cm-com">← DOIT être refusé</span>
+ftp> <span class="cm-val">dir</span>                    <span class="cm-com">← lecture seule OK</span>
+ftp> <span class="cm-val">quit</span>
+</div>
+  <label class="qlabel">D1.1 — Résultats des 3 tests depuis Apt. La suppression avec direction a-t-elle fonctionné ? L'écriture avec lecture a-t-elle bien été refusée ?</label>
+  <textarea class="rep rep-sm" id="d1-1" placeholder="Test 1 (employe) : …&#10;Test 2 (direction) : …&#10;Test 3 (lecture) : …"></textarea>
+<div class="upload-zone" onclick="document.getElementById('img-6').click()">
+  <input type="file" id="img-6" accept="image/*" onchange="compresserImage(this.files[0],'prev-6','hint-6',d=>imgData['img6']=d)" style="display:none;">
+  <div class="upload-text">📎 Capture : les 3 sessions FTP depuis PC-Apt (employe, direction, lecture)</div>
+  <div class="upload-hint" id="hint-6">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-6" style="display:none; max-width:100%; margin-top:10px">
+</div>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">9</div>Tests FTP depuis Roussillon, Saignon et Cucuron vers NAS-APT</div>
+  <p>Depuis chaque site, connecte-toi au NAS central (192.168.15.4) avec le compte <code>employe</code>, dépose un fichier de test et vérifie qu'il est lisible depuis Apt.</p>
+  <table class="data-table">
+    <tr><th>Site source</th><th>VLAN</th><th>Fichier déposé</th><th>Ping NAS-APT</th><th>FTP connexion</th><th>put réussi ?</th></tr>
+    <tr><td>Roussillon</td><td>21</td><td>doc-roussillon.txt</td>
+      <td><input type="text" id="d2-r-ping" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+      <td><input type="text" id="d2-r-ftp" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+      <td><input type="text" id="d2-r-put" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+    </tr>
+    <tr><td>Saignon</td><td>31</td><td>doc-saignon.txt</td>
+      <td><input type="text" id="d2-s-ping" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+      <td><input type="text" id="d2-s-ftp" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+      <td><input type="text" id="d2-s-put" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+    </tr>
+    <tr><td>Cucuron</td><td>41</td><td>doc-cucuron.txt</td>
+      <td><input type="text" id="d2-c-ping" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+      <td><input type="text" id="d2-c-ftp" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+      <td><input type="text" id="d2-c-put" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:2px 5px;font-size:11px;"></td>
+    </tr>
+  </table>
+  <label class="qlabel">D2.1 — Depuis PC-Apt, effectue un <code>dir</code> sur NAS-APT. Vois-tu les 3 fichiers déposés par Roussillon, Saignon et Cucuron ? Qu'est-ce que cela confirme ?</label>
+  <textarea class="rep rep-sm" id="d2-1" placeholder="Votre réponse…"></textarea>
+<div class="upload-zone" onclick="document.getElementById('img-7').click()">
+  <input type="file" id="img-7" accept="image/*" onchange="compresserImage(this.files[0],'prev-7','hint-7',d=>imgData['img7']=d)" style="display:none;">
+  <div class="upload-text">📎 Capture : dir sur NAS-APT montrant les fichiers des 3 sites</div>
+  <div class="upload-hint" id="hint-7">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-7" style="display:none; max-width:100%; margin-top:10px">
+</div>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">10</div>Test d'isolation — les clients WiFi ne doivent pas accéder aux NAS</div>
+  <p>Depuis un PC dans le VLAN 12 (Clients WiFi d'Apt), tente un ping vers NAS-APT (192.168.15.4).</p>
+  <label class="qlabel">D3.1 — Résultat du ping depuis VLAN 12 vers NAS-APT ? Explique pourquoi sans ACL ce résultat peut varier, et ce que tu devras corriger en S9.</label>
+  <textarea class="rep rep-sm" id="d3-1" placeholder="Résultat : …&#10;Explication : sans ACL, le routage inter-VLAN est autorisé par défaut. En S9 on bloquera…"></textarea>
+  <label class="qlabel">D3.2 — Résume en une phrase le principe de sécurité qui sera appliqué en S9 pour protéger les NAS des clients WiFi.</label>
+  <textarea class="rep rep-xs" id="d3-2" placeholder="En S9, on configurera des ACL sur le routeur pour…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PHASE E ══ -->
+<h1>Phase E — Section 9 du dossier de déploiement <span class="duree-badge">~60 min</span></h1>
+
+<div class="exercice-synth">
+  <div class="exercice-titre">📝 Rédaction complète de la Section 9 — Organisation des partages réseau</div>
+
+  <label class="qlabel">S1 — Description des serveurs NAS. Complète le tableau de la section 9 :</label>
+  <table class="data-table">
+    <tr><th>Serveur</th><th>VLAN</th><th>Adresse IP</th><th>Passerelle</th><th>Sites pouvant y accéder</th></tr>
+    <tr><td><strong>NAS-APT</strong></td>
+      <td><input type="text" id="s1-apt-vlan" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="s1-apt-ip" style="width:110px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="s1-apt-gw" style="width:110px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="s1-apt-sites" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+    </tr>
+    <tr><td><strong>NAS-Roussillon</strong></td>
+      <td><input type="text" id="s1-rou-vlan" style="width:60px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="s1-rou-ip" style="width:110px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="s1-rou-gw" style="width:110px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="s1-rou-sites" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+    </tr>
+  </table>
+
+  <label class="qlabel">S2 — Arborescence des partages réseau. Recopie et complète l'arborescence ci-dessous pour NAS-APT (ajoute les droits en face de chaque partage) :</label>
+  <textarea class="rep rep-lg" id="s2-arbo" placeholder="\NAS-APT\&#10;  ├── Reservations\       ← Accès : …&#10;  ├── Comptabilite\       ← Accès : …&#10;  ├── RH\                 ← Accès : …&#10;  ├── Commun\             ← Accès : …&#10;  └── Public\             ← Accès : …"></textarea>
+
+  <label class="qlabel">S3 — Tableau des droits d'accès FTP par compte. Rédige le tableau complet (comptes, permissions, profil représenté) tel qu'il figurera dans le dossier.</label>
+  <textarea class="rep rep-lg" id="s3-droits" placeholder="Compte | MDP | Write | Read | Delete | Rename | List | Profil&#10;employe   | …&#10;direction | …&#10;lecture   | …"></textarea>
+
+  <label class="qlabel">S4 — Compte-rendu des tests. Rédige un bilan professionnel des tests effectués (source, destination, compte, résultat) sous forme de tableau ou de liste structurée.</label>
+  <textarea class="rep rep-lg" id="s4-tests" placeholder="Test 1 : PC-Personnel-Apt (VLAN 11) → NAS-APT (192.168.15.4) — compte employe — put : OK&#10;Test 2 : …&#10;…&#10;Conclusion : tous les sites du groupe accèdent au NAS central…"></textarea>
+
+  <label class="qlabel">S5 — Justification technique. En 4 à 6 phrases, explique pourquoi les NAS sont placés dans des VLANs dédiés, quel lien cela a avec la sécurité, et ce qui sera renforcé en S9.</label>
+  <textarea class="rep rep-lg" id="s5-justif" placeholder="Les serveurs NAS sont placés dans des VLANs dédiés (VLAN 15 et 25) afin de…"></textarea>
+
+  <div class="autoeval" id="ae-container"></div>
+</div>
+
+</div>
+<div class="footer">
+  <span><strong style="color:var(--orange)">S8</strong> — Atelier 1 : Serveurs de fichiers et tests inter-sites</span>
+  <span>Lycée Louis Lumière – Bac Pro CIEL</span>
+</div>
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs et captures sont complétés avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+<script>
+
+document.getElementById('eleve-date').valueAsDate = new Date();
+const imgData = {};
+
+function compresserImage(file, idPreview, idHint, callback) {
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const MAX = 900;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const b64 = canvas.toDataURL('image/jpeg', 0.72);
+      document.getElementById(idPreview).src = b64;
+      document.getElementById(idPreview).style.display = 'block';
+      const kb = Math.round(b64.length * 0.75 / 1024);
+      document.getElementById(idHint).textContent = `Image compressée : ${w}×${h}px – environ ${kb} Ko`;
+      callback(b64);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function buildAE(criteres) {
+  const NIVEAUX = ['★★★ Maîtrisé','★★☆ En cours','★☆☆ À revoir','? Non traité'];
+  const VALS    = ['maitrise','en_cours','a_revoir','non_traite'];
+  const c = document.getElementById('ae-container');
+  let h = '<div class="autoeval-title">🎯 Auto-évaluation</div>';
+  h += '<div class="ae-row ae-header"><span>Critère</span><span>★★★</span><span>★★☆</span><span>★☆☆</span><span>?</span></div>';
+  criteres.forEach((cr,i)=>{
+    h += `<div class="ae-row"><span>${cr}</span>`;
+    NIVEAUX.forEach((lbl,j)=>{
+      h += `<label title="${lbl}" style="cursor:pointer;text-align:center;"><input type="radio" name="ae${i}" value="${VALS[j]}" style="display:none;"><span id="ae-lbl-${i}-${j}" style="font-size:18px;color:#bbb;">○</span></label>`;
+    });
+    h += '</div>';
+  });
+  c.innerHTML = h;
+  document.querySelectorAll('input[type=radio]').forEach(r=>{
+    r.addEventListener('change',()=>{
+      const ci=parseInt(r.name.replace('ae',''));
+      NIVEAUX.forEach((_,j)=>{ const s=document.getElementById(`ae-lbl-${ci}-${j}`); if(s){s.style.color='#bbb';s.textContent='○';} });
+      const idx=VALS.indexOf(r.value);
+      const sel=document.getElementById(`ae-lbl-${ci}-${idx}`);
+      if(sel){sel.style.color='var(--bleu)';sel.textContent='●';}
+    });
+  });
+}
+
+function getAE(criteres) {
+  const VALS=['maitrise','en_cours','a_revoir','non_traite'];
+  const result={};
+  criteres.forEach((cr,i)=>{
+    const sel=document.querySelector(`input[name=ae${i}]:checked`);
+    result[`critere_${i+1}`]={critere:cr,niveau:sel?sel.value:'non_traite'};
+  });
+  return result;
+}
+
+function v(id){return(document.getElementById(id)||{value:''}).value;}
+function sv(id){const e=document.getElementById(id); return e?e.value:'';}
+
+function dlJSON(data, suffix) {
+  const nom=v('eleve-nom'), prenom=v('eleve-prenom');
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${safeName}_${suffix}.json`;
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+buildAE(["J'ai ajouté et configuré NAS-APT (VLAN 15, IP 192.168.15.4) dans Packet Tracer", "J'ai configuré le port switch d'Apt pour le NAS (Access VLAN 15)", "J'ai activé FTP et créé les 3 comptes (employe, direction, lecture) avec les bons droits", "J'ai ajouté et configuré NAS-Roussillon (VLAN 25, IP 192.168.25.4)", 'Les tests FTP depuis Apt vers NAS-APT ont réussi (ping + connexion + put/get)', 'Les tests FTP depuis Roussillon vers NAS-APT ont réussi (accès inter-sites)', 'Les tests depuis Saignon et Cucuron vers NAS-APT ont réussi', "J'ai vérifié l'isolation : les clients WiFi ne peuvent pas atteindre les NAS", "J'ai compris la différence de droits employe / direction / lecture", "J'ai rédigé la Section 9 complète du dossier de déploiement (arbo + droits + tests + justif)"]);
+
+function genererJSON() {
+  const data = {
+    meta: {
+      devoir: "S8 – Atelier 1 : Configuration des serveurs de fichiers et tests inter-sites",
+      eleve: {nom:v('eleve-nom'),prenom:v('eleve-prenom'),classe:v('eleve-classe')},
+      date: v('eleve-date'), genere_le: new Date().toISOString()
+    },
+    phaseA_verification: {
+      ping_apt_roussillon:v('v1'), ping_apt_saignon:v('v2'),
+      ping_apt_cucuron:v('v3'), ping_apt_dns:v('v4'),
+      a1_cause_echec:v('a1-1'), a1_vlan12_vs_vlan11:v('a1-2'),
+      capture_pings:imgData.img1||null
+    },
+    phaseB_nas_apt: {
+      b1_switch_interface:v('b1-if'), b1_switch_mode:v('b1-mode'), b1_switch_vlan:v('b1-vlan'),
+      b1_show_vlan:v('b1-2'), capture_show_vlan:imgData.img2||null,
+      b2_ping_passerelle:v('b2-1'), b2_chemin_reseau:v('b2-2'),
+      capture_ip_nas:imgData.img3||null,
+      b3_droit_delete:v('b3-1'), b3_compte_pdg:v('b3-2'),
+      capture_ftp_config:imgData.img4||null
+    },
+    phaseC_nas_roussillon: {
+      c1_vlan_cmd:v('c1-vlan'), c1_vlan_name:v('c1-name'),
+      c1_ip:v('c1-ip'), c1_mask:v('c1-mask'), c1_gw:v('c1-gw'),
+      c1_route_apt:v('c1-3'), c2_ftp_local:v('c2-1'), c2_ftp_inter_sites:v('c2-2'),
+      capture_nas_roussillon:imgData.img5||null
+    },
+    phaseD_tests: {
+      tests_apt:{employe:v('d1-1')},
+      capture_tests_apt:imgData.img6||null,
+      roussillon:{ping:v('d2-r-ping'),ftp:v('d2-r-ftp'),put:v('d2-r-put')},
+      saignon:{ping:v('d2-s-ping'),ftp:v('d2-s-ftp'),put:v('d2-s-put')},
+      cucuron:{ping:v('d2-c-ping'),ftp:v('d2-c-ftp'),put:v('d2-c-put')},
+      d2_dir_nas_apt:v('d2-1'), capture_dir_nas:imgData.img7||null,
+      d3_isolation_wifi:v('d3-1'), d3_resume_securite:v('d3-2')
+    },
+    section9_dossier: {
+      nas_apt_vlan:v('s1-apt-vlan'), nas_apt_ip:v('s1-apt-ip'), nas_apt_gw:v('s1-apt-gw'), nas_apt_sites:v('s1-apt-sites'),
+      nas_rou_vlan:v('s1-rou-vlan'), nas_rou_ip:v('s1-rou-ip'), nas_rou_gw:v('s1-rou-gw'), nas_rou_sites:v('s1-rou-sites'),
+      arborescence:v('s2-arbo'), tableau_droits:v('s3-droits'),
+      compte_rendu_tests:v('s4-tests'), justification_technique:v('s5-justif')
+    },
+    auto_evaluation: getAE(["J'ai ajouté et configuré NAS-APT (VLAN 15, IP 192.168.15.4) dans Packet Tracer", "J'ai configuré le port switch d'Apt pour le NAS (Access VLAN 15)", "J'ai activé FTP et créé les 3 comptes (employe, direction, lecture) avec les bons droits", "J'ai ajouté et configuré NAS-Roussillon (VLAN 25, IP 192.168.25.4)", 'Les tests FTP depuis Apt vers NAS-APT ont réussi (ping + connexion + put/get)', 'Les tests FTP depuis Roussillon vers NAS-APT ont réussi (accès inter-sites)', 'Les tests depuis Saignon et Cucuron vers NAS-APT ont réussi', "J'ai vérifié l'isolation : les clients WiFi ne peuvent pas atteindre les NAS", "J'ai compris la différence de droits employe / direction / lecture", "J'ai rédigé la Section 9 complète du dossier de déploiement (arbo + droits + tests + justif)"])
+  };
+  dlJSON(data, 'S8Atelier1');
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S8 — Atelier 2 : Plan de recette, dépannage et manipulation physique</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.consigne{border-left:4px solid var(--orange);background:#fffbf0;padding:12px 16px;margin:14px 0;font-size:12px;line-height:1.75;}
+.consigne strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.etape{background:#fff;border:2px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.etape-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);margin-bottom:10px;font-size:13px;display:flex;align-items:center;gap:10px;}
+.etape-num{background:var(--bleu);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.upload-zone{border:2px dashed var(--bleu);border-radius:8px;padding:16px;text-align:center;margin:8px 0 12px;cursor:pointer;background:var(--ciel-bg);}
+.upload-zone:hover{border-color:var(--marine);}
+.upload-text{color:var(--bleu);font-weight:600;margin-bottom:4px;}
+.upload-hint{font-size:11px;color:#888;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}.cli .cm-val{color:#FFD54F;}.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 16px;}
+.compare-card{border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.75;}
+.compare-card.bleu{background:var(--ciel-bg);border:2px solid var(--bleu);}
+.compare-card.vert{background:#f6fbed;border:2px solid var(--vert);}
+.compare-card .cc-titre{font-family:'Roboto',sans-serif;font-weight:700;margin-bottom:6px;font-size:13px;}
+.compare-card.bleu .cc-titre{color:var(--bleu);}
+.compare-card.vert .cc-titre{color:#4a7a1a;}
+.recette-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:11.5px;}
+.recette-table th{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:7px 8px;border:1px solid #aac;text-align:center;}
+.recette-table td{border:1px solid #c0d0e8;padding:5px 7px;vertical-align:top;}
+.recette-table tr:nth-child(even){background:var(--ciel-bg);}
+.recette-table select{width:100%;border:1px solid #c0d0e0;border-radius:4px;padding:3px 5px;font-family:'Montserrat',sans-serif;font-size:11px;color:var(--marine);}
+.phys-zone{background:#fff8f0;border:2px solid var(--orange);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.phys-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:8px;font-size:13px;}
+.duree-badge{display:inline-block;background:var(--vert);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;padding:3px 10px;border-radius:12px;margin-left:10px;}
+
+</style>
+</head>
+<body>
+<div class="header"><div class="header-logo"><img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumiere" style="height:44px;width:auto;"></div><div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div></div><div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S8 – Atelier 2 : Plan de recette complet, dépannage et manipulation physique</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Lycée Louis Lumière – Chelles &nbsp;|&nbsp; 2025-2026</div>
+  <div class="eleve-box">
+    <input id="eleve-nom" placeholder="Nom">
+    <input id="eleve-prenom" placeholder="Prénom">
+    <input id="eleve-classe" placeholder="Classe">
+    <input id="eleve-date" type="date">
+  </div><table class="comp-table"><tr><th class="th-head">Code</th><th class="th-head">Compétence</th><th class="th-head">Bloc</th><th class="th-head">✓</th></tr><tr class="tr-bloc"><td colspan="4">Bloc 1 — Réaliser</td></tr><tr class="tr-even"><td class="td-code">C03</td><td>Participer à un projet</td><td>Bloc 1</td><td class="td-check"><span class="chk-off">☐</span></td></tr><tr class="tr-odd"><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td><td>Bloc 1</td><td class="td-check"><span class="chk-on">☑</span></td></tr><tr class="tr-even"><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau informatique</td><td>Bloc 1</td><td class="td-check"><span class="chk-off">☐</span></td></tr><tr class="tr-bloc"><td colspan="4">Bloc 2 — Déployer</td></tr><tr class="tr-odd"><td class="td-code">C06</td><td>Valider la conformité d'une installation</td><td>Bloc 2</td><td class="td-check"><span class="chk-on">☑</span></td></tr><tr class="tr-even"><td class="td-code">C09</td><td>Installer les éléments d'un système électronique ou informatique</td><td>Bloc 2</td><td class="td-check"><span class="chk-on">☑</span></td></tr><tr class="tr-odd"><td class="td-code">C10</td><td>Exploiter un réseau informatique</td><td>Bloc 2</td><td class="td-check"><span class="chk-on">☑</span></td></tr><tr class="tr-bloc"><td colspan="4">Bloc 3 — Analyser</td></tr><tr class="tr-even"><td class="td-code">C01</td><td>Communiquer en situation professionnelle (français / anglais)</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr><tr class="tr-odd"><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr><tr class="tr-even"><td class="td-code">C08</td><td>Coder</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr></table></div>
+
+<div class="content">
+
+<div class="consigne">
+  <strong>📋 Consignes générales :</strong> Cet atelier reprend la maquette de l'Atelier 1 (NAS-APT + NAS-Roussillon configurés). Tu réalises la campagne de tests complète, les exercices de dépannage, puis la manipulation physique tournante. Durée : 4h. Travail individuel.
+</div>
+
+<h1>Phase A — Plan de recette exhaustif (12 tests) <span class="duree-badge">~90 min</span></h1>
+
+<div class="mise-en-situation">
+  <strong>🎯 Objectif :</strong> Valider méthodiquement chaque flux réseau lié aux NAS. Un bon technicien ne dit pas "ça marche" — il remplit un plan de recette signé.
+</div>
+
+<table class="recette-table">
+  <tr>
+    <th>N°</th><th>Source</th><th>Dest.</th><th>Compte</th><th>Action</th><th>Attendu</th>
+    <th>Résultat</th><th>Observations / Commandes tapées</th>
+  </tr>
+  <tr><td>T01</td><td>Apt VLAN 11</td><td>NAS-APT 192.168.15.4</td><td>—</td><td>ping</td><td>OK</td>
+    <td><select id="t01"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t01-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T02</td><td>Apt VLAN 11</td><td>NAS-APT</td><td>employe</td><td>ftp + put</td><td>OK</td>
+    <td><select id="t02"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t02-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T03</td><td>Apt VLAN 11</td><td>NAS-APT</td><td>direction</td><td>ftp + delete</td><td>Suppression OK</td>
+    <td><select id="t03"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t03-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T04</td><td>Apt VLAN 11</td><td>NAS-APT</td><td>lecture</td><td>ftp + put (bloqué)</td><td>Refus écriture</td>
+    <td><select id="t04"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t04-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T05</td><td>Roussillon VLAN 21</td><td>NAS-APT</td><td>employe</td><td>ping + ftp + get</td><td>OK (inter-sites)</td>
+    <td><select id="t05"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t05-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T06</td><td>Saignon VLAN 31</td><td>NAS-APT</td><td>employe</td><td>ping + ftp + put</td><td>OK (inter-sites)</td>
+    <td><select id="t06"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t06-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T07</td><td>Cucuron VLAN 41</td><td>NAS-APT</td><td>employe</td><td>ping + ftp + put</td><td>OK (inter-sites)</td>
+    <td><select id="t07"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t07-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T08</td><td>Roussillon VLAN 21</td><td>NAS-Roussillon 192.168.25.4</td><td>employe</td><td>ftp + put local</td><td>OK (local)</td>
+    <td><select id="t08"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t08-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T09</td><td>Apt VLAN 11</td><td>NAS-Roussillon 192.168.25.4</td><td>employe</td><td>ftp + get</td><td>OK (inter-sites)</td>
+    <td><select id="t09"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t09-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T10</td><td>Apt VLAN 12 (WiFi)</td><td>NAS-APT</td><td>—</td><td>ping</td><td>Variable (pas ACL)</td>
+    <td><select id="t10"><option value="">—</option><option>✅ Accès (sans ACL)</option><option>❌ Bloqué</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t10-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T11</td><td>Apt VLAN 13 (Cameras)</td><td>NAS-APT</td><td>—</td><td>ping</td><td>Variable (pas ACL)</td>
+    <td><select id="t11"><option value="">—</option><option>✅ Accès (sans ACL)</option><option>❌ Bloqué</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t11-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+  <tr><td>T12</td><td>Apt VLAN 11</td><td>NAS-APT</td><td>employe</td><td>dir apres tous les puts</td><td>Tous fichiers visibles</td>
+    <td><select id="t12"><option value="">—</option><option>✅ OK</option><option>❌ KO</option><option>⚠ Partiel</option></select></td>
+    <td><input type="text" id="t12-obs" style="width:100%;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:11px;"></td></tr>
+</table>
+
+<label class="qlabel">A1 — Combien de tests sont marqués OK ? Pour les tests T10 et T11 (WiFi, Cameras), quel mécanisme permettrait de les bloquer systématiquement en S9 ?</label>
+<textarea class="rep rep-sm" id="a1" placeholder="Tests OK : …/12&#10;T10/T11 en S9 : on configurera des ACL qui interdiront…"></textarea>
+<div class="upload-zone" onclick="document.getElementById('img-1').click()">
+  <input type="file" id="img-1" accept="image/*" onchange="compresserImage(this.files[0],'prev-1,'hint-1,d=>imgData['img1]=d)" style="display:none;">
+  <div class="upload-text">📎 Capture : plan de recette complété — au moins 8 tests visibles à l'écran</div>
+  <div class="upload-hint" id="hint-1">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-1" style="display:none; max-width:100%; margin-top:10px">
+</div>
+
+<label class="qlabel">A2 — Rédige une phrase de conclusion professionnelle pour le plan de recette de la Section 9, indiquant si l'infrastructure est conforme au cahier des charges Axentis pour le service de fichiers.</label>
+<textarea class="rep rep-sm" id="a2" placeholder="Conclusion : L'ensemble des tests confirme que le serveur NAS-APT est accessible depuis les 4 sites du groupe Provence Évasion via le protocole FTP…"></textarea>
+
+<hr class="sep">
+
+<h1>Phase B — Exercices de dépannage (4 scénarios) <span class="duree-badge">~60 min</span></h1>
+
+<div class="mise-en-situation">
+  <strong>🔧 Contexte :</strong> Ton professeur te soumet 4 topologies Packet Tracer avec des pannes introduites volontairement. Pour chaque symptôme, identifie la cause, indique la commande corrective et teste-la.
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">A</div>Symptôme A — Route manquante</div>
+  <p>PC-Personnel-Saignon (192.168.31.10) peut pinguer le routeur de Saignon (192.168.31.1) mais ne peut pas atteindre NAS-APT (192.168.15.4). La commande <code>show ip route</code> sur le routeur de Saignon ne montre aucune route vers 192.168.15.0/24.</p>
+  <label class="qlabel">SA1 — Quelle commande corrective entres-tu sur le routeur de Saignon ? Justifie.</label>
+  <textarea class="rep rep-sm" id="sa1" placeholder="ip route 192.168.15.0 255.255.255.0 … ← passerelle vers le réseau 15&#10;Justification : …"></textarea>
+  <label class="qlabel">SA2 — Après correction, le ping depuis Saignon vers NAS-APT fonctionne-t-il ? Donne le résultat.</label>
+  <textarea class="rep rep-xs" id="sa2" placeholder="Résultat après correction : …"></textarea>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">B</div>Symptôme B — Droits FTP incorrects</div>
+  <p>Un employé de Roussillon se connecte au NAS-APT avec le compte <code>employe</code> : la connexion réussit, mais la commande <code>put fichier.txt</code> retourne l'erreur <em>Permission denied</em>.</p>
+  <label class="qlabel">SB1 — Quelle est la cause ? Où et comment corriges-tu ?</label>
+  <textarea class="rep rep-sm" id="sb1" placeholder="Cause : la permission Write n'est pas cochée pour le compte employe&#10;Correction : Services → FTP → compte employe → cocher Write"></textarea>
+  <label class="qlabel">SB2 — Après correction, le put réussit-il ? Note aussi le message d'erreur exact vu avant correction.</label>
+  <textarea class="rep rep-sm" id="sb2" placeholder="Message avant : …&#10;Résultat après correction : …"></textarea>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">C</div>Symptôme C — NAS injoignable même en local</div>
+  <p>NAS-APT ne répond plus au ping depuis aucun équipement, même depuis un PC dans le même VLAN 15. La configuration IP est correcte.</p>
+  <label class="qlabel">SC1 — Cite 3 causes possibles dans Packet Tracer. Quelle est la première vérification à faire ?</label>
+  <textarea class="rep rep-sm" id="sc1" placeholder="Cause 1 : le câble entre NAS et switch est débranché&#10;Cause 2 : le port switch n'est pas configuré en Access VLAN 15&#10;Cause 3 : le service FTP est désactivé (ne bloque pas le ping, mais…)&#10;Vérification 1 : show interfaces status sur le switch"></textarea>
+  <label class="qlabel">SC2 — Après investigation, tu trouves que le port du switch est dans le VLAN 1 (défaut) au lieu du VLAN 15. Quelle commande corriges-tu ?</label>
+  <textarea class="rep rep-xs" id="sc2" placeholder="Commande corrective : switchport access vlan …"></textarea>
+</div>
+
+<div class="etape">
+  <div class="etape-titre"><div class="etape-num">D</div>Symptôme D — Accès FTP depuis Cucuron seulement échoue</div>
+  <p>L'accès FTP fonctionne depuis Apt (T02), Roussillon (T05) et Saignon (T06), mais pas depuis Cucuron. Le ping de Cucuron vers NAS-APT échoue aussi. La topologie inter-sites semble pourtant complète.</p>
+  <label class="qlabel">SD1 — Quelle est la cause probable ? Quelle commande vérifies-tu en premier sur le routeur de Cucuron ?</label>
+  <textarea class="rep rep-sm" id="sd1" placeholder="show ip route sur Routeur-Cucuron&#10;Cause probable : route vers 192.168.15.0/24 manquante OU route vers le réseau WAN Cucuron-Apt"></textarea>
+  <label class="qlabel">SD2 — Décris la correction complète et teste à nouveau le ping depuis Cucuron vers NAS-APT.</label>
+  <textarea class="rep rep-sm" id="sd2" placeholder="Correction : …&#10;Résultat après correction : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<h1>Phase C — Manipulation physique tournante <span class="duree-badge">~70 min</span></h1>
+
+<div class="phys-zone">
+  <div class="phys-titre">🔧 Atelier physique — Poste de travail réel (20–25 min par rotation)</div>
+  <p>À l'appel de ton professeur, tu travailles sur l'équipement physique mis à disposition. Documente précisément chaque action.</p>
+
+  <h2>Tâche P1 — Câblage et identification des interfaces</h2>
+  <p>Branche 2 PC sur des ports différents du switch physique. Identifie les ports, observe les LEDs et note leur signification.</p>
+  <label class="qlabel">P1.1 — Quels ports as-tu utilisés ? Quelle couleur pour la LED de liaison ? Que signifie chaque couleur (vert fixe, vert clignotant, orange, éteint) ?</label>
+  <textarea class="rep rep-sm" id="p1-1" placeholder="Port Fa0/1 : LED verte fixe → lien actif 100 Mb/s&#10;Port Fa0/2 : LED verte clignotante → lien actif + trafic&#10;Orange → négociation en cours ou erreur de duplex&#10;Éteinte → pas de câble connecté ou port désactivé"></textarea>
+
+  <h2>Tâche P2 — Connexion console et lecture de l'état du switch</h2>
+  <p>Connecte le câble console au switch physique, lance PuTTY (9600 bauds, 8N1). Entre les commandes suivantes et note les résultats.</p>
+  <div class="cli">
+Switch# <span class="cm-val">show interfaces status</span>
+Switch# <span class="cm-val">show vlan brief</span>
+Switch# <span class="cm-val">show mac address-table</span>
+</div>
+  <label class="qlabel">P2.1 — Recopie les 4 premières lignes du résultat de <code>show interfaces status</code>. Quel est l'état des ports sur lesquels tu as branché les PC (connected / notconnect / disabled) ?</label>
+  <textarea class="rep rep-md" id="p2-1" placeholder="Port    Name    Status      Vlan  Duplex  Speed  Type&#10;Fa0/1           connected   1     a-full  100    10/100BaseTX&#10;Fa0/2           connected   1     a-full  100    10/100BaseTX&#10;Fa0/3           notconnect  1     auto    auto   10/100BaseTX&#10;…"></textarea>
+  <label class="qlabel">P2.2 — Résultat de <code>show vlan brief</code> : combien de VLANs existent par défaut ? Dans quel VLAN sont les ports Fa0/1 et Fa0/2 ?</label>
+  <textarea class="rep rep-sm" id="p2-2" placeholder="VLANs présents par défaut : …&#10;Fa0/1 dans VLAN : … — Fa0/2 dans VLAN : …"></textarea>
+  <label class="qlabel">P2.3 — Résultat de <code>show mac address-table</code> : vois-tu les adresses MAC de tes 2 PC ? Note-les.</label>
+  <textarea class="rep rep-sm" id="p2-3" placeholder="MAC PC1 : xxxx.xxxx.xxxx — port Fa0/… — VLAN …&#10;MAC PC2 : xxxx.xxxx.xxxx — port Fa0/… — VLAN …"></textarea>
+  <div class="upload-zone" onclick="document.getElementById('img-2').click()">
+  <input type="file" id="img-2" accept="image/*" onchange="compresserImage(this.files[0],'prev-2,'hint-2,d=>imgData['img2]=d)" style="display:none;">
+  <div class="upload-text">📎 Capture ou photo : résultat de show interfaces status sur switch physique</div>
+  <div class="upload-hint" id="hint-2">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-2" style="display:none; max-width:100%; margin-top:10px">
+</div>
+
+  <h2>Tâche P3 — Configuration IP et test de connectivité</h2>
+  <p>Configure manuellement une adresse IP sur chacun des 2 PC (même réseau), puis teste le ping dans les deux sens.</p>
+  <label class="qlabel">P3.1 — Adresses configurées sur les 2 PC :</label>
+  <table class="data-table">
+    <tr><th>PC</th><th>Adresse IP</th><th>Masque</th><th>Port switch</th></tr>
+    <tr><td>PC1</td><td><input type="text" id="p3-ip1" style="width:120px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="p3-mask1" style="width:120px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="p3-port1" style="width:80px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td></tr>
+    <tr><td>PC2</td><td><input type="text" id="p3-ip2" style="width:120px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="p3-mask2" style="width:120px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td>
+      <td><input type="text" id="p3-port2" style="width:80px;border:1px solid #c0d0e0;border-radius:3px;padding:3px 6px;font-size:12px;"></td></tr>
+  </table>
+  <label class="qlabel">P3.2 — Ping de PC1 vers PC2 et de PC2 vers PC1. Résultats (envoyés / reçus / perdus) ?</label>
+  <textarea class="rep rep-sm" id="p3-2" placeholder="PC1 → PC2 : 4 envoyés, 4 reçus, 0 perdus (100%)&#10;PC2 → PC1 : …"></textarea>
+  <label class="qlabel">P3.3 — Crée maintenant un VLAN 10 sur le switch physique et affecte PC1 à Fa0/1 VLAN 10, PC2 reste en VLAN 1. Le ping fonctionne-t-il encore ? Explique pourquoi.</label>
+  <textarea class="rep rep-sm" id="p3-3" placeholder="Résultat : le ping échoue&#10;Explication : les VLANs 1 et 10 sont des réseaux logiquement isolés. Sans routeur inter-VLAN, la communication est impossible."></textarea>
+  <div class="upload-zone" onclick="document.getElementById('img-3').click()">
+  <input type="file" id="img-3" accept="image/*" onchange="compresserImage(this.files[0],'prev-3,'hint-3,d=>imgData['img3]=d)" style="display:none;">
+  <div class="upload-text">📎 Capture ou photo : ping réussi entre les 2 PC physiques (avant séparation VLAN)</div>
+  <div class="upload-hint" id="hint-3">Formats : JPG, PNG – compression automatique</div>
+  <img id="prev-3" style="display:none; max-width:100%; margin-top:10px">
+</div>
+
+  <h2>Tâche P4 — Remettre en état et bilan physique</h2>
+  <label class="qlabel">P4.1 — Remets le switch dans son état initial (no vlan 10, ports par défaut). Quelle commande utilises-tu pour supprimer le VLAN 10 ?</label>
+  <textarea class="rep rep-xs" id="p4-1" placeholder="Commande : no vlan 10"></textarea>
+  <label class="qlabel">P4.2 — Cite 2 différences importantes entre travailler sur Packet Tracer et travailler sur un switch physique réel.</label>
+  <textarea class="rep rep-sm" id="p4-2" placeholder="1. Sur un switch physique, les commandes prennent effet immédiatement et les LEDs reflètent l'état en temps réel…&#10;2. Un câble mal branché ou défectueux peut causer des problèmes impossibles à simuler…"></textarea>
+</div>
+
+<hr class="sep">
+
+<h1>Phase D — Bilan de séance et préparation S9 <span class="duree-badge">~20 min</span></h1>
+
+<div class="exercice-synth">
+  <div class="exercice-titre">📝 Bilan S8 et préparation S9</div>
+
+  <label class="qlabel">B1 — Bilan du plan de recette : combien de tests sur 12 sont validés ? Pour les tests échoués, quelle a été la cause et comment as-tu corrigé ?</label>
+  <textarea class="rep rep-sm" id="b1" placeholder="Tests validés : …/12&#10;Tests échoués : T… — Cause : … — Correction : …"></textarea>
+
+  <label class="qlabel">B2 — La Section 9 du dossier de déploiement est-elle complète ? Liste les éléments présents et ceux encore à finaliser.</label>
+  <textarea class="rep rep-sm" id="b2" placeholder="Présent : description NAS, tableau droits FTP, arborescence partages, compte-rendu tests&#10;À finaliser : …"></textarea>
+
+  <label class="qlabel">B3 — En S8, les clients WiFi (VLAN x2) peuvent potentiellement atteindre les NAS via le routage inter-VLAN. En S9, comment les ACL vont-elles résoudre ce problème ? Donne un exemple de règle ACL.</label>
+  <textarea class="rep rep-md" id="b3" placeholder="En S9, on configurera une ACL étendue sur le routeur qui bloquera tout trafic depuis les VLANs Clients WiFi (x2) vers le VLAN 15 (Serveurs).&#10;Exemple : access-list 110 deny ip 192.168.12.0 0.0.0.255 192.168.15.0 0.0.0.255&#10;          access-list 110 permit ip any any"></textarea>
+
+  <label class="qlabel">B4 — Synthèse finale : en 5 à 8 lignes, résume ce que tu as appris en S8 sur le serveur de fichiers, les droits d'accès, le lien avec les VLANs et ce qui reste à sécuriser en S9.</label>
+  <textarea class="rep rep-lg" id="b4" placeholder="Au cours de cette séance S8, j'ai configuré deux serveurs NAS dans la topologie Provence Évasion…"></textarea>
+
+  <div class="autoeval" id="ae-container"></div>
+</div>
+
+</div>
+<div class="footer">
+  <span><strong style="color:var(--orange)">S8</strong> — Atelier 2 : Plan de recette, dépannage et manipulation physique</span>
+  <span>Lycée Louis Lumière – Bac Pro CIEL</span>
+</div>
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs et captures sont complétés avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+<script>
+
+document.getElementById('eleve-date').valueAsDate = new Date();
+const imgData = {};
+
+function compresserImage(file, idPreview, idHint, callback) {
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const MAX = 900;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const b64 = canvas.toDataURL('image/jpeg', 0.72);
+      document.getElementById(idPreview).src = b64;
+      document.getElementById(idPreview).style.display = 'block';
+      const kb = Math.round(b64.length * 0.75 / 1024);
+      document.getElementById(idHint).textContent = `Image compressée : ${w}x${h}px - environ ${kb} Ko`;
+      callback(b64);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function buildAE(criteres) {
+  const NIVEAUX = ['Maitrise','En cours','A revoir','Non traite'];
+  const VALS    = ['maitrise','en_cours','a_revoir','non_traite'];
+  const STARS   = ['★★★ Maîtrisé','★★☆ En cours','★☆☆ À revoir','? Non traité'];
+  const c = document.getElementById('ae-container');
+  let h = '<div class="autoeval-title">🎯 Auto-évaluation</div>';
+  h += '<div class="ae-row ae-header"><span>Critère</span><span>★★★</span><span>★★☆</span><span>★☆☆</span><span>?</span></div>';
+  criteres.forEach((cr,i)=>{
+    h += '<div class="ae-row"><span>'+cr+'</span>';
+    VALS.forEach((val,j)=>{
+      h += '<label title="'+STARS[j]+'" style="cursor:pointer;text-align:center;"><input type="radio" name="ae'+i+'" value="'+val+'" style="display:none;"><span id="ae-lbl-'+i+'-'+j+'" style="font-size:18px;color:#bbb;">○</span></label>';
+    });
+    h += '</div>';
+  });
+  c.innerHTML = h;
+  document.querySelectorAll('input[type=radio]').forEach(r=>{
+    r.addEventListener('change',()=>{
+      const ci=parseInt(r.name.replace('ae',''));
+      VALS.forEach((_,j)=>{ const s=document.getElementById('ae-lbl-'+ci+'-'+j); if(s){s.style.color='#bbb';s.textContent='○';} });
+      const idx=VALS.indexOf(r.value);
+      const sel=document.getElementById('ae-lbl-'+ci+'-'+idx);
+      if(sel){sel.style.color='var(--bleu)';sel.textContent='●';}
+    });
+  });
+}
+
+function getAE(criteres) {
+  const VALS=['maitrise','en_cours','a_revoir','non_traite'];
+  const result={};
+  criteres.forEach((cr,i)=>{
+    const sel=document.querySelector('input[name=ae'+i+']:checked');
+    result['critere_'+(i+1)]={critere:cr,niveau:sel?sel.value:'non_traite'};
+  });
+  return result;
+}
+
+function v(id){return(document.getElementById(id)||{value:''}).value;}
+function sv(id){const e=document.getElementById(id); return e?e.value:'';}
+
+function dlJSON(data, suffix) {
+  const nom=v('eleve-nom'), prenom=v('eleve-prenom');
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=safeName+'_'+suffix+'.json';
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+buildAE(["J'ai réalisé les 12 tests du plan de recette (T01-T12)","J'ai su diagnostiquer le symptôme A (route manquante) et proposer la correction","J'ai su diagnostiquer le symptôme B (droits FTP insuffisants)","J'ai su diagnostiquer les symptômes C et D (port switch, Cucuron)","J'ai réalisé la manipulation physique : câblage, LEDs, console, show interfaces","J'ai configuré des IPs statiques sur deux PC physiques et testé le ping","J'ai compris le rôle des ACL (S9) comme complément au contrôle FTP","Le bilan Section 9 est complet et cohérent avec les tests effectués"]);
+
+function genererJSON() {
+  const AE_CRITERES = ["J'ai réalisé les 12 tests du plan de recette (T01-T12)","J'ai su diagnostiquer le symptôme A (route manquante) et proposer la correction","J'ai su diagnostiquer le symptôme B (droits FTP insuffisants)","J'ai su diagnostiquer les symptômes C et D (port switch, Cucuron)","J'ai réalisé la manipulation physique : câblage, LEDs, console, show interfaces","J'ai configuré des IPs statiques sur deux PC physiques et testé le ping","J'ai compris le rôle des ACL (S9) comme complément au contrôle FTP","Le bilan Section 9 est complet et cohérent avec les tests effectués"];
+  const data = {
+    meta: { devoir:"S8 – Atelier 2 : Plan de recette, dépannage et manipulation physique",
+      eleve:{nom:v('eleve-nom'),prenom:v('eleve-prenom'),classe:v('eleve-classe')},
+      date:v('eleve-date'), genere_le:new Date().toISOString() },
+    plan_recette: {
+      T01:{res:sv('t01'),obs:v('t01-obs')}, T02:{res:sv('t02'),obs:v('t02-obs')},
+      T03:{res:sv('t03'),obs:v('t03-obs')}, T04:{res:sv('t04'),obs:v('t04-obs')},
+      T05:{res:sv('t05'),obs:v('t05-obs')}, T06:{res:sv('t06'),obs:v('t06-obs')},
+      T07:{res:sv('t07'),obs:v('t07-obs')}, T08:{res:sv('t08'),obs:v('t08-obs')},
+      T09:{res:sv('t09'),obs:v('t09-obs')}, T10:{res:sv('t10'),obs:v('t10-obs')},
+      T11:{res:sv('t11'),obs:v('t11-obs')}, T12:{res:sv('t12'),obs:v('t12-obs')},
+      conclusion_recette:v('a1'), phrase_conformite:v('a2'),
+      capture_recette:imgData.img1||null
+    },
+    depannage: {
+      A_commande:v('sa1'), A_resultat:v('sa2'),
+      B_cause_correction:v('sb1'), B_resultat:v('sb2'),
+      C_causes:v('sc1'), C_correction:v('sc2'),
+      D_cause:v('sd1'), D_correction:v('sd2')
+    },
+    physique: {
+      P1_leds:v('p1-1'),
+      P2_show_interfaces:v('p2-1'), P2_show_vlan:v('p2-2'), P2_mac_table:v('p2-3'),
+      capture_show_interfaces:imgData.img2||null,
+      P3_ip_pc1:v('p3-ip1'), P3_mask_pc1:v('p3-mask1'), P3_port_pc1:v('p3-port1'),
+      P3_ip_pc2:v('p3-ip2'), P3_mask_pc2:v('p3-mask2'), P3_port_pc2:v('p3-port2'),
+      P3_ping:v('p3-2'), P3_vlan_isolation:v('p3-3'),
+      capture_ping_physique:imgData.img3||null,
+      P4_no_vlan:v('p4-1'), P4_differences:v('p4-2')
+    },
+    bilan: { b1:v('b1'), b2:v('b2'), b3:v('b3'), b4:v('b4') },
+    auto_evaluation: getAE(AE_CRITERES)
+  };
+  dlJSON(data, 'S8Atelier2');
+}
+
+</script>
+</body>
+</html>

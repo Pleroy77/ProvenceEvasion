@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S8 — Cours : Serveur de fichiers et accès partagés</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:120px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.0;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.cli .cm-prompt{color:#FF5722;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 16px;}
+.compare-card{border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.75;}
+.compare-card.bleu{background:var(--ciel-bg);border:2px solid var(--bleu);}
+.compare-card.vert{background:#f6fbed;border:2px solid var(--vert);}
+.compare-card .cc-titre{font-family:'Roboto',sans-serif;font-weight:700;margin-bottom:6px;font-size:13px;}
+.compare-card.bleu .cc-titre{color:var(--bleu);}
+.compare-card.vert .cc-titre{color:#4a7a1a;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S8 – Cours : Serveur de fichiers et accès partagés</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Lycée Louis Lumière – Chelles &nbsp;|&nbsp; 2025-2026</div>
+
+  <div class="eleve-box">
+    <input id="eleve-nom" placeholder="Nom">
+    <input id="eleve-prenom" placeholder="Prénom">
+    <input id="eleve-classe" placeholder="Classe">
+    <input id="eleve-date" type="date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head">Code</th><th class="th-head">Compétence</th><th class="th-head">Bloc</th><th class="th-head">✓</th></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 1 — Réaliser</td></tr>
+    <tr class="tr-odd"><td class="td-code">C03</td><td>Participer à un projet</td><td>Bloc 1</td><td class="td-check"><span class="chk-off">☐</span></td></tr>
+    <tr class="tr-even"><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td><td>Bloc 1</td><td class="td-check"><span class="chk-off">☐</span></td></tr>
+    <tr class="tr-odd"><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau informatique</td><td>Bloc 1</td><td class="td-check"><span class="chk-off">☐</span></td></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 2 — Déployer</td></tr>
+    <tr class="tr-even"><td class="td-code">C06</td><td>Valider la conformité d'une installation</td><td>Bloc 2</td><td class="td-check"><span class="chk-off">☐</span></td></tr>
+    <tr class="tr-odd"><td class="td-code">C09</td><td>Installer les éléments d'un système électronique ou informatique</td><td>Bloc 2</td><td class="td-check"><span class="chk-on">☑</span></td></tr>
+    <tr class="tr-even"><td class="td-code">C10</td><td>Exploiter un réseau informatique</td><td>Bloc 2</td><td class="td-check"><span class="chk-on">☑</span></td></tr>
+    <tr class="tr-bloc"><td colspan="4">Bloc 3 — Analyser</td></tr>
+    <tr class="tr-odd"><td class="td-code">C01</td><td>Communiquer en situation professionnelle (français / anglais)</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr>
+    <tr class="tr-even"><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr>
+    <tr class="tr-odd"><td class="td-code">C08</td><td>Coder</td><td>Bloc 3</td><td class="td-check"><span class="chk-off">☐</span></td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Mise en situation — Provence Évasion et ses données partagées</h1>
+
+<div class="mise-en-situation">
+  <strong>🏨 Contexte :</strong> Le groupe Provence Évasion dispose désormais d'un réseau opérationnel sur ses 4 sites (S1–S7). Laurent Ferracci souhaite maintenant que ses équipes puissent partager des fichiers de manière sécurisée : les plannings de réservation, les fiches clients, les documents RH et les bilans comptables doivent être accessibles depuis tous les sites, <strong>mais pas par tout le monde</strong>. Un technicien d'Axentis Informatique va configurer un <strong>serveur de fichiers centralisé</strong> au siège d'Apt.
+</div>
+
+<h2>1.1 Qu'est-ce qu'un serveur de fichiers ?</h2>
+<p>Un <strong>serveur de fichiers</strong> (ou <em>file server</em>) est un équipement dédié au stockage et au partage de fichiers sur un réseau. Il centralise les données pour que plusieurs utilisateurs puissent y accéder simultanément, depuis n'importe quel poste du réseau.</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Serveur de fichiers</div>
+  <p>Un serveur de fichiers offre plusieurs avantages :</p>
+  <ul>
+    <li><strong>Centralisation :</strong> toutes les données sont stockées à un seul endroit, facilitant les sauvegardes</li>
+    <li><strong>Partage :</strong> plusieurs utilisateurs accèdent aux mêmes fichiers simultanément</li>
+    <li><strong>Contrôle des accès :</strong> on peut définir qui peut lire, modifier ou supprimer chaque dossier</li>
+    <li><strong>Disponibilité :</strong> accessible depuis tous les sites via le réseau WAN</li>
+  </ul>
+</div>
+
+<h2>1.2 Les protocoles de partage de fichiers</h2>
+<div class="compare-grid">
+  <div class="compare-card bleu">
+    <div class="cc-titre">SMB / CIFS</div>
+    <p><strong>Server Message Block</strong> — protocole Windows. Utilisé par défaut dans les environnements Microsoft. Les partages apparaissent sous la forme <code>\\serveur\partage</code>. C'est le protocole natif de Packet Tracer.</p>
+  </div>
+  <div class="compare-card vert">
+    <div class="cc-titre">NFS</div>
+    <p><strong>Network File System</strong> — protocole Linux/Unix. Plus utilisé dans les environnements mixtes ou sous Linux. Les dossiers partagés sont <em>montés</em> comme des disques locaux.</p>
+  </div>
+</div>
+
+<p>Dans le projet Provence Évasion (et dans Packet Tracer), nous utilisons le service <strong>FTP/TFTP</strong> fourni par les serveurs Cisco pour simuler le serveur de fichiers.</p>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 1 — Comprendre le besoin</div>
+  <label class="qlabel">Q1.1 — Citez 3 types de fichiers que le personnel de Provence Évasion doit pouvoir partager entre les sites.</label>
+  <textarea class="rep rep-sm" id="ex1-q1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q1.2 — Pourquoi ne peut-on pas simplement envoyer les fichiers par e-mail plutôt que d'utiliser un serveur de fichiers ?</label>
+  <textarea class="rep rep-sm" id="ex1-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q1.3 — Dans quel VLAN Axentis a-t-il placé le serveur NAS (fichiers) au siège d'Apt ? Quelle est son adresse IP statique ?</label>
+  <textarea class="rep rep-xs" id="ex1-q3" placeholder="VLAN… — IP : 192.168.…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Organisation des partages réseau</h1>
+
+<h2>2.1 Structure des dossiers partagés</h2>
+<p>L'organisation des partages doit refléter la <strong>structure organisationnelle</strong> de Provence Évasion. Axentis propose l'arborescence suivante sur le serveur NAS (192.168.15.4) :</p>
+
+<div class="schema-box">
+  <div class="sch-titre">Arborescence des partages réseau — NAS Provence Évasion</div>
+\\NAS-APT\
+  ├── Reservations\       ← Accès : Personnel de tous les sites (R/W)
+  │     ├── Apt\
+  │     ├── Roussillon\
+  │     ├── Saignon\
+  │     └── Cucuron\
+  ├── Comptabilite\       ← Accès : Direction + Comptables uniquement (R/W)
+  │     └── Bilans\
+  ├── RH\                 ← Accès : Direction uniquement (R/W)
+  │     └── Contrats\
+  ├── Commun\             ← Accès : Tout le personnel (R/W)
+  │     └── Modeles\
+  └── Public\             ← Accès : Lecture seule pour tous (R seulement)
+        └── Tarifs\
+</div>
+
+<h2>2.2 Les droits d'accès</h2>
+<p>Les droits d'accès définissent ce qu'un utilisateur peut faire avec un partage :</p>
+
+<table class="data-table">
+  <tr><th>Droit</th><th>Lecture (R)</th><th>Écriture (W)</th><th>Suppression</th><th>Symbole</th></tr>
+  <tr><td class="center"><strong>Lecture seule</strong></td><td class="center">✓</td><td class="center">✗</td><td class="center">✗</td><td class="center">R</td></tr>
+  <tr><td class="center"><strong>Lecture / Écriture</strong></td><td class="center">✓</td><td class="center">✓</td><td class="center">✗</td><td class="center">R/W</td></tr>
+  <tr><td class="center"><strong>Contrôle total</strong></td><td class="center">✓</td><td class="center">✓</td><td class="center">✓</td><td class="center">Full</td></tr>
+  <tr><td class="center"><strong>Aucun accès</strong></td><td class="center">✗</td><td class="center">✗</td><td class="center">✗</td><td class="center">—</td></tr>
+</table>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 2 — Droits d'accès</div>
+  <label class="qlabel">Q2.1 — Complétez le tableau de droits d'accès pour les partages de Provence Évasion :</label>
+  <table class="data-table" style="margin-top:8px;">
+    <tr><th>Partage</th><th>Personnel (VLAN 11/21/31/41)</th><th>Direction (VLAN 11)</th><th>Clients WiFi (VLAN x2)</th></tr>
+    <tr><td><strong>\\NAS\Reservations</strong></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t1c1"></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t1c2"></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t1c3"></td></tr>
+    <tr><td><strong>\\NAS\Comptabilite</strong></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t2c1"></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t2c2"></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t2c3"></td></tr>
+    <tr><td><strong>\\NAS\RH</strong></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t3c1"></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t3c2"></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t3c3"></td></tr>
+    <tr><td><strong>\\NAS\Public</strong></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t4c1"></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t4c2"></td><td class="center"><input type="text" style="width:80px;text-align:center;" id="ex2-t4c3"></td></tr>
+  </table>
+  <label class="qlabel">Q2.2 — Pourquoi les clients WiFi (VLAN x2) ne doivent-ils avoir aucun accès aux partages réseau internes ?</label>
+  <textarea class="rep rep-sm" id="ex2-q2" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. Lien avec les VLANs et la sécurité</h1>
+
+<h2>3.1 Le rôle des VLANs dans la sécurité des partages</h2>
+<p>La segmentation en VLANs réalisée lors des séances précédentes joue un rôle essentiel dans la sécurisation du serveur de fichiers. Le contrôle des accès repose sur <strong>deux niveaux complémentaires</strong> :</p>
+
+<div class="compare-grid">
+  <div class="compare-card bleu">
+    <div class="cc-titre">Niveau réseau (VLANs + routage)</div>
+    <ul>
+      <li>Le routeur décide quels VLANs peuvent atteindre le VLAN 15 (Serveurs)</li>
+      <li>Les clients WiFi (VLAN x2) sont bloqués au niveau du routeur</li>
+      <li>Les caméras IP (VLAN x3) n'ont pas besoin d'accéder aux fichiers</li>
+    </ul>
+  </div>
+  <div class="compare-card vert">
+    <div class="cc-titre">Niveau applicatif (droits sur partages)</div>
+    <ul>
+      <li>Le serveur NAS gère ses propres droits par dossier</li>
+      <li>Un utilisateur du VLAN Personnel peut accéder à Réservations mais pas à RH</li>
+      <li>Les droits s'appliquent après que le réseau a autorisé la connexion</li>
+    </ul>
+  </div>
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 À retenir — Défense en profondeur</div>
+  <p>La sécurité des données repose sur plusieurs couches :</p>
+  <ol>
+    <li><strong>Couche réseau :</strong> les VLANs isolent les flux — un PC client WiFi ne peut pas physiquement atteindre le serveur</li>
+    <li><strong>Couche routage :</strong> le routeur filtre les communications inter-VLANs (préparation des ACL en S9)</li>
+    <li><strong>Couche applicative :</strong> le serveur NAS gère lui-même les droits d'accès par dossier</li>
+  </ol>
+  <p>C'est le principe de la <strong>défense en profondeur</strong> : même si un attaquant franchit une couche, les suivantes le bloquent.</p>
+</div>
+
+<h2>3.2 Adressage du serveur NAS dans la topologie Provence Évasion</h2>
+<p>Le serveur NAS est placé dans le <strong>VLAN 15 (Serveurs)</strong> au siège d'Apt. Il utilise une adresse statique conforme à la convention établie en S2 :</p>
+
+<table class="data-table">
+  <tr><th>Équipement</th><th>VLAN</th><th>Adresse IP</th><th>Masque</th><th>Passerelle</th></tr>
+  <tr><td><strong>NAS (Serveur fichiers)</strong></td><td class="center">VLAN 15</td><td class="center">192.168.15.4</td><td class="center">/24</td><td class="center">192.168.15.1</td></tr>
+  <tr><td>Serveur DNS/DHCP</td><td class="center">VLAN 15</td><td class="center">192.168.15.3</td><td class="center">/24</td><td class="center">192.168.15.1</td></tr>
+</table>
+
+<p>Le VLAN 15 (Serveurs) est accessible depuis les VLANs Personnel de tous les sites (VLAN 11, 21, 31, 41) via le routage inter-sites mis en place en S5 et S6.</p>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 3 — Topologie et accessibilité</div>
+  <label class="qlabel">Q3.1 — Un employé de Roussillon (VLAN 21, IP : 192.168.21.10) veut accéder au NAS (192.168.15.4). Listez les équipements traversés par son paquet, dans l'ordre.</label>
+  <textarea class="rep rep-md" id="ex3-q1" placeholder="PC Roussillon → Switch Roussillon → Routeur Roussillon → … → NAS"></textarea>
+  <label class="qlabel">Q3.2 — Un client WiFi de Roussillon (VLAN 22, IP : 192.168.22.50) tente d'accéder au même NAS. Où et pourquoi sa requête sera-t-elle bloquée ? (pour l'instant, sans ACL)</label>
+  <textarea class="rep rep-sm" id="ex3-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q3.3 — Quelle entrée de table de routage doit posséder le routeur de Roussillon pour atteindre le réseau 192.168.15.0/24 ?</label>
+  <textarea class="rep rep-sm" id="ex3-q3" placeholder="ip route 192.168.15.0 255.255.255.0 …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Configuration du serveur de fichiers dans Packet Tracer</h1>
+
+<h2>4.1 Le service serveur dans Packet Tracer</h2>
+<p>Dans Packet Tracer, un serveur générique peut activer plusieurs services : DHCP, DNS, HTTP, FTP… Pour simuler un serveur de fichiers, nous utilisons le <strong>service FTP</strong> qui permet de transférer des fichiers entre un client et le serveur.</p>
+
+<div class="cli">
+<span class="cm-titre">Vérification de la connectivité depuis un PC vers le NAS</span>
+
+<span class="cm-com">─── Depuis PC-Personnel-Roussillon (192.168.21.10) ───</span>
+PC> <span class="cm-val">ping 192.168.15.4</span>             <span class="cm-com">← test de connectivité vers le NAS</span>
+
+Reply from 192.168.15.4: bytes=32 time=2ms TTL=126
+
+PC> <span class="cm-val">ftp 192.168.15.4</span>              <span class="cm-com">← connexion FTP au serveur de fichiers</span>
+Trying to connect... 192.168.15.4
+Connected to 192.168.15.4
+220- Welcome to PT Ftp server
+Username: <span class="cm-val">employe</span>
+331- Username ok, need password
+Password:
+230- Logged in
+(passive mode On)
+ftp>
+</div>
+
+<h2>4.2 Commandes FTP utiles</h2>
+
+<table class="data-table">
+  <tr><th>Commande</th><th>Description</th><th>Exemple</th></tr>
+  <tr><td><code>dir</code></td><td>Lister les fichiers du répertoire courant</td><td><code>ftp&gt; dir</code></td></tr>
+  <tr><td><code>get</code></td><td>Télécharger un fichier depuis le serveur</td><td><code>ftp&gt; get planning.txt</code></td></tr>
+  <tr><td><code>put</code></td><td>Envoyer un fichier vers le serveur</td><td><code>ftp&gt; put rapport.txt</code></td></tr>
+  <tr><td><code>pwd</code></td><td>Afficher le répertoire actuel</td><td><code>ftp&gt; pwd</code></td></tr>
+  <tr><td><code>quit</code></td><td>Se déconnecter du serveur FTP</td><td><code>ftp&gt; quit</code></td></tr>
+</table>
+
+<h2>4.3 Gestion des utilisateurs et mots de passe</h2>
+<p>Dans Packet Tracer, le service FTP d'un serveur permet de créer des utilisateurs avec des droits distincts. On accède à la configuration via l'onglet <strong>Services → FTP</strong> du serveur :</p>
+<ul>
+  <li><strong>Username :</strong> identifiant de l'utilisateur (ex : <code>employe</code>, <code>direction</code>)</li>
+  <li><strong>Password :</strong> mot de passe de connexion</li>
+  <li><strong>Permissions :</strong> Write, Read, Delete, Rename, List (cocher selon les droits)</li>
+</ul>
+
+<div class="attention">
+  <strong>⚠ Important :</strong> Dans Packet Tracer, tous les utilisateurs FTP ont accès aux mêmes fichiers. La segmentation réelle des partages par VLAN se fait via les <strong>ACL</strong> sur les routeurs (séance S9). Pour l'atelier S8, nous simulons les droits en créant des comptes distincts avec des permissions différentes.
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 4 — Configuration FTP</div>
+  <label class="qlabel">Q4.1 — Quelles permissions FTP doit avoir le compte <code>employe</code> pour simuler un accès en Lecture / Écriture sur les Réservations ?</label>
+  <textarea class="rep rep-xs" id="ex4-q1" placeholder="Cocher : Write ☐  Read ☐  Delete ☐  Rename ☐  List ☐"></textarea>
+  <label class="qlabel">Q4.2 — Quelles permissions FTP doit avoir le compte <code>client-wifi</code> pour simuler l'absence d'accès aux fichiers internes ?</label>
+  <textarea class="rep rep-xs" id="ex4-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q4.3 — Quelle commande tapez-vous dans le terminal d'un PC Packet Tracer pour vous connecter au NAS (192.168.15.4) avec le compte <code>direction</code> ?</label>
+  <textarea class="rep rep-xs" id="ex4-q3" placeholder="Commande complète…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. Section 9 du dossier de déploiement</h1>
+
+<h2>5.1 Ce que vous devrez rédiger</h2>
+<p>À l'issue de la séance S8, vous complétez la <strong>Section 9 — Organisation des partages réseau</strong> de votre dossier de déploiement Provence Évasion. Cette section doit contenir :</p>
+
+<ul>
+  <li>L'arborescence complète des partages réseau</li>
+  <li>Le tableau des droits d'accès par profil utilisateur</li>
+  <li>L'adresse IP du serveur NAS et sa position dans la topologie</li>
+  <li>Les captures Packet Tracer montrant les tests de connexion FTP réussis</li>
+  <li>Un commentaire technique justifiant les choix de droits (lien avec les VLANs)</li>
+</ul>
+
+<div class="exercice-synth">
+  <div class="exercice-titre">📝 Synthèse finale</div>
+  <label class="qlabel">S1 — Qu'est-ce qu'un serveur de fichiers et à quoi sert-il ?</label>
+  <textarea class="rep rep-sm" id="synth-1" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">S2 — Quelle est l'adresse IP du NAS dans la topologie Provence Évasion ? Dans quel VLAN se trouve-t-il ?</label>
+  <textarea class="rep rep-xs" id="synth-2" placeholder="IP : … — VLAN : …"></textarea>
+  <label class="qlabel">S3 — Expliquez pourquoi les clients WiFi ne doivent pas accéder aux partages réseau internes, en citant deux mécanismes de protection complémentaires.</label>
+  <textarea class="rep rep-md" id="synth-3" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">S4 — Dans Packet Tracer, quel service simule le serveur de fichiers ? Quelle commande permet d'y accéder depuis un PC ?</label>
+  <textarea class="rep rep-sm" id="synth-4" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">S5 — Quel est le principe de la « défense en profondeur » appliqué au serveur de fichiers de Provence Évasion ?</label>
+  <textarea class="rep rep-md" id="synth-5" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">S6 — Citez le contenu attendu de la Section 9 du dossier de déploiement.</label>
+  <textarea class="rep rep-sm" id="synth-6" placeholder="Votre réponse…"></textarea>
+
+  <div class="autoeval" id="ae-container"></div>
+</div>
+
+</div><!-- /content -->
+
+<div class="footer">
+  <span><strong style="color:var(--orange)">S8</strong> — Cours : Serveur de fichiers et accès partagés</span>
+  <span>Lycée Louis Lumière – Bac Pro CIEL</span>
+</div>
+
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+const AE_CRITERES = [
+  "Je sais expliquer le rôle d'un serveur de fichiers",
+  "Je connais l'adresse IP et le VLAN du NAS Provence Évasion",
+  "Je comprends le lien entre VLANs et droits d'accès aux fichiers",
+  "Je sais attribuer des droits d'accès (R, R/W, aucun) selon le profil",
+  "Je comprends le principe de défense en profondeur",
+  "Je sais utiliser les commandes FTP de base dans Packet Tracer"
+];
+const NIVEAUX = ['★★★ Maîtrisé','★★☆ En cours','★☆☆ À revoir','? Non traité'];
+const VALS    = ['maitrise','en_cours','a_revoir','non_traite'];
+
+function buildAE(){
+  const c = document.getElementById('ae-container');
+  let h = '<div class="autoeval-title">🎯 Auto-évaluation</div>';
+  h += '<div class="ae-row ae-header"><span>Critère</span><span>★★★</span><span>★★☆</span><span>★☆☆</span><span>?</span></div>';
+  AE_CRITERES.forEach((cr,i)=>{
+    h += `<div class="ae-row"><span>${cr}</span>`;
+    NIVEAUX.forEach((lbl,j)=>{
+      h += `<label title="${lbl}" style="cursor:pointer;text-align:center;">
+        <input type="radio" name="ae${i}" value="${VALS[j]}" style="display:none;">
+        <span id="ae-lbl-${i}-${j}" style="font-size:18px;color:#bbb;">○</span>
+      </label>`;
+    });
+    h += '</div>';
+  });
+  c.innerHTML = h;
+  document.querySelectorAll('input[type=radio]').forEach(r=>{
+    r.addEventListener('change',()=>{
+      const parts = r.name.replace('ae','').split('-');
+      const ci = parseInt(parts[0]);
+      NIVEAUX.forEach((_,j)=>{
+        const s = document.getElementById(`ae-lbl-${ci}-${j}`);
+        if(s) s.style.color='#bbb', s.textContent='○';
+      });
+      const idx = VALS.indexOf(r.value);
+      const sel = document.getElementById(`ae-lbl-${ci}-${idx}`);
+      if(sel){ sel.style.color='var(--bleu)'; sel.textContent='●'; }
+    });
+  });
+}
+buildAE();
+
+function getAE(){
+  const result = {};
+  AE_CRITERES.forEach((cr,i)=>{
+    const sel = document.querySelector(`input[name=ae${i}]:checked`);
+    result[`critere_${i+1}`] = { critere: cr, niveau: sel ? sel.value : 'non_traite' };
+  });
+  return result;
+}
+
+function v(id){ return (document.getElementById(id)||{value:''}).value; }
+
+function genererJSON(){
+  const data = {
+    meta: {
+      devoir: "S8 – Cours : Serveur de fichiers et accès partagés",
+      eleve: { nom: v('eleve-nom'), prenom: v('eleve-prenom'), classe: v('eleve-classe') },
+      date: v('eleve-date'),
+      genere_le: new Date().toISOString()
+    },
+    exercice1: { q1: v('ex1-q1'), q2: v('ex1-q2'), q3: v('ex1-q3') },
+    exercice2: {
+      tableau: {
+        reservations: { personnel: v('ex2-t1c1'), direction: v('ex2-t1c2'), clients_wifi: v('ex2-t1c3') },
+        comptabilite: { personnel: v('ex2-t2c1'), direction: v('ex2-t2c2'), clients_wifi: v('ex2-t2c3') },
+        rh:           { personnel: v('ex2-t3c1'), direction: v('ex2-t3c2'), clients_wifi: v('ex2-t3c3') },
+        public:       { personnel: v('ex2-t4c1'), direction: v('ex2-t4c2'), clients_wifi: v('ex2-t4c3') }
+      },
+      q2: v('ex2-q2')
+    },
+    exercice3: { q1: v('ex3-q1'), q2: v('ex3-q2'), q3: v('ex3-q3') },
+    exercice4: { q1: v('ex4-q1'), q2: v('ex4-q2'), q3: v('ex4-q3') },
+    synthese: {
+      s1: v('synth-1'), s2: v('synth-2'), s3: v('synth-3'),
+      s4: v('synth-4'), s5: v('synth-5'), s6: v('synth-6')
+    },
+    auto_evaluation: getAE()
+  };
+  const nom = v('eleve-nom'), prenom = v('eleve-prenom');
+  const safeName = (nom+prenom).replace(/[^a-zA-Z0-9]/g,'') || 'Eleve';
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${safeName}_S8Cours.json`;
+  a.click();
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(()=> t.style.display='none', 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travail de compréhension — Provence Évasion & Cahier des charges Axentis</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bleu:   #029AED;
+  --vert:   #8BC34A;
+  --orange: #FF5722;
+  --marine: #1E3A5F;
+  --ciel:   #5BB8E8;
+  --ciel-bg:#F0F8FF;
+  --rouge:  #EE0000;
+}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#1a1a2e;background:#f8f9fb;line-height:1.7;}
+
+/* ── EN-TÊTE ── */
+.entete{
+  background:var(--marine);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 32px;border-bottom:3px solid var(--bleu);
+}
+.entete-logo{display:flex;align-items:center;gap:14px;}
+.entete-logo img{height:44px;width:auto;}
+.entete-titre{
+  font-family:'Roboto',sans-serif;font-size:13px;font-weight:700;
+  color:#fff;letter-spacing:1px;
+}
+.entete-lycee{
+  font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;
+  color:var(--rouge);letter-spacing:1px;
+}
+
+/* ── PAGE DE GARDE ── */
+.garde{
+  background:#fff;max-width:860px;margin:32px auto 0;
+  border-radius:8px;box-shadow:0 2px 12px rgba(30,58,95,0.1);
+  padding:40px 48px;
+}
+.garde-titre{
+  font-family:'Roboto',sans-serif;font-size:20px;font-weight:700;
+  color:var(--vert);text-align:center;margin-bottom:6px;
+}
+.garde-sous-titre{
+  font-family:'Roboto',sans-serif;font-size:14px;font-style:italic;
+  color:var(--marine);text-align:center;margin-bottom:4px;
+}
+.garde-infos{
+  text-align:center;font-size:12px;color:var(--marine);
+  margin-bottom:28px;letter-spacing:0.5px;
+}
+.eleve-box{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  background:var(--ciel-bg);border:1px solid var(--ciel);
+  border-radius:6px;padding:16px 20px;margin-bottom:24px;
+}
+.eleve-box input{
+  border:1px solid #cce4f6;border-radius:4px;padding:8px 12px;
+  font-family:'Montserrat',sans-serif;font-size:12px;width:100%;
+  background:#fff;color:var(--marine);
+}
+.eleve-box input:focus{outline:2px solid var(--bleu);border-color:var(--bleu);}
+.eleve-box input::placeholder{color:#aaa;}
+
+/* ── TABLEAU COMPÉTENCES ── */
+.competences-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:0;}
+.competences-table th{
+  background:var(--ciel);color:#fff;
+  font-family:'Roboto',sans-serif;font-weight:700;
+  padding:8px 12px;text-align:left;
+}
+.competences-table .bloc-header{
+  background:var(--marine);color:#fff;
+  font-family:'Roboto',sans-serif;font-weight:700;
+  padding:6px 12px;font-size:11px;letter-spacing:1px;text-transform:uppercase;
+}
+.competences-table td{
+  padding:7px 12px;border-bottom:1px solid #e0eef8;
+}
+.competences-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.check-on{color:var(--bleu);font-weight:700;font-size:14px;}
+.check-off{color:#bbb;font-size:14px;}
+
+/* ── CORPS ── */
+.contenu{max-width:860px;margin:0 auto;padding:0 0 120px;}
+
+.section-card{
+  background:#fff;border-radius:8px;
+  box-shadow:0 2px 10px rgba(30,58,95,0.08);
+  margin:24px 0;overflow:hidden;
+}
+.section-header{
+  background:var(--marine);
+  padding:14px 28px;
+  display:flex;align-items:center;gap:14px;
+}
+.section-header h1{
+  font-family:'Roboto',sans-serif;font-size:16px;font-weight:700;
+  color:#fff;
+}
+.section-num-badge{
+  background:var(--bleu);color:#fff;
+  font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;
+  padding:4px 12px;border-radius:20px;white-space:nowrap;
+  letter-spacing:1px;
+}
+.section-body{padding:24px 28px;}
+
+h2{
+  font-family:'Roboto',sans-serif;font-size:13px;font-weight:700;
+  font-style:italic;color:var(--bleu);
+  margin:20px 0 10px;border-left:3px solid var(--bleu);
+  padding-left:10px;
+}
+h3{
+  font-family:'Roboto',sans-serif;font-size:12px;font-weight:700;
+  color:var(--orange);margin:16px 0 8px;
+}
+
+.consigne{
+  border-left:4px solid var(--orange);background:#fffbf0;
+  padding:12px 16px;border-radius:0 6px 6px 0;
+  margin:14px 0;font-size:12px;line-height:1.7;
+}
+.consigne strong{color:var(--orange);}
+
+.q-bloc{
+  background:var(--ciel-bg);border:1px solid #cce4f6;
+  border-radius:6px;padding:14px 16px;margin:12px 0;
+}
+.q-label{
+  font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;
+  color:var(--marine);display:block;margin-bottom:8px;
+}
+.q-num{
+  display:inline-block;background:var(--bleu);color:#fff;
+  font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;
+  padding:2px 9px;border-radius:12px;margin-right:8px;
+}
+
+textarea.rep{
+  width:100%;border:1px solid #cce4f6;border-radius:4px;
+  padding:10px 12px;font-family:'Montserrat',sans-serif;font-size:12px;
+  color:var(--marine);background:#fff;resize:vertical;
+  line-height:1.6;
+}
+textarea.rep:focus{outline:2px solid var(--bleu);border-color:var(--bleu);}
+textarea.rep.sm{min-height:60px;}
+textarea.rep.md{min-height:100px;}
+textarea.rep.lg{min-height:140px;}
+
+/* ── QCM / CASES ── */
+.qcm-groupe{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.qcm-option{
+  display:flex;align-items:center;gap:10px;
+  background:#fff;border:1px solid #d0e8f8;
+  border-radius:4px;padding:8px 12px;cursor:pointer;
+  transition:border-color 0.15s,background 0.15s;
+  font-size:12px;
+}
+.qcm-option:hover{border-color:var(--bleu);background:var(--ciel-bg);}
+.qcm-option input[type="radio"],
+.qcm-option input[type="checkbox"]{
+  accent-color:var(--bleu);width:15px;height:15px;flex-shrink:0;cursor:pointer;
+}
+.qcm-option.selected{border-color:var(--bleu);background:#e0f3fc;}
+
+/* ── TABLEAUX INTERACTIFS ── */
+.ax-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px;}
+.ax-table th{
+  background:var(--ciel);color:#fff;
+  font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;
+  padding:9px 12px;text-align:left;
+}
+.ax-table td{
+  border-bottom:1px solid #e0eef8;padding:8px 12px;vertical-align:top;
+}
+.ax-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.ax-table input[type="text"],
+.ax-table select{
+  width:100%;border:1px solid #cce4f6;border-radius:3px;
+  padding:5px 8px;font-family:'Montserrat',sans-serif;font-size:11px;
+  color:var(--marine);background:#fff;
+}
+.ax-table input[type="text"]:focus,
+.ax-table select:focus{outline:1px solid var(--bleu);}
+.fixed-cell{color:var(--marine);font-weight:600;}
+
+/* ── VRAI/FAUX ── */
+.vf-grid{display:grid;grid-template-columns:1fr auto auto;gap:8px 16px;align-items:center;margin:10px 0;}
+.vf-enonce{font-size:12px;padding:8px 12px;background:var(--ciel-bg);border-radius:4px;border:1px solid #d0e8f8;}
+.vf-btn{
+  padding:6px 16px;border-radius:4px;border:2px solid #ccc;
+  font-family:'Roboto',sans-serif;font-weight:700;font-size:12px;cursor:pointer;
+  background:#fff;transition:all 0.15s;
+}
+.vf-btn.v:hover,.vf-btn.v.sel{background:#e8f5e9;border-color:#4caf50;color:#2e7d32;}
+.vf-btn.f:hover,.vf-btn.f.sel{background:#fce8e8;border-color:#e53935;color:#c62828;}
+
+/* ── AUTOÉVALUATION ── */
+.auto-eval-table{width:100%;border-collapse:collapse;margin-top:12px;}
+.auto-eval-table th{
+  background:var(--marine);color:#fff;
+  font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;
+  padding:9px 14px;text-align:left;
+}
+.auto-eval-table td{
+  border-bottom:1px solid #e0eef8;padding:9px 14px;font-size:12px;vertical-align:middle;
+}
+.auto-eval-table tr:nth-child(even) td{background:var(--ciel-bg);}
+.stars-group{display:flex;gap:6px;}
+.star-label{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:4px;border:1px solid #ccc;
+  font-size:11px;font-weight:600;cursor:pointer;
+  background:#fff;transition:all 0.15s;white-space:nowrap;
+}
+.star-label input{display:none;}
+.star-label:hover{border-color:var(--bleu);}
+.star-label.l3{color:#2e7d32;}input:checked+.star-label.l3,.star-label.l3.sel{background:#e8f5e9;border-color:#4caf50;}
+.star-label.l2{color:#e67e22;}input:checked+.star-label.l2,.star-label.l2.sel{background:#fff3e0;border-color:#e67e22;}
+.star-label.l1{color:#c62828;}input:checked+.star-label.l1,.star-label.l1.sel{background:#fce8e8;border-color:#e53935;}
+.star-label.l0{color:#888;}input:checked+.star-label.l0,.star-label.l0.sel{background:#f0f0f0;border-color:#999;}
+.stars-group input:checked+label{border-width:2px;}
+
+/* ── PIED DE PAGE ── */
+.pied{
+  background:#fff;border-top:2px solid var(--marine);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 32px;margin-top:32px;font-size:11px;
+}
+.pied-ref{color:var(--orange);font-family:'Roboto',sans-serif;font-weight:700;font-size:12px;}
+.pied-droite{color:var(--marine);font-family:'Roboto',sans-serif;}
+
+/* ── BARRE STICKY ── */
+.send-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:3px solid var(--marine);
+  padding:12px 32px;display:flex;justify-content:space-between;
+  align-items:center;z-index:100;
+  box-shadow:0 -4px 16px rgba(30,58,95,0.12);
+}
+.send-info{font-size:12px;color:#666;}
+.btn-send{
+  background:var(--marine);color:#fff;border:none;
+  font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;
+  padding:10px 28px;border-radius:6px;cursor:pointer;
+  transition:background 0.2s;
+}
+.btn-send:hover{background:var(--bleu);}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:72px;right:24px;
+  background:var(--marine);color:#fff;
+  font-family:'Roboto',sans-serif;font-size:13px;font-weight:700;
+  padding:12px 24px;border-radius:6px;
+  opacity:0;transition:opacity 0.4s;
+  pointer-events:none;z-index:200;
+}
+.toast.show{opacity:1;}
+
+/* ── MISE EN PAGE ── */
+.sep{border:none;border-top:1px solid #e0eef8;margin:20px 0;}
+.pts{
+  display:inline-block;background:var(--orange);color:#fff;
+  font-family:'Roboto',sans-serif;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle;
+}
+.info-box{
+  border-left:4px solid var(--ciel);background:var(--ciel-bg);
+  padding:11px 15px;border-radius:0 6px 6px 0;
+  margin:12px 0;font-size:12px;line-height:1.7;
+}
+.scenario-box{
+  border:2px solid var(--orange);background:#fffbf0;
+  border-radius:6px;padding:14px 18px;margin:14px 0;font-size:12px;line-height:1.7;
+}
+.scenario-box strong{color:var(--orange);}
+</style>
+</head>
+<body>
+
+<!-- ══ EN-TÊTE ══ -->
+<div class="entete">
+  <div class="entete-logo">
+    <img src="data:image/jpeg;base64,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" alt="Logo CIEL Louis Lumière">
+    <div class="entete-titre">Bac Pro CIEL — Projet Provence Évasion</div>
+  </div>
+  <div class="entete-lycee">Lycée Louis Lumière</div>
+</div>
+
+<!-- ══ PAGE DE GARDE ══ -->
+<div class="garde">
+  <div class="garde-titre">Travail de compréhension — Provence Évasion &amp; Cahier des charges Axentis</div>
+  <div class="garde-sous-titre">Découvrir et analyser le contexte du projet réseau</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Séquence Provence Évasion — S1 &nbsp;|&nbsp; Année 2025-2026</div>
+  <div class="consigne">
+    <strong>📋 Consignes générales</strong><br>
+    Ce travail est à réaliser <strong>individuellement</strong>, documents de présentation ouverts. Il dure <strong>environ 1 heure</strong>.
+    Tu complètes toutes les parties, puis tu cliques sur le bouton en bas pour télécharger ton fichier de réponses <code>.json</code> que tu déposes sur Classroom.
+    Lis chaque question attentivement avant de répondre.
+  </div>
+
+  <div class="eleve-box">
+    <input id="eleve-nom"    placeholder="Nom">
+    <input id="eleve-prenom" placeholder="Prénom">
+    <input id="eleve-classe" placeholder="Classe">
+    <input id="eleve-date"   type="date">
+  </div>
+
+  <table class="competences-table">
+    <tr><th>Code</th><th>Compétence</th><th>Bloc</th><th>Mobilisée</th></tr>
+    <tr><td colspan="4" class="bloc-header">Bloc 1 — Réaliser</td></tr>
+    <tr><td>C03</td><td>Participer à un projet</td><td>1</td><td><span class="check-off">☐</span></td></tr>
+    <tr><td>C07</td><td>Réaliser des maquettes et prototypes</td><td>1</td><td><span class="check-off">☐</span></td></tr>
+    <tr><td>C11</td><td>Maintenir un système électronique ou réseau</td><td>1</td><td><span class="check-off">☐</span></td></tr>
+    <tr><td colspan="4" class="bloc-header">Bloc 2 — Mettre en œuvre</td></tr>
+    <tr><td>C06</td><td>Valider la conformité d'une installation</td><td>2</td><td><span class="check-off">☐</span></td></tr>
+    <tr><td>C09</td><td>Installer les éléments d'un système informatique</td><td>2</td><td><span class="check-off">☐</span></td></tr>
+    <tr><td>C10</td><td>Exploiter un réseau informatique</td><td>2</td><td><span class="check-off">☐</span></td></tr>
+    <tr><td colspan="4" class="bloc-header">Bloc 3 — Communiquer &amp; Analyser</td></tr>
+    <tr><td>C01</td><td>Communiquer en situation professionnelle</td><td>3</td><td><span class="check-on">☑</span></td></tr>
+    <tr><td>C04</td><td>Analyser une structure matérielle et logicielle</td><td>3</td><td><span class="check-on">☑</span></td></tr>
+    <tr><td>C08</td><td>Coder</td><td>3</td><td><span class="check-off">☐</span></td></tr>
+  </table>
+</div>
+
+<!-- ══ CONTENU ══ -->
+<div class="contenu">
+
+<!-- ════════════════════════════════════════════
+     PARTIE 1 — L'ENTREPRISE PROVENCE ÉVASION
+     ════════════════════════════════════════════ -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-num-badge">Partie 1</span>
+    <h1>L'entreprise Provence Évasion <span class="pts">~15 min</span></h1>
+  </div>
+  <div class="section-body">
+
+    <div class="consigne">
+      <strong>📖 Contexte</strong> — En t'appuyant sur la plaquette de présentation de Provence Évasion, réponds aux questions suivantes.
+    </div>
+
+    <h2>1.1 Questions de mémorisation — Qui est Provence Évasion ?</h2>
+
+    <!-- Q1 Vrai/Faux -->
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q1</span> Réponds <strong>Vrai</strong> ou <strong>Faux</strong> à chacune des affirmations suivantes :</span>
+      <div class="vf-grid" id="vf-zone">
+        <div class="vf-enonce">Provence Évasion a été fondée en 2011.</div>
+        <button class="vf-btn v" onclick="setVF(this,'vf_1','V')">Vrai</button>
+        <button class="vf-btn f" onclick="setVF(this,'vf_1','F')">Faux</button>
+        <input type="hidden" id="vf_1">
+
+        <div class="vf-enonce">Le fondateur de Provence Évasion s'appelle Laurent Ferracci.</div>
+        <button class="vf-btn v" onclick="setVF(this,'vf_2','V')">Vrai</button>
+        <button class="vf-btn f" onclick="setVF(this,'vf_2','F')">Faux</button>
+        <input type="hidden" id="vf_2">
+
+        <div class="vf-enonce">Le groupe possède 5 sites d'hébergement dans le Vaucluse.</div>
+        <button class="vf-btn v" onclick="setVF(this,'vf_3','V')">Vrai</button>
+        <button class="vf-btn f" onclick="setVF(this,'vf_3','F')">Faux</button>
+        <input type="hidden" id="vf_3">
+
+        <div class="vf-enonce">Le siège administratif du groupe est situé à Apt.</div>
+        <button class="vf-btn v" onclick="setVF(this,'vf_4','V')">Vrai</button>
+        <button class="vf-btn f" onclick="setVF(this,'vf_4','F')">Faux</button>
+        <input type="hidden" id="vf_4">
+
+        <div class="vf-enonce">Le taux d'occupation estival avoisine les 96 %.</div>
+        <button class="vf-btn v" onclick="setVF(this,'vf_5','V')">Vrai</button>
+        <button class="vf-btn f" onclick="setVF(this,'vf_5','F')">Faux</button>
+        <input type="hidden" id="vf_5">
+
+        <div class="vf-enonce">Provence Évasion emploie 38 salariés permanents et 60 saisonniers.</div>
+        <button class="vf-btn v" onclick="setVF(this,'vf_6','V')">Vrai</button>
+        <button class="vf-btn f" onclick="setVF(this,'vf_6','F')">Faux</button>
+        <input type="hidden" id="vf_6">
+
+        <div class="vf-enonce">Le chiffre d'affaires 2024 du groupe est de 1,2 million d'euros.</div>
+        <button class="vf-btn v" onclick="setVF(this,'vf_7','V')">Vrai</button>
+        <button class="vf-btn f" onclick="setVF(this,'vf_7','F')">Faux</button>
+        <input type="hidden" id="vf_7">
+
+        <div class="vf-enonce">Le Camping l'Étang se trouve à Cucuron et propose du glamping.</div>
+        <button class="vf-btn v" onclick="setVF(this,'vf_8','V')">Vrai</button>
+        <button class="vf-btn f" onclick="setVF(this,'vf_8','F')">Faux</button>
+        <input type="hidden" id="vf_8">
+      </div>
+    </div>
+
+    <h2>1.2 Les quatre sites — Tableau à compléter</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q2</span> Complète le tableau suivant avec les informations tirées de la plaquette :</span>
+      <table class="ax-table">
+        <tr>
+          <th>Nom du site</th>
+          <th>Commune</th>
+          <th>Type d'activité</th>
+          <th>Capacité d'accueil</th>
+          <th>Nb de permanents</th>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Siège administratif</td>
+          <td><input type="text" id="t2_1_1" placeholder="Commune…"></td>
+          <td><input type="text" id="t2_1_2" placeholder="Activité…"></td>
+          <td><input type="text" id="t2_1_3" placeholder="Capacité…"></td>
+          <td><input type="text" id="t2_1_4" placeholder="Nb…"></td>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Mas des Ocres</td>
+          <td><input type="text" id="t2_2_1" placeholder="Commune…"></td>
+          <td><input type="text" id="t2_2_2" placeholder="Activité…"></td>
+          <td><input type="text" id="t2_2_3" placeholder="Capacité…"></td>
+          <td><input type="text" id="t2_2_4" placeholder="Nb…"></td>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Domaine de Saignon</td>
+          <td><input type="text" id="t2_3_1" placeholder="Commune…"></td>
+          <td><input type="text" id="t2_3_2" placeholder="Activité…"></td>
+          <td><input type="text" id="t2_3_3" placeholder="Capacité…"></td>
+          <td><input type="text" id="t2_3_4" placeholder="Nb…"></td>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Camping l'Étang</td>
+          <td><input type="text" id="t2_4_1" placeholder="Commune…"></td>
+          <td><input type="text" id="t2_4_2" placeholder="Activité…"></td>
+          <td><input type="text" id="t2_4_3" placeholder="Capacité…"></td>
+          <td><input type="text" id="t2_4_4" placeholder="Nb…"></td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>1.3 Questions de compréhension</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q3</span> Laurent Ferracci était <em>ancien guide de randonnée</em> avant de fonder Provence Évasion. En quoi cette origine explique-t-elle la philosophie du groupe vis-à-vis de ses hébergements ?</span>
+      <textarea class="rep md" id="q3" placeholder="Votre réponse…"></textarea>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q4</span> En 2025, Provence Évasion annonce son intention d'ouvrir un 5ème site d'ici 2027. Selon toi, quelles contraintes informatiques et réseau ce nouveau site va-t-il générer pour l'infrastructure existante ?</span>
+      <textarea class="rep md" id="q4" placeholder="Votre réponse…"></textarea>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q5</span> QCM — La forme juridique de Provence Évasion est :</span>
+      <div class="qcm-groupe" id="qcm_q5">
+        <label class="qcm-option"><input type="radio" name="q5" value="a"> SARL (Société à Responsabilité Limitée)</label>
+        <label class="qcm-option"><input type="radio" name="q5" value="b"> SAS (Société par Actions Simplifiée)</label>
+        <label class="qcm-option"><input type="radio" name="q5" value="c"> SA (Société Anonyme)</label>
+        <label class="qcm-option"><input type="radio" name="q5" value="d"> Auto-entreprise</label>
+      </div>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q6</span> QCM — En quelle année le Camping l'Étang de Cucuron a-t-il été ouvert ?</span>
+      <div class="qcm-groupe" id="qcm_q6">
+        <label class="qcm-option"><input type="radio" name="q6" value="a"> 2013</label>
+        <label class="qcm-option"><input type="radio" name="q6" value="b"> 2017</label>
+        <label class="qcm-option"><input type="radio" name="q6" value="c"> 2021</label>
+        <label class="qcm-option"><input type="radio" name="q6" value="d"> 2009</label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PARTIE 2 — L'INCIDENT ET LE CONSTAT
+     ════════════════════════════════════════════ -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-num-badge">Partie 2</span>
+    <h1>L'incident déclencheur et l'audit réseau <span class="pts">~15 min</span></h1>
+  </div>
+  <div class="section-body">
+
+    <div class="consigne">
+      <strong>📖 Contexte</strong> — En t'appuyant sur la section 02 du cahier des charges Axentis (Constat initial — Audit du réseau existant).
+    </div>
+
+    <h2>2.1 L'incident de décembre 2024</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q7</span> Décris en quelques phrases l'incident qui a conduit Laurent Ferracci à contacter Axentis Informatique. Précise : le site concerné, ce qui s'est passé, et les conséquences commerciales.</span>
+      <textarea class="rep lg" id="q7" placeholder="Votre réponse…"></textarea>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q8</span> Quelle est la <strong>cause technique directe</strong> de cet incident ? Coche la bonne réponse :</span>
+      <div class="qcm-groupe">
+        <label class="qcm-option"><input type="radio" name="q8" value="a"> Une panne du serveur de réservation central</label>
+        <label class="qcm-option"><input type="radio" name="q8" value="b"> L'absence de logiciel de réservation centralisé partagé entre les sites</label>
+        <label class="qcm-option"><input type="radio" name="q8" value="c"> Une attaque informatique sur le réseau WiFi</label>
+        <label class="qcm-option"><input type="radio" name="q8" value="d"> Une erreur humaine de la réceptionniste</label>
+      </div>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q9</span> Les fichiers de réservation étaient échangés par clé USB entre les sites. Explique en quoi cette méthode est dangereuse dans un contexte professionnel (donne au moins 2 risques distincts).</span>
+      <textarea class="rep md" id="q9" placeholder="Risque 1 : …&#10;Risque 2 : …&#10;Risque 3 (bonus) : …"></textarea>
+    </div>
+
+    <h2>2.2 L'audit des équipements réseau</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q10</span> Complète le tableau de l'audit réseau avec les informations du cahier des charges :</span>
+      <table class="ax-table">
+        <tr>
+          <th>Site</th>
+          <th>Box internet</th>
+          <th>Switch (nb ports / type)</th>
+          <th>WiFi clients</th>
+          <th>Niveau de risque</th>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Apt (siège)</td>
+          <td><input type="text" id="t10_1_1" placeholder="Modèle, âge…"></td>
+          <td><input type="text" id="t10_1_2" placeholder="ex: 8 ports, non manageable"></td>
+          <td><input type="text" id="t10_1_3" placeholder="Présence ?"></td>
+          <td>
+            <select id="t10_1_4">
+              <option value="">— choisir —</option>
+              <option>Élevé</option>
+              <option>Critique</option>
+              <option>Faible</option>
+              <option>Moyen</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Roussillon</td>
+          <td><input type="text" id="t10_2_1" placeholder="Modèle, âge…"></td>
+          <td><input type="text" id="t10_2_2" placeholder=""></td>
+          <td><input type="text" id="t10_2_3" placeholder=""></td>
+          <td>
+            <select id="t10_2_4">
+              <option value="">— choisir —</option>
+              <option>Élevé</option>
+              <option>Critique</option>
+              <option>Faible</option>
+              <option>Moyen</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Saignon</td>
+          <td><input type="text" id="t10_3_1" placeholder="Modèle, âge…"></td>
+          <td><input type="text" id="t10_3_2" placeholder=""></td>
+          <td><input type="text" id="t10_3_3" placeholder=""></td>
+          <td>
+            <select id="t10_3_4">
+              <option value="">— choisir —</option>
+              <option>Élevé</option>
+              <option>Critique</option>
+              <option>Faible</option>
+              <option>Moyen</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Cucuron</td>
+          <td><input type="text" id="t10_4_1" placeholder="Modèle, âge…"></td>
+          <td><input type="text" id="t10_4_2" placeholder=""></td>
+          <td><input type="text" id="t10_4_3" placeholder=""></td>
+          <td>
+            <select id="t10_4_4">
+              <option value="">— choisir —</option>
+              <option>Élevé</option>
+              <option>Critique</option>
+              <option>Faible</option>
+              <option>Moyen</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q11</span> L'audit a révélé que « les clients partagent involontairement le même réseau que le personnel ». Pourquoi est-ce un problème de sécurité grave ? Que risque-t-on concrètement ?</span>
+      <textarea class="rep md" id="q11" placeholder="Votre réponse…"></textarea>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q12</span> Parmi les défaillances listées par l'audit, lesquelles te semblent les deux <strong>plus graves</strong> pour la continuité du service ? Justifie ton choix.</span>
+      <textarea class="rep md" id="q12" placeholder="Défaillance 1 : … — Pourquoi : …&#10;Défaillance 2 : … — Pourquoi : …"></textarea>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PARTIE 3 — LES BESOINS ET SOLUTIONS TECHNIQUES
+     ════════════════════════════════════════════ -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-num-badge">Partie 3</span>
+    <h1>Besoins exprimés et solutions techniques <span class="pts">~15 min</span></h1>
+  </div>
+  <div class="section-body">
+
+    <div class="consigne">
+      <strong>📖 Contexte</strong> — En t'appuyant sur les sections 03 et 04 du cahier des charges Axentis (Besoins exprimés / Objectifs techniques).
+    </div>
+
+    <h2>3.1 Les besoins du client</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q13</span> Associe chaque besoin (B1 à B7) à sa solution technique. Écris le code du besoin correspondant dans la colonne de droite :</span>
+      <table class="ax-table">
+        <tr>
+          <th>Solution technique retenue</th>
+          <th>Code(s) besoin(s) couvert(s)</th>
+        </tr>
+        <tr>
+          <td>Mise en place de VLANs sur switches manageables</td>
+          <td><input type="text" id="t13_1" placeholder="ex: B1, B2…"></td>
+        </tr>
+        <tr>
+          <td>Routage statique inter-sites via liaison WAN, topologie étoile</td>
+          <td><input type="text" id="t13_2" placeholder=""></td>
+        </tr>
+        <tr>
+          <td>Serveur DNS interne + serveur de fichiers partagés</td>
+          <td><input type="text" id="t13_3" placeholder=""></td>
+        </tr>
+        <tr>
+          <td>ACL étendues + isolation des VLANs sensibles</td>
+          <td><input type="text" id="t13_4" placeholder=""></td>
+        </tr>
+        <tr>
+          <td>Configuration SSH + VPN site-à-site</td>
+          <td><input type="text" id="t13_5" placeholder=""></td>
+        </tr>
+        <tr>
+          <td>Caméras IP raccordées sur VLAN dédié, enregistrement central</td>
+          <td><input type="text" id="t13_6" placeholder=""></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q14</span> Le besoin B7 concerne l'accès distant de Laurent Ferracci depuis son domicile. Quelle solution technique est prévue ? Explique en quelques mots ce qu'est cette technologie et pourquoi elle est nécessaire ici.</span>
+      <textarea class="rep md" id="q14" placeholder="Solution : …&#10;Explication : …&#10;Pourquoi nécessaire : …"></textarea>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q15</span> Parmi les 7 besoins exprimés, lesquels ont été classés en priorité <strong>Haute</strong> ? Liste-les et explique pourquoi ils sont prioritaires par rapport aux autres.</span>
+      <textarea class="rep md" id="q15" placeholder="Besoins priorité haute : …&#10;Justification : …"></textarea>
+    </div>
+
+    <h2>3.2 Analyse du périmètre</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q16</span> QCM (plusieurs réponses possibles) — Parmi les éléments suivants, lesquels sont <strong>hors périmètre</strong> de la mission Axentis ?</span>
+      <div class="qcm-groupe">
+        <label class="qcm-option"><input type="checkbox" name="q16" value="a"> La configuration des switches manageables</label>
+        <label class="qcm-option"><input type="checkbox" name="q16" value="b"> Les travaux de câblage structuré</label>
+        <label class="qcm-option"><input type="checkbox" name="q16" value="c"> La fourniture et l'installation des points d'accès WiFi clients</label>
+        <label class="qcm-option"><input type="checkbox" name="q16" value="d"> La rédaction du dossier de déploiement</label>
+        <label class="qcm-option"><input type="checkbox" name="q16" value="e"> L'achat du logiciel de réservation</label>
+        <label class="qcm-option"><input type="checkbox" name="q16" value="f"> La mise en place des ACL</label>
+        <label class="qcm-option"><input type="checkbox" name="q16" value="g"> L'infogérance post-déploiement</label>
+      </div>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q17</span> Quelle est la topologie réseau choisie pour interconnecter les 4 sites de Provence Évasion ? Décris-la brièvement et explique pourquoi ce choix est pertinent pour ce groupe.</span>
+      <textarea class="rep md" id="q17" placeholder="Topologie : …&#10;Description : …&#10;Pertinence : …"></textarea>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PARTIE 4 — LE PROJET AXENTIS
+     ════════════════════════════════════════════ -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-num-badge">Partie 4</span>
+    <h1>Le projet Axentis — Phases, livrables et budget <span class="pts">~10 min</span></h1>
+  </div>
+  <div class="section-body">
+
+    <div class="consigne">
+      <strong>📖 Contexte</strong> — En t'appuyant sur les sections 06, 07 et 08 du cahier des charges Axentis.
+    </div>
+
+    <h2>4.1 Les phases du projet</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q18</span> Complète le tableau des 3 phases du projet :</span>
+      <table class="ax-table">
+        <tr>
+          <th>Phase</th>
+          <th>Intitulé</th>
+          <th>Séances concernées</th>
+          <th>Objectif principal</th>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Phase 1</td>
+          <td><input type="text" id="t18_1_1" placeholder="Intitulé…"></td>
+          <td><input type="text" id="t18_1_2" placeholder="S? → S?"></td>
+          <td><input type="text" id="t18_1_3" placeholder="Objectif…"></td>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Phase 2</td>
+          <td><input type="text" id="t18_2_1" placeholder="Intitulé…"></td>
+          <td><input type="text" id="t18_2_2" placeholder="S? → S?"></td>
+          <td><input type="text" id="t18_2_3" placeholder="Objectif…"></td>
+        </tr>
+        <tr>
+          <td class="fixed-cell">Phase 3</td>
+          <td><input type="text" id="t18_3_1" placeholder="Intitulé…"></td>
+          <td><input type="text" id="t18_3_2" placeholder="S? → S?"></td>
+          <td><input type="text" id="t18_3_3" placeholder="Objectif…"></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q19</span> Quelle est la date de mise en service prévue pour le réseau ? Pourquoi cette date te semble-t-elle logique dans le contexte de l'activité touristique de Provence Évasion ?</span>
+      <textarea class="rep sm" id="q19" placeholder="Date : …&#10;Justification : …"></textarea>
+    </div>
+
+    <h2>4.2 Les livrables</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q20</span> Axentis doit remettre 6 livrables à l'issue de la mission. Lequel te semble le plus important pour assurer la <strong>maintenabilité</strong> du réseau sur le long terme ? Justifie.</span>
+      <textarea class="rep md" id="q20" placeholder="Livrable choisi : …&#10;Justification : …"></textarea>
+    </div>
+
+    <h2>4.3 Le budget</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q21</span> Le budget total HT de la mission Axentis est de 45 000 €. Quelle est la part consacrée aux équipements réseau (switches, câblage) ? En pourcentage, cela représente combien du budget total ? (calcule)</span>
+      <textarea class="rep sm" id="q21" placeholder="Montant équipements : …€ — Calcul % : … / 45000 × 100 = …%"></textarea>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q22</span> Les conditions de règlement prévoient 3 versements. Complète : <br>— Versement 1 : __ % à la __________<br>— Versement 2 : __ % à la __________<br>— Versement 3 : __ % à la __________<br>Explique pourquoi ce découpage en 3 versements est avantageux pour le client.</span>
+      <textarea class="rep md" id="q22" placeholder="Versement 1 : …%…&#10;Versement 2 : …%…&#10;Versement 3 : …%…&#10;Avantage pour le client : …"></textarea>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PARTIE 5 — MISE EN SITUATION / ANALYSE
+     ════════════════════════════════════════════ -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-num-badge">Partie 5</span>
+    <h1>Mise en situation — Tu es technicien Axentis <span class="pts">~15 min</span></h1>
+  </div>
+  <div class="section-body">
+
+    <div class="scenario-box">
+      <strong>📌 Scénario</strong><br>
+      Nous sommes le 20 janvier 2025. Tu es technicien chez Axentis Informatique.
+      Thomas Vidal, ton directeur technique, t'a assigné à la mission Provence Évasion.
+      Tu viens de lire le cahier des charges et la plaquette de l'entreprise.
+      Avant de démarrer la phase 1, il te pose quelques questions pour s'assurer que tu as bien compris le contexte.
+    </div>
+
+    <h2>5.1 Comprendre le client</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q23</span> Thomas te demande : <em>« En deux ou trois phrases, présente-moi le client comme si tu devais l'expliquer à un collègue qui n'a rien lu. »</em></span>
+      <textarea class="rep md" id="q23" placeholder="Présentation synthétique de Provence Évasion…"></textarea>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q24</span> Thomas ajoute : <em>« Pourquoi le réseau actuel est-il insuffisant pour ce groupe ? Cite trois points critiques. »</em></span>
+      <textarea class="rep md" id="q24" placeholder="Point critique 1 : …&#10;Point critique 2 : …&#10;Point critique 3 : …"></textarea>
+    </div>
+
+    <h2>5.2 Comprendre la mission</h2>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q25</span> Thomas te montre un schéma simplifié avec 4 boîtes (Apt, Roussillon, Saignon, Cucuron) et te dit : <em>« Explique-moi comment ces 4 sites vont être reliés après notre intervention. »</em> Décris l'architecture cible en quelques phrases.</span>
+      <textarea class="rep lg" id="q25" placeholder="Architecture prévue : …"></textarea>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q26</span> Sur le site de Saignon, tu vas devoir créer plusieurs VLANs. D'après le cahier des charges, quels sont les 4 VLANs prévus sur ce site ? À quoi sert chacun ?</span>
+      <table class="ax-table">
+        <tr>
+          <th>Nom du VLAN</th>
+          <th>Rôle / Usage</th>
+        </tr>
+        <tr>
+          <td><input type="text" id="vlan_1_nom" placeholder="Nom du VLAN…"></td>
+          <td><input type="text" id="vlan_1_role" placeholder="Rôle…"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="vlan_2_nom" placeholder="Nom du VLAN…"></td>
+          <td><input type="text" id="vlan_2_role" placeholder="Rôle…"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="vlan_3_nom" placeholder="Nom du VLAN…"></td>
+          <td><input type="text" id="vlan_3_role" placeholder="Rôle…"></td>
+        </tr>
+        <tr>
+          <td><input type="text" id="vlan_4_nom" placeholder="Nom du VLAN…"></td>
+          <td><input type="text" id="vlan_4_role" placeholder="Rôle…"></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="q-bloc">
+      <span class="q-label"><span class="q-num">Q27</span> Thomas conclut : <em>« Un client WiFi (vacancier au Mas des Ocres) essaie d'accéder au serveur de fichiers du siège d'Apt. Selon notre architecture, est-ce possible ? Justifie en t'appuyant sur les solutions techniques prévues. »</em></span>
+      <textarea class="rep md" id="q27" placeholder="Réponse (oui/non) : …&#10;Justification technique : …"></textarea>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PARTIE 6 — AUTO-ÉVALUATION
+     ════════════════════════════════════════════ -->
+<div class="section-card">
+  <div class="section-header">
+    <span class="section-num-badge">Partie 6</span>
+    <h1>Auto-évaluation</h1>
+  </div>
+  <div class="section-body">
+    <div class="consigne">
+      <strong>📋 Consigne</strong> — Évalue honnêtement ton niveau de maîtrise sur chaque critère.
+    </div>
+    <table class="auto-eval-table">
+      <tr>
+        <th style="width:55%">Critère</th>
+        <th>★★★ Maîtrisé</th>
+        <th>★★☆ En cours</th>
+        <th>★☆☆ À revoir</th>
+        <th>? Non traité</th>
+      </tr>
+      <tr>
+        <td>Je sais présenter l'entreprise Provence Évasion (activité, sites, chiffres-clés)</td>
+        <td><label class="star-label l3"><input type="radio" name="ae1" value="maitrise"> ★★★</label></td>
+        <td><label class="star-label l2"><input type="radio" name="ae1" value="en_cours"> ★★☆</label></td>
+        <td><label class="star-label l1"><input type="radio" name="ae1" value="a_revoir"> ★☆☆</label></td>
+        <td><label class="star-label l0"><input type="radio" name="ae1" value="non_traite"> ?</label></td>
+      </tr>
+      <tr>
+        <td>Je comprends pourquoi l'infrastructure réseau actuelle est insuffisante</td>
+        <td><label class="star-label l3"><input type="radio" name="ae2" value="maitrise"> ★★★</label></td>
+        <td><label class="star-label l2"><input type="radio" name="ae2" value="en_cours"> ★★☆</label></td>
+        <td><label class="star-label l1"><input type="radio" name="ae2" value="a_revoir"> ★☆☆</label></td>
+        <td><label class="star-label l0"><input type="radio" name="ae2" value="non_traite"> ?</label></td>
+      </tr>
+      <tr>
+        <td>Je sais identifier les besoins (B1 à B7) et les associer à des solutions techniques</td>
+        <td><label class="star-label l3"><input type="radio" name="ae3" value="maitrise"> ★★★</label></td>
+        <td><label class="star-label l2"><input type="radio" name="ae3" value="en_cours"> ★★☆</label></td>
+        <td><label class="star-label l1"><input type="radio" name="ae3" value="a_revoir"> ★☆☆</label></td>
+        <td><label class="star-label l0"><input type="radio" name="ae3" value="non_traite"> ?</label></td>
+      </tr>
+      <tr>
+        <td>Je comprends la notion de VLAN et pourquoi on en utilise plusieurs sur un même site</td>
+        <td><label class="star-label l3"><input type="radio" name="ae4" value="maitrise"> ★★★</label></td>
+        <td><label class="star-label l2"><input type="radio" name="ae4" value="en_cours"> ★★☆</label></td>
+        <td><label class="star-label l1"><input type="radio" name="ae4" value="a_revoir"> ★☆☆</label></td>
+        <td><label class="star-label l0"><input type="radio" name="ae4" value="non_traite"> ?</label></td>
+      </tr>
+      <tr>
+        <td>Je comprends les phases du projet et leur enchaînement logique</td>
+        <td><label class="star-label l3"><input type="radio" name="ae5" value="maitrise"> ★★★</label></td>
+        <td><label class="star-label l2"><input type="radio" name="ae5" value="en_cours"> ★★☆</label></td>
+        <td><label class="star-label l1"><input type="radio" name="ae5" value="a_revoir"> ★☆☆</label></td>
+        <td><label class="star-label l0"><input type="radio" name="ae5" value="non_traite"> ?</label></td>
+      </tr>
+      <tr>
+        <td>Je suis capable de me mettre en situation de technicien et de raisonner sur le projet</td>
+        <td><label class="star-label l3"><input type="radio" name="ae6" value="maitrise"> ★★★</label></td>
+        <td><label class="star-label l2"><input type="radio" name="ae6" value="en_cours"> ★★☆</label></td>
+        <td><label class="star-label l1"><input type="radio" name="ae6" value="a_revoir"> ★☆☆</label></td>
+        <td><label class="star-label l0"><input type="radio" name="ae6" value="non_traite"> ?</label></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- fin contenu -->
+
+<!-- ══ PIED DE PAGE ══ -->
+<div class="pied">
+  <span class="pied-ref">S1 — Compréhension Provence Évasion</span>
+  <span class="pied-droite">Lycée Louis Lumière — Bac Pro CIEL</span>
+</div>
+
+<!-- ══ BARRE STICKY ══ -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé — Dépose-le sur Classroom !</div>
+
+<script>
+// ── Date du jour
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+// ── Vrai / Faux
+function setVF(btn, id, val) {
+  const paire = btn.closest('.vf-grid');
+  const btns = btn.closest('.vf-grid').querySelectorAll('button');
+  btns.forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById(id).value = val;
+}
+
+// ── Génération JSON
+function genererJSON() {
+  const nom    = document.getElementById('eleve-nom').value.trim();
+  const prenom = document.getElementById('eleve-prenom').value.trim();
+  const classe = document.getElementById('eleve-classe').value.trim();
+  const date   = document.getElementById('eleve-date').value;
+
+  const getVal = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const getRadio = name => {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '';
+  };
+  const getCheckboxes = name => {
+    return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(e => e.value);
+  };
+
+  const data = {
+    meta: {
+      devoir: "Travail de compréhension — Provence Évasion & Cahier des charges Axentis",
+      eleve: { nom, prenom, classe },
+      date,
+      genere_le: new Date().toISOString()
+    },
+    partie1_provence_evasion: {
+      q1_vrai_faux: {
+        vf_1_fondee_2011: getVal('vf_1'),
+        vf_2_Laurent_Ferracci: getVal('vf_2'),
+        vf_3_cinq_sites: getVal('vf_3'),
+        vf_4_siege_Apt: getVal('vf_4'),
+        vf_5_taux_96pct: getVal('vf_5'),
+        vf_6_38_permanents: getVal('vf_6'),
+        vf_7_CA_1_2M: getVal('vf_7'),
+        vf_8_Cucuron_glamping: getVal('vf_8')
+      },
+      q2_tableau_sites: {
+        siege_commune: getVal('t2_1_1'), siege_activite: getVal('t2_1_2'), siege_capacite: getVal('t2_1_3'), siege_permanents: getVal('t2_1_4'),
+        ocres_commune: getVal('t2_2_1'), ocres_activite: getVal('t2_2_2'), ocres_capacite: getVal('t2_2_3'), ocres_permanents: getVal('t2_2_4'),
+        saignon_commune: getVal('t2_3_1'), saignon_activite: getVal('t2_3_2'), saignon_capacite: getVal('t2_3_3'), saignon_permanents: getVal('t2_3_4'),
+        cucuron_commune: getVal('t2_4_1'), cucuron_activite: getVal('t2_4_2'), cucuron_capacite: getVal('t2_4_3'), cucuron_permanents: getVal('t2_4_4')
+      },
+      q3_philosophie_fondateur: getVal('q3'),
+      q4_contraintes_5eme_site: getVal('q4'),
+      q5_forme_juridique: getRadio('q5'),
+      q6_annee_camping: getRadio('q6')
+    },
+    partie2_incident_audit: {
+      q7_description_incident: getVal('q7'),
+      q8_cause_technique: getRadio('q8'),
+      q9_risques_cle_usb: getVal('q9'),
+      q10_audit_equipements: {
+        apt_box: getVal('t10_1_1'), apt_switch: getVal('t10_1_2'), apt_wifi: getVal('t10_1_3'), apt_risque: getVal('t10_1_4'),
+        roussillon_box: getVal('t10_2_1'), roussillon_switch: getVal('t10_2_2'), roussillon_wifi: getVal('t10_2_3'), roussillon_risque: getVal('t10_2_4'),
+        saignon_box: getVal('t10_3_1'), saignon_switch: getVal('t10_3_2'), saignon_wifi: getVal('t10_3_3'), saignon_risque: getVal('t10_3_4'),
+        cucuron_box: getVal('t10_4_1'), cucuron_switch: getVal('t10_4_2'), cucuron_wifi: getVal('t10_4_3'), cucuron_risque: getVal('t10_4_4')
+      },
+      q11_risque_wifi_partage: getVal('q11'),
+      q12_defaillances_les_plus_graves: getVal('q12')
+    },
+    partie3_besoins_solutions: {
+      q13_association_besoins_solutions: {
+        vlans: getVal('t13_1'),
+        routage_wan: getVal('t13_2'),
+        dns_fichiers: getVal('t13_3'),
+        acl: getVal('t13_4'),
+        ssh_vpn: getVal('t13_5'),
+        cameras: getVal('t13_6')
+      },
+      q14_vpn_acces_distant: getVal('q14'),
+      q15_besoins_haute_priorite: getVal('q15'),
+      q16_hors_perimetre: getCheckboxes('q16'),
+      q17_topologie: getVal('q17')
+    },
+    partie4_projet_axentis: {
+      q18_phases: {
+        phase1: { intitule: getVal('t18_1_1'), seances: getVal('t18_1_2'), objectif: getVal('t18_1_3') },
+        phase2: { intitule: getVal('t18_2_1'), seances: getVal('t18_2_2'), objectif: getVal('t18_2_3') },
+        phase3: { intitule: getVal('t18_3_1'), seances: getVal('t18_3_2'), objectif: getVal('t18_3_3') }
+      },
+      q19_date_mise_en_service: getVal('q19'),
+      q20_livrable_maintenabilite: getVal('q20'),
+      q21_budget_equipements_pct: getVal('q21'),
+      q22_conditions_reglement: getVal('q22')
+    },
+    partie5_mise_en_situation: {
+      q23_presentation_client: getVal('q23'),
+      q24_points_critiques_reseau: getVal('q24'),
+      q25_architecture_cible: getVal('q25'),
+      q26_vlans_saignon: {
+        vlan1: { nom: getVal('vlan_1_nom'), role: getVal('vlan_1_role') },
+        vlan2: { nom: getVal('vlan_2_nom'), role: getVal('vlan_2_role') },
+        vlan3: { nom: getVal('vlan_3_nom'), role: getVal('vlan_3_role') },
+        vlan4: { nom: getVal('vlan_4_nom'), role: getVal('vlan_4_role') }
+      },
+      q27_acces_serveur_par_client: getVal('q27')
+    },
+    auto_evaluation: {
+      ae1_presentation_entreprise: getRadio('ae1'),
+      ae2_infrastructure_insuffisante: getRadio('ae2'),
+      ae3_besoins_solutions: getRadio('ae3'),
+      ae4_notion_vlan: getRadio('ae4'),
+      ae5_phases_projet: getRadio('ae5'),
+      ae6_situation_technicien: getRadio('ae6')
+    }
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const safeName = (nom + prenom).replace(/[^a-zA-Z0-9]/g,'') || 'Eleve';
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${safeName}_Comprehension_ProvenanceEvasion.json`;
+  link.click();
+
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

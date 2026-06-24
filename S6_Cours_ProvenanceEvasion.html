@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S6 — Cours : Vérification et débogage d'une table de routage</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bleu:#029AED;--vert:#8BC34A;--orange:#FF5722;--marine:#1E3A5F;--ciel:#5BB8E8;--ciel-bg:#F0F8FF;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;font-size:13px;color:#222;background:#fff;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px 8px;border-bottom:2.5px solid var(--marine);}
+.header-logo{display:flex;align-items:center;}
+.header-lycee{font-family:'Roboto',sans-serif;font-size:11px;color:var(--marine);text-align:right;line-height:1.4;}
+.garde{padding:24px 28px 20px;border-bottom:1px solid #e0e8f0;margin-bottom:18px;}
+.garde-titre{font-family:'Roboto',sans-serif;font-size:17px;font-weight:700;color:var(--vert);text-align:center;margin-bottom:6px;}
+.garde-sous{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;text-align:center;color:#444;margin-bottom:4px;}
+.garde-infos{font-size:12px;text-align:center;color:var(--marine);margin-bottom:18px;}
+.eleve-box{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:18px;}
+.eleve-box input{border:1px solid #c0d0e0;border-radius:4px;padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--marine);width:100%;}
+.eleve-box input:focus{outline:none;border-color:var(--bleu);}
+.comp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.comp-table th,.comp-table td{border:1px solid var(--bleu);padding:5px 8px;}
+.comp-table .th-head{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;text-align:center;}
+.comp-table .tr-bloc{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:11px;}
+.comp-table .tr-even{background:var(--ciel-bg);}.comp-table .tr-odd{background:#fff;}
+.comp-table .td-check{text-align:center;font-size:15px;width:36px;}.comp-table .td-code{text-align:center;color:var(--bleu);font-family:'Roboto',sans-serif;font-weight:700;width:56px;}
+.chk-on{color:var(--bleu);}.chk-off{color:#bbb;}
+.content{padding:0 28px 80px;}
+h1{font-family:'Roboto',sans-serif;font-size:15px;font-weight:700;color:var(--bleu);margin:24px 0 8px;border-bottom:1px solid var(--ciel);padding-bottom:4px;}
+h2{font-family:'Roboto',sans-serif;font-size:13px;font-style:italic;color:var(--bleu);margin:18px 0 6px;}
+p{margin-bottom:8px;line-height:1.7;}
+ul,ol{margin:6px 0 10px 20px;line-height:1.8;}
+strong{font-weight:600;}
+.mise-en-situation{border-left:4px solid var(--vert);background:#f6fbed;padding:10px 14px;margin:10px 0 16px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.7;}
+.mise-en-situation strong{color:#4a7a1a;}
+.retenir{border:2px solid var(--bleu);background:var(--ciel-bg);padding:12px 16px;margin:12px 0 16px;border-radius:8px;font-size:12px;line-height:1.75;}
+.retenir .retenir-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);margin-bottom:6px;font-size:13px;}
+.attention{border-left:4px solid var(--orange);background:#fffbf0;padding:10px 14px;margin:10px 0 14px;border-radius:0 6px 6px 0;font-size:12px;line-height:1.65;}
+.attention strong{color:var(--orange);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12px;}
+.data-table th{background:var(--ciel);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;padding:6px 10px;border:1px solid var(--bleu);text-align:center;}
+.data-table td{border:1px solid var(--bleu);padding:6px 10px;}
+.data-table tr:nth-child(even){background:var(--ciel-bg);}
+.data-table td.left{text-align:left;}.data-table td.center{text-align:center;}
+.exercice{background:#fffbf0;border:1px solid #f0c080;border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--orange);margin-bottom:10px;font-size:13px;}
+.exercice-synth{background:#f0f4ff;border:1px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:16px 0;}
+.exercice-synth .exercice-titre{color:var(--marine);}
+.rep{width:100%;border:1px solid #c0d0e0;border-radius:5px;padding:8px 10px;font-family:'Montserrat',sans-serif;font-size:12px;resize:vertical;margin:4px 0 8px;}
+.rep:focus{outline:none;border-color:var(--bleu);}
+.rep-xs{min-height:40px;}.rep-sm{min-height:60px;}.rep-md{min-height:90px;}.rep-lg{min-height:120px;}
+label.qlabel{display:block;font-weight:600;color:var(--marine);margin:8px 0 3px;font-size:12px;}
+.inline-field{display:inline-block;border:none;border-bottom:1px solid #999;width:140px;font-family:'Montserrat',sans-serif;font-size:12px;padding:1px 4px;margin:0 4px;text-align:center;background:transparent;}
+.inline-field:focus{outline:none;border-bottom-color:var(--bleu);}
+.conclusion{background:#f6fbed;border:2px solid var(--vert);border-radius:8px;padding:12px 16px;margin:16px 0 8px;font-size:12px;line-height:2.2;}
+.sep{border:none;border-top:1px solid #d0e0ec;margin:20px 0;}
+.section-synth-titre{font-family:'Roboto',sans-serif;font-size:14px;font-weight:700;color:#fff;text-align:center;background:var(--marine);padding:10px 16px;border-radius:8px;margin:24px 0 12px;}
+.autoeval{margin:18px 0 10px;}
+.autoeval-title{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.ae-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #e8eef4;font-size:12px;}
+.ae-row.ae-header{font-weight:700;color:var(--marine);border-bottom:2px solid var(--bleu);padding-bottom:8px;font-size:11px;}
+.footer{border-top:2px solid var(--marine);padding:8px 28px;display:flex;justify-content:space-between;font-size:11px;color:var(--marine);margin-top:30px;}
+.send-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--marine);padding:10px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;}
+.send-info{font-size:11px;color:#666;}
+.btn-send{background:var(--marine);color:#fff;font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;border:none;border-radius:5px;padding:9px 22px;cursor:pointer;transition:background 0.2s;}
+.btn-send:hover{background:var(--bleu);}
+.toast{display:none;position:fixed;bottom:70px;right:28px;background:var(--marine);color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;z-index:200;}
+.cli{background:var(--marine);color:#e0f0ff;font-family:'Courier New',monospace;font-size:12px;padding:14px 18px;border-radius:6px;margin:10px 0 14px;line-height:1.9;white-space:pre;}
+.cli .cm-com{color:#8BC34A;}
+.cli .cm-val{color:#FFD54F;}
+.cli .cm-titre{color:#5BB8E8;font-weight:700;}
+.cli .cm-prompt{color:#FF5722;}
+.cli .cm-out{color:#ccc;font-style:italic;}
+.schema-box{background:#f8f9ff;border:2px solid var(--marine);border-radius:8px;padding:16px 20px;margin:12px 0 16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.9;color:var(--marine);}
+.schema-box .sch-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--marine);font-size:13px;margin-bottom:10px;}
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 16px;}
+.diag-card{border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.75;}
+.diag-card.ok{background:#f0fff4;border:2px solid var(--vert);}
+.diag-card.ko{background:#fff5f5;border:2px solid #e53935;}
+.diag-card .dc-titre{font-family:'Roboto',sans-serif;font-weight:700;font-size:13px;margin-bottom:8px;}
+.diag-card.ok .dc-titre{color:#2e7d32;}
+.diag-card.ko .dc-titre{color:#c62828;}
+.badge-site{display:inline-block;background:var(--marine);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:1px 2px;}
+.badge-cmd{display:inline-block;background:#1a2a40;color:#FFD54F;border-radius:3px;padding:1px 7px;font-size:11px;font-family:'Courier New',monospace;font-weight:700;}
+.methodo-box{background:#fff;border:2px solid var(--bleu);border-radius:8px;padding:14px 16px;margin:12px 0 16px;font-size:12px;line-height:1.8;}
+.methodo-box .m-titre{font-family:'Roboto',sans-serif;font-weight:700;color:var(--bleu);font-size:13px;margin-bottom:10px;}
+.methodo-step{display:flex;align-items:flex-start;gap:12px;margin:8px 0;padding:8px 12px;background:var(--ciel-bg);border-radius:6px;}
+.methodo-num{background:var(--bleu);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-family:'Roboto',sans-serif;font-weight:700;font-size:12px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<div class="header">
+  <div class="header-logo">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQIAHAAcAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCABEAJYDAREAAhEBAxEB/8QAHAAAAQUBAQEAAAAAAAAAAAAABgABAwQFAgcI/8QAGgEAAgMBAQAAAAAAAAAAAAAAAAUBAgMEBv/aAAwDAQACEAMQAAAB+qQQIECBAgQIECBAgQIECBAgYjB7uHB7eCntjvcPeRcDCO1Rlits56EPAxxOzh7i4i1UsBUraKaka9j3FkFbTLy30nlyLgY1tcqG3OSrmeD3cBondV9M7uOwe2Ty11ob4FiproYdAU4RnyN/NW6CO1fOX/nNfl7Mzo5WmNrj7srp5PQkXoUFPXEKcJZa6ADxFdx39Z8v6kQapj5G/mrdAg8+e+ft5bSVnD7eE+RvwR2iN0zuvfO1nqINU81daWuReqbXMtQhwjLVbeWl9HDdyc7fmFmayWltbm69/h787fnGGSyznoSLmWJ28MlbhzZQiSZcylqUdsESZqHHcWz5iQgY1yI8tq4VZi/E9h0EYQEMFokStTbi00GTaDCl+gBb0gmGDuDKtEwb9bVSLBOHMOGHapnS4nem5WzhhTX2DLZwpEdBXkngcOJJoOAYIJL0SgYjOkvwdBnSa0T/AP/EACcQAAICAQMDBAIDAAAAAAAAAAMEAgUBAAY0ERITEBQVFiEzIjZA/9oACAEBAAEFAv8AHnPbg1yEei2rB9CsGA5DeY0BkbOGmxqRnez6gvMZyQ3aulayaYubOVWH7eXX28uqW2laxctpLMQl3w9GeNqtl3CND3zh15ryovxAs5vtgrABixUBLk44hQp+du7h7crVnFPgUNKogS1bc8P6fQke4aq8TaVXwFtCfad8ncasj0r6nnejnEp+du7iKjcnDwWmqrBI19tzw/p9WvJXu+T30f4mK3+W01/ApOM0GwWIDQZtgh0YsToU/O3dw9tPrqqfMpaXdA3m254rBfAvkVtYz1xp1OLgkl5ruB/UvW9G9NojcjKjNjIKPPWYMe2RqpqsXVZO0D9RPr6ifVJTEq5u1M2Wfgi6+CLqGO2GiPCE42wFRdK9r8ki8KbpLUAisXqq66FgKyEw8JUzrg69V2wEgke3WXesLhasnh4WXvso5tu3q6GkLlaxnDdSpcYz3Y1ZmGDc25DiMDc7yrlRE8Ud0lLFtjC4C19BZHdluAkRWe4CwfoNw2Kzu2bmujZX7qDUgD/uFGRiK15I2b+k8zt3twp4I4z19GEl29BUAtBesUUIymB2A1AiAZFZgIFxKjYUC3hdICmhVaYT+KGSkFA2PDDy5qEZZ9uLu8I/L8OjnWMdMf/EAC4RAAEDAgMFCAIDAAAAAAAAAAEAAgMEERIhMRAyM0FSBRMUFSBCUXEiI0BhYv/aAAgBAwEBPwH+Hon1kbdM06rlfk1MqJWc0yuHvCZI2QXaVLK2IXcjXnkEyuB3wnPswvChqjK/DZVdSaZgcBdebu6F5s7oVHVGqBJFrKarMT8NkDcX2ybh2Uxu0sabFPb38p7tSRujNnKh0cnF1RKmU0bBopKRj9Mk9oZCWj4VHxV2twm/a7Op4pYiXtvmvBU/Qo4Y4dwWVXximbo2uFwQoow+5doFFGGSjDoQqd1n4DzVQ67sI0CpR+lxVJxRtm4blR8VdrcJv2oW1BH6r2/pd3W/6VNiETceqq+MUzdHolxU8pwrF34xt3wsnujl5lTcV32oY8EYanB1PL9JlRG8XupKtjNM09wfCXN+FR8VdrcJv2uzZo44iHutmvFwdYTJY5dw3VXxim1EWEfkvERdW2aETNsoI3Ry2cmbsX2o6a0hkdslhbMM0aF/IplD1lOZ+BY1QUron4iVWUxqWBoNl5S/qXlL+pUdI6lJub3U1I6V5cCvAO+V4F3ygLC2025pgY3IBX5K6uEDdXWivZXGiJAV+SxImyBusQ2neCcnHJe5fK5BNKdqE7MJxu1EXKIOpXuTb/KOoQzOabf02C12W9Fh6LDbbZ//xAAuEQABAwIDBQgCAwAAAAAAAAABAAIDBBESITEQMjNBUgUTFBUgI1FxIkJAYoH/2gAIAQIBAT8B/h6plI92uSbTRs3k6CN/JPoj+hT43R7yjidKbNQom8yn0RG4U1l3hpU1MImYrqkphUuLSbLypvUvKm9SrKUUxFje6ipRIzFdEWNtse+NlQLODnC4THdzGMaZI2QXCrdWpobBGn1Ejzqo6p7dc0xxdKCVV8JdlcR30u0KiWKQBhsvG1HUpJpJt83VLwgn7x2tNjdSSFtg3UqSQvjN+RU4u3GOSgbZuI81Un3mhVXCO2LiNVXwl2VxHfSldAD7tv8AVjo/6qpwmZ2DRUvCCfvH0R4Z4hiWHufwdulZsa+PkFFw2qV+OQuCBE8f2n08jDoo6V79ckxpZKAVV8JdlcR30u0YZJJAWNvkvCT9BT4ZIt8WVLwgnQSXOS7iXp2wymJ11M9skd2p+9J9J9R7YjbsimdEckK1nMJ9b0BB/wCeNymqWyMwgKjqBTOLiF5qzpXmrOlVlW2pAAGihqmxswkLxrfheNb8I5m+yyF+ScXuzKtzVlhKIsrIZoC6sbXQBKtzWFBt0RZYTtG6U1NGa1avhcynCyboU3IhNFnIGwQI0C/VOt8IbpujkMk769Nyr22X9Fz6Lnbc7P/EADsQAAIBAgQBBwoDCQEAAAAAAAECAwARBBITITEFECJBUWFxFCMyMzRygZGxwUKSoQYgQFJiY3N0k7L/2gAIAQEABj8C/g7nYV0LyHuqydAf01tIT3NvXnUt3rV42zVdz4AV0YwB31aVMveKaVekAtxQjKAUjqgfM1t69nX81ezp+apS0YTJbgaaMRg266U9o55fdPM8aPpS3vmt1U+jbL1k7CrN4gjrqY+Fd7Gw7qtkDntagU82eu1SIosoQ0vgah9/7VI00Qdg9q9nX5mm0YxHm41J8PpSeA52HaKkZyQiC5txpchLK8ZIvxrSZbrJ0SK0wMqRdEViD23+lJ8eeb3TS+BqH3/tR8nE2W++neuGJ+ZqAS5tS2+bjUnw+lJ4D9xyhy33HhQlQ5MVGOHaKweIy5XdulapvfNLGezeu9DtV84U9jV0TqHuqR0NwUNL4Goff+1SLLKsZz3sa9pj+dHRlWS3G1SfD6Ug1Rwr1y1fmtwYcDRVxY5TWA/yH61JPJ/MSo5ulsw4MK6LqRV5X27FpoksoK2FCQupHdSIjhMrX3r18f616+P9alLur5h1U0gdQD216xK9YlAdg5ocKxOrKCy7dlPNiGCRKN2NRQhJcPmPmmniKhvAmpMKL6yIHO3UaxUbE5sNHqybdVYeU538oGaKONCzt8KLxZxY5SsilSDWHie+edsqbddSYiW4jQXNqbFSkiJbE2FQYSR8s04um2xqBJ3s87ZEUC96bCb6wTU4dVZoxipMOt0ZVwrN0u5qw4kWYvOLoiRlm+VPHHnSVNzHKhRreBq8cOLkW9syYdiKB5uTGkdY10pd2NuysHOrrPhIMSrT6ZzWHaaMEMiYiecqIFja5zX40/lDiPWwqhGbYMQTev2jniOpCMKI844XCmuRX8u8gxqYcaT7bjKLixrFwztHM2HcLrw+i+1cjM7BFE7XLG34TWPXDSJOwj4RtetOCZJZMRkWNFO5NxUEDHK3kjFHHFWzCxqLH8pAeWHExRKo4Iob78an/wBNf/RqTJythsKmvJ5qRAT6R764GbCabSFZbah6PAdlYvE4wpHi4F0NCMbBeObvvSW5Ww2HiEr+ZdBm9I9d+ca0EctuGdb0UihSNTxCra9GSHCxROeLIgBrJiIUmTsdb1opEiQ8MgXahFLBHJEOCMtwKEcMaxIPwoLCgJoklA4Z1vR0YY4s3HItr0Zo8LCkx/GqC9CTINQC2a29qAdA4Bv0hWpkGpa2a29qJODgJP8AbFRtpreMWQ29HwrVyLqWtntvavY4P+Yqw4V//8QAJxABAAIBAgYCAgMBAAAAAAAAAQARITFREEFhcYHwkaHR8SBAwbH/2gAIAQEAAT8h/pmqUFq8pdg8IfMWewG35mJB2EfQvlfUSlBruTVMeqYvz4tguieff1CoqGbDiHp0WxjnXBVcp+7T9kl0BAyXd/iF865PScpaHjn6WOGQd5pZ5S8nBflDCZmSwsHSK60PymB5pOyBVzMruGhm6KSsUQPE9JtPT6pUmQVdKJ6R/sABFMFzU9jonttuPWsI5g1HKL9BmrRLzUPYTMPU4O70dY4+tB4iufanxx9ltPSbT1+qPDOcUvxw9pIDv3Wex0T2238Aoh2iuUtrOQcFzIoAUfIUdYURlf8ApKy5+11mI4urcgrdbUkpTN5HgO8/zkInpNp6fVGd2haxRwYIoZ23U9jojYNCJ44QBDI5OF481txv/i3HLgxgA35nq8CB5AE74M2SlH9rzHDqNogekJVoxyst9p+oj9RAJQgzxUo1Li209hnsMtvUDhQQWGFUvPmX4dcrLHtCXPLcRiqJ6LEM+GUwIo0sXG+jFerwA1eB0Yd49NJkYxYRVawXnxGpsyLagaiRY5QMeYnxQXwL3jeibQX4yQ2tOzRdrXvNAyXiGrA7lRB1bMAC2MmsZ0oGjdRpEhcrHI05CY0Sy6deFbc1ceTKTicjLochRhESDPQgrStbma+Z4GB3zDh2B22UHnVko9tM0awwJpCE7Sq22m5zmHfQg60eYVQPfl2ZSyRu6arXlNnt8Oh7M5GCKltO+/hw1CRbB71k69pbxm0sa19EGRZ4sNbPglokC6DMWOvbnAAjY6JwQbOsdfmZxXjDuCatrwHkmYjXWP3LN4NMVdSoL2QDF0JpkaCHgiS9sFX5nYut5qmo0Qr51FxWh0my4dKBLKTRgKNq3WbL2jkgtXL9SrkGDY0rZAnlbaLbL2ipV15v44BBQwBP/9oADAMBAAIAAwAAABCSSSSSSSSSMAQmEOi4uQ5Fp/t0/JyAmkKRKqJuSWM0XnlE67xjiaTFtS2ORmKCWNjxyRW8U87aEFydz8PsAeNif//EACgRAQACAQIFBAMAAwAAAAAAAAEAESExYRBBUXGxkaHB8IHR4SBA8f/aAAgBAwEBPxD/AE1ArpMbm9vWM6HbWK4b3zGYo3JnyluPxzl3HW8YqjcgZCBcPOszJDWtcpsPX+Taev8AJoiTncSktb7So6uOfbfHDWCbuuRLpo5uh3nVR6MxZ2+ZjHNo2JXGz1YsObaHLQLxNHsz6GzCTIp7E2EITO1ni+CewOO4hLy0Ftax0VoS9ZguzFmFqwkYNzvxK5t/HH2T4mj2Z9DZit1nM1f4n0L+4CrYZvWeL4nsD/C2KrydmWJ65PU2jWCkz+IFA6vMsnpn8zANVjch6gejMW7bR9LFeJo9mfQ2YORdTXIn/UJeB06NzxfBCAjQmygiWcLowmjERVhnvnmbjVD54VzFNGFcSeka7xdD9wXECIQURJgzG/abX0ZtfRjieDTa4RQGvE2fvNv7yo6OFl1MFwKVg0+spcUFOkSB6wBZECDzigtiBbEkWrKUecpcVvF+jBpfODone9Higs3+Iih5DCaGrpLrLmRbWdP3KFLpiNjymHc+GZNQMHOEI9H4lDm2eYa+0wYGr5l8W8urqJg1K/vFB1gBpAMhEBSSgKiEpIAYIg6wA0gDYcNZXObEqVzlOnD/xAAoEQEAAgEDAwQCAgMAAAAAAAABABEhMVFhEKGxQXGBkcHRIPBA4fH/2gAIAQIBAT8Q/wAMFUazJYu8z2XvpDs/TEBmzhiVCpXD5hjPfEIuzhiYHbUUC0xEBc5/0Tn/AEQF1DtCzRcuNnXvTz00hGq5lG17avt0g5Ac/iZT6GfeXgobEFT7oz9qnmanuT+pySpeS/TdnN7fqODjaTy/LO4etDsZUi0ovSERpAdplSnMiWVubAdlXmXwceeveHmanxP6nJAZk9mnzOb6ESFMsVpPL8s7h/gxBdeSUaF9t5hkdhj5jpnY8T6xfE4oJULJuTJCnMG+kTzNT3J/U5IvgbPdn/EhArbeeX5Y1h6s5kRGnpSmR1IZa8k7F4l2wlv46WLTtGGQhJWTdjhyU3HSCLSbKxOV2nK7R1RlrATFP3Of2nP7R2bulkuZKhhe71r/AFLVAmneCKbRFTBIp6QKoiKiDIaEta9JaovWa+yJavSLkzer7OoWjj8wtp6pGLuhrK0fRgUF3/UtMFkCiesy9n8zJMbIaRnTf9wD6NPiOn3mQtaHiV+BKiaHMrerQ8dRTSKusUKWCVjFVtghsYqtsFNIq6xQpemkv0nJLl+k5On/xAAoEAEAAgEDAgYCAwEAAAAAAAABABEhMUFREGFxgZGhwfCx0SDh8UD/2gAIAQEAAT8Q/wCMJ6SVANVlYhxY918EztV5tPfV6VFTfLUsfPJ5S9Z3Wnqz7sqJDUEs0scmkHqeceGcd2MOG3p6VNLtrwPFZ9I/DhGhSZiB3D1KLiKNJ4CzePCfRPifYPiKKyDYGq4FA1Fi2H5jIgmQ2svqaJq/n9GOh78EzbatZj8A1oALwLML72JN1vCX0yXgBMyo2pcW4PAMvnK3Z1guw4CUqI0HcY2fCDKJjxZ8Z9RynvEGu5HEtVhN16MH5gizUrVeWezg++4dWFy+riSsFfuyUAP5mA+WQKKQ3lWzRxsYI7IysnIUkS0u7CyQe8/tZtm9Rzf++v1/Kfccp75A3zoiYzW1XVT778wgaKEuZ3Zvxns4PvuH8FtipQqXYcNOPKKtANZsDt3O8qONtGjDlhkIMDVbwsuUjzB715REBsJptvgkfdNjWeeviSjxhuQy7L7Qjr8TUyseEg+xunvEErnsZpX6j0eUXgMY6XPZwKitC4QXtP8AUf1GFpiG49L0l2nq4ezAFit2dy3IfpbIRVNQQtJ3uDoTKSvQDydozNrKvpT+YZ1DbbfZbT0hcQYNQS31iAhhWbK3I5qgKEsUUd592+J92+IRPWIUlzZ3hZ6qVigbHaf5X6z/ADv1jpBQpo0V0PAXYvOuzR4x0uk6A4o3VugMt1LREIzXTVewUXaM3IlBYDc3g7QtMQRBJW6sRxHkSghNxLgFWguOUkJaCliNI8Zg+1VgixbYOZaPF8rBgNdYkb4xmIO4iv0rYL7IqwOsTaEJVC0NAgrjJLOt2qpLsujiFfi7bE0kRWO1VkqePYRCoBsTGeI7Eb1mioVOLLJdRJ4gAwaRMO0IUBAaFl5NnoBrKM1xLAuVLhMOABtqRxmZL91IDlBFYADKIkt7RbRSjWtMrp1cW2YQsrS4oHg0AcwWyx4lR+ieDeQ0gNWkb56IOrKQMwOqFsDsblKOaj12WGrjaIK7MVmMoDWZduyB4lm8A3zqAnBRR4RjToGXCXuXFa5Gy94ml9Y9XIeRXaAMiQMlMoWqgKRLmTIh5ZEjUjoprAbGFFicnQS3IxF1CjV0ekUxdvqqsAOMZl0asumtgMPllBq8gHMbtCO4UhKpNcZhjHOQKBCgArE9jM2IARK6Ak3VANM2Lo0MusBdW68sRKCuJdWto4CqxcbTqBc1BTcMKrAdEcjtAeTlFRserLNaRsvH5S2q6mAATCWMElYIBRsQTgcmaXetts1H7FagrzBSCgFAGgT/2Q==" alt="Logo CIEL Louis Lumière" style="height:44px;width:auto;">
+  </div>
+  <div class="header-lycee">Lycée Louis Lumière – Chelles<br>Bac Pro CIEL · Terminale</div>
+</div>
+
+<!-- PAGE DE GARDE -->
+<div class="garde">
+  <div class="garde-titre">Projet Provence Évasion — Infrastructure réseau</div>
+  <div class="garde-sous">S6 – Cours : Vérification et débogage d'une table de routage</div>
+  <div class="garde-infos">Terminale Bac Pro CIEL &nbsp;|&nbsp; Durée : 2h30 &nbsp;|&nbsp; Année 2025-2026</div>
+
+  <div class="eleve-box">
+    <input type="text" id="eleve-nom" placeholder="Nom">
+    <input type="text" id="eleve-prenom" placeholder="Prénom">
+    <input type="text" id="eleve-classe" placeholder="Classe" value="TCIEL">
+    <input type="date" id="eleve-date">
+  </div>
+
+  <table class="comp-table">
+    <tr><th class="th-head td-check"></th><th class="th-head td-code">Code</th><th class="th-head">Compétence</th></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 1 – Réalisation et maintenance de produits électroniques (U2)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C03</td><td>Participer à un projet</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C07</td><td>Réaliser des maquettes et prototypes</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C11</td><td>Maintenir un système électronique ou réseau</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 2 – Installation et maintenance de réseaux informatiques (U3)</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C06</td><td>Valider la conformité d'une installation</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C09</td><td>Installer les éléments d'un système informatique</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-on">☑</span></td><td class="td-code">C10</td><td>Exploiter un réseau informatique</td></tr>
+    <tr><td class="tr-bloc" colspan="3">Bloc 3 – Études et développement électronique et informatique (U4)</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C01</td><td>Communiquer en situation professionnelle</td></tr>
+    <tr class="tr-odd"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C04</td><td>Analyser une structure matérielle et logicielle</td></tr>
+    <tr class="tr-even"><td class="td-check"><span class="chk-off">☐</span></td><td class="td-code">C08</td><td>Coder</td></tr>
+  </table>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+<!-- ══ PARTIE 1 ══ -->
+<h1>1. Rappel : la table de routage et son fonctionnement</h1>
+
+<div class="mise-en-situation">
+  <strong>📍 Mise en situation :</strong> Lors de la séance S5, vous avez construit la topologie complète des 4 sites de Provence Évasion et commencé à configurer le routage statique entre Apt et Roussillon. Cucuron reste à interconnecter. Avant d'aller plus loin, Laurent Ferracci (PDG d'Axentis, votre cabinet) signale que certains pings inter-sites échouent. Objectif de la séance : savoir <strong>lire, interpréter et déboguer</strong> une table de routage pour identifier l'origine des pannes.
+</div>
+
+<h2>1.1 À quoi sert la table de routage ?</h2>
+<p>Un routeur doit savoir <em>où envoyer</em> chaque paquet IP qu'il reçoit. Pour cela, il consulte sa <strong>table de routage</strong> (aussi appelée <em>routing table</em> ou <em>RIB — Routing Information Base</em>). C'est une liste ordonnée de règles : pour chaque réseau de destination possible, quelle est la <em>prochaine étape</em> (next-hop) ou quelle interface de sortie utiliser ?</p>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Règle fondamentale : longest prefix match</div>
+  <p>Quand un paquet arrive, le routeur compare l'adresse IP de destination avec <strong>toutes les entrées</strong> de sa table de routage. Il choisit la route avec le <strong>masque le plus long</strong> (le plus précis). Si aucune route ne correspond, il utilise la <strong>route par défaut</strong> (0.0.0.0/0) si elle existe — sinon, le paquet est abandonné (dropped) et le routeur génère un message ICMP "Destination Unreachable".</p>
+</div>
+
+<h2>1.2 Structure d'une entrée de table de routage Cisco</h2>
+<p>Voici un extrait typique de <span class="badge-cmd">show ip route</span> sur le routeur du siège d'Apt :</p>
+
+<div class="cli">
+<span class="cm-titre">Routeur-Apt# show ip route</span>
+
+<span class="cm-out">Codes: C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       * - candidate default, U - per-user static route</span>
+
+<span class="cm-com">C</span>    192.168.10.0/24 is directly connected, GigabitEthernet0/0.11  <span class="cm-com">← réseau local directement connecté</span>
+<span class="cm-com">C</span>    192.168.11.0/28 is directly connected, GigabitEthernet0/0.13
+<span class="cm-com">C</span>    192.168.12.0/28 is directly connected, GigabitEthernet0/0.14
+<span class="cm-com">C</span>    192.168.13.0/29 is directly connected, GigabitEthernet0/0.15
+<span class="cm-com">C</span>    10.0.0.0/30     is directly connected, Serial0/0/0            <span class="cm-com">← liaison WAN Apt—Roussillon</span>
+<span class="cm-val">S</span>    192.168.20.0/22 [1/0] via 10.0.0.2                           <span class="cm-com">← route statique vers Roussillon</span>
+<span class="cm-val">S</span>    192.168.30.0/22 [1/0] via 10.0.1.2                           <span class="cm-com">← route statique vers Saignon</span>
+<span class="cm-out">S*   0.0.0.0/0 [1/0] via 203.0.113.1                              ← route par défaut (vers Internet)</span>
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Décodage d'une entrée de table de routage</div>
+  <table class="data-table">
+    <tr><th>Champ</th><th>Exemple</th><th>Signification</th></tr>
+    <tr><td class="center"><strong>Code</strong></td><td class="center"><code>S</code></td><td class="left">Type de route : <strong>C</strong>=connectée, <strong>S</strong>=statique, <strong>R</strong>=RIP, <strong>O</strong>=OSPF…</td></tr>
+    <tr><td class="center"><strong>Réseau/masque</strong></td><td class="center"><code>192.168.20.0/22</code></td><td class="left">Réseau de destination avec son masque CIDR</td></tr>
+    <tr><td class="center"><strong>[AD/métrique]</strong></td><td class="center"><code>[1/0]</code></td><td class="left">Distance administrative / métrique. Une route statique a AD=1 par défaut.</td></tr>
+    <tr><td class="center"><strong>via</strong></td><td class="center"><code>via 10.0.0.2</code></td><td class="left">Adresse IP du prochain routeur (next-hop) à atteindre</td></tr>
+  </table>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 1 — Lecture de la table de routage</div>
+  <label class="qlabel">Q1.1 — Dans l'extrait ci-dessus, que se passe-t-il si un paquet destiné à 192.168.21.50 (VLAN Personnel de Roussillon) arrive sur le routeur d'Apt ? Quelle entrée va-t-il utiliser ?</label>
+  <textarea class="rep rep-sm" id="ex1-q1" placeholder="Il va consulter… L'entrée choisie sera… car…"></textarea>
+  <label class="qlabel">Q1.2 — Que signifie "S* 0.0.0.0/0" dans la table de routage ? Dans quel cas cette entrée est-elle utilisée ?</label>
+  <textarea class="rep rep-sm" id="ex1-q2" placeholder="Votre réponse…"></textarea>
+  <label class="qlabel">Q1.3 — Le réseau de Cucuron (192.168.40.0/22) n'apparaît pas encore dans la table. Qu'arrive-t-il à un paquet destiné à 192.168.41.10 (PC de Cucuron) ?</label>
+  <textarea class="rep rep-xs" id="ex1-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 2 ══ -->
+<h1>2. Les commandes de diagnostic essentielles</h1>
+
+<h2>2.1 <span class="badge-cmd">show ip route</span> — lire la table de routage complète</h2>
+<p>C'est la commande de base. Elle affiche l'intégralité des routes connues du routeur, avec leur type, leur next-hop et leur interface de sortie. On peut la filtrer :</p>
+
+<div class="cli">
+<span class="cm-titre">Variantes de show ip route</span>
+
+Routeur-Apt# <span class="cm-val">show ip route</span>                         <span class="cm-com">← affiche toute la table</span>
+Routeur-Apt# <span class="cm-val">show ip route 192.168.40.0</span>             <span class="cm-com">← cherche une route vers ce réseau</span>
+Routeur-Apt# <span class="cm-val">show ip route static</span>                   <span class="cm-com">← affiche uniquement les routes statiques</span>
+Routeur-Apt# <span class="cm-val">show ip route connected</span>                <span class="cm-com">← affiche uniquement les réseaux directement connectés</span>
+</div>
+
+<h2>2.2 <span class="badge-cmd">show interfaces</span> — état des interfaces</h2>
+<p>Une route ne peut être active que si l'interface correspondante est <strong>UP/UP</strong>. La commande <span class="badge-cmd">show interfaces</span> (ou <span class="badge-cmd">show ip interface brief</span>) permet de vérifier l'état physique et logique de chaque interface.</p>
+
+<div class="cli">
+<span class="cm-titre">Routeur-Apt# show ip interface brief</span>
+
+<span class="cm-out">Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0     unassigned      YES unset  up                    up
+GigabitEthernet0/0.11  192.168.10.1    YES manual up                    up
+GigabitEthernet0/0.13  192.168.11.1    YES manual up                    up
+Serial0/0/0            10.0.0.1        YES manual up                    up</span>
+<span class="cm-prompt">Serial0/0/1            10.0.1.1        YES manual administratively down down</span>  <span class="cm-com">⚠ PROBLÈME !</span>
+</div>
+
+<div class="attention">
+  <strong>⚠ À retenir :</strong> Si une interface affiche <code>administratively down</code>, c'est qu'elle a été désactivée manuellement (<code>shutdown</code>). Il faut utiliser <code>no shutdown</code> pour la réactiver. Si l'interface est <code>down/down</code> sans "administratively", c'est un problème physique (câble, SFP, autre équipement).
+</div>
+
+<h2>2.3 <span class="badge-cmd">ping</span> et <span class="badge-cmd">traceroute</span> — tester la connectivité</h2>
+<p>Ces deux commandes sont complémentaires. Le <span class="badge-cmd">ping</span> confirme qu'une destination est joignable. Le <span class="badge-cmd">traceroute</span> (ou <span class="badge-cmd">tracert</span> sous Windows) révèle le chemin emprunté saut par saut.</p>
+
+<div class="cli">
+<span class="cm-titre">Utilisation de ping étendu (depuis le routeur Cisco)</span>
+
+Routeur-Apt# <span class="cm-val">ping 192.168.41.10</span>
+<span class="cm-out">Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.41.10, timeout is 2 seconds:
+.....</span>
+<span class="cm-prompt">Success rate is 0 percent (0/5)</span>     <span class="cm-com">← 0% = la destination est injoignable</span>
+
+Routeur-Apt# <span class="cm-val">ping 192.168.21.10</span>
+<span class="cm-out">Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.21.10, timeout is 2 seconds:
+!!!!!</span>
+<span class="cm-val">Success rate is 100 percent (5/5)</span>  <span class="cm-com">← 5/5 = connectivité OK</span>
+</div>
+
+<div class="cli">
+<span class="cm-titre">Utilisation de traceroute</span>
+
+Routeur-Apt# <span class="cm-val">traceroute 192.168.31.10</span>
+<span class="cm-out">Type escape sequence to abort.
+Tracing the route to 192.168.31.10
+  1 10.0.1.2 8 msec 4 msec 4 msec</span>
+<span class="cm-val">  2 192.168.31.10 12 msec 8 msec 8 msec</span>  <span class="cm-com">← 2 sauts, route valide ✓</span>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 2 — Interpréter les commandes de diagnostic</div>
+  <label class="qlabel">Q2.1 — Dans la sortie de <code>show ip interface brief</code> ci-dessus, quelle interface pose problème et pourquoi ? Quelle commande faut-il taper pour corriger ce problème ?</label>
+  <textarea class="rep rep-sm" id="ex2-q1" placeholder="L'interface… est… parce que… La correction est : …"></textarea>
+  <label class="qlabel">Q2.2 — Un ping vers 192.168.41.10 échoue (0%). Listez 3 causes possibles, dans l'ordre logique à vérifier.</label>
+  <textarea class="rep rep-md" id="ex2-q2" placeholder="1. … 2. … 3. …"></textarea>
+  <label class="qlabel">Q2.3 — Comment utilise-t-on <code>traceroute</code> pour distinguer un problème de routage "aller" d'un problème de routage "retour" ?</label>
+  <textarea class="rep rep-sm" id="ex2-q3" placeholder="Votre réponse…"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 3 ══ -->
+<h1>3. La passerelle par défaut — côté équipement terminal</h1>
+
+<h2>3.1 Pourquoi configurer une passerelle par défaut ?</h2>
+<p>Un PC ou un serveur ne possède pas de table de routage aussi élaborée qu'un routeur. Il ne connaît que son propre réseau local. Pour joindre un autre réseau (un autre site, Internet…), il doit envoyer le paquet à une machine de confiance chargée de le router : sa <strong>passerelle par défaut</strong> (<em>default gateway</em>). C'est l'adresse IP du routeur (ou de la sous-interface Router-on-a-Stick) du VLAN concerné.</p>
+
+<div class="schema-box">
+  <div class="sch-titre">Schéma : rôle de la passerelle par défaut</div>
+PC-Personnel (192.168.21.10)  ──→  Switch Roussillon ──→  Routeur (192.168.21.1)
+                                                             │
+  Paquet destiné à 192.168.41.5 (Cucuron)                  │ consulte sa table de routage
+  → Le PC ne connaît pas ce réseau                          ↓
+  → Il envoie le paquet à sa GW : 192.168.21.1    Routeur route vers 10.0.2.2 (Cucuron)
+</div>
+
+<h2>3.2 Vérifier et configurer la passerelle par défaut</h2>
+<p>Si la passerelle par défaut est absente ou incorrecte, le PC peut pinguer son réseau local mais pas les autres sites. C'est une cause fréquente de panne inter-sites.</p>
+
+<div class="diag-grid">
+  <div class="diag-card ok">
+    <div class="dc-titre">✅ Configuration correcte</div>
+    <p>PC-Personnel-1 (Roussillon)<br>
+    IP : 192.168.21.10 / 255.255.255.0<br>
+    Passerelle : <strong>192.168.21.1</strong> ← sous-interface routeur</p>
+    <p>→ Peut joindre tous les autres sites.</p>
+  </div>
+  <div class="diag-card ko">
+    <div class="dc-titre">❌ Erreur courante</div>
+    <p>PC-Personnel-1 (Roussillon)<br>
+    IP : 192.168.21.10 / 255.255.255.0<br>
+    Passerelle : <strong>192.168.21.10</strong> ← adresse du PC lui-même !</p>
+    <p>→ Ne peut pas quitter son réseau local.</p>
+  </div>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 3 — Passerelle par défaut</div>
+  <label class="qlabel">Q3.1 — Quelle est la passerelle par défaut correcte pour un PC du VLAN Caméras IP de Saignon (VLAN 33, réseau 192.168.33.0/28) ?</label>
+  <textarea class="rep rep-xs" id="ex3-q1" placeholder="La passerelle est : 192.168…"></textarea>
+  <label class="qlabel">Q3.2 — Un PC du VLAN WiFi de Cucuron (VLAN 42, IP 192.168.42.50) n'arrive pas à pinguer le siège d'Apt. Sa passerelle est correctement configurée. Où peut se situer le problème ?</label>
+  <textarea class="rep rep-sm" id="ex3-q2" placeholder="Le problème peut venir de… (pensez à la table de routage du routeur de Cucuron, puis à celle d'Apt)"></textarea>
+  <label class="qlabel">Q3.3 — Comment vérifier la passerelle d'un PC Windows en ligne de commande ? Quelle commande utiliser ?</label>
+  <textarea class="rep rep-xs" id="ex3-q3" placeholder="La commande est : …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 4 ══ -->
+<h1>4. Méthodologie de troubleshooting réseau</h1>
+
+<h2>4.1 Approche systématique : du bas vers le haut</h2>
+<p>Face à une panne réseau, il ne faut pas "tester au hasard". La méthode professionnelle consiste à remonter le modèle OSI couche par couche, ou à utiliser la <strong>méthode de bissection</strong> (tester le milieu du chemin pour diviser le problème).</p>
+
+<div class="methodo-box">
+  <div class="m-titre">🔧 Méthode par couche — troubleshooting inter-sites</div>
+  <div class="methodo-step">
+    <div class="methodo-num">1</div>
+    <div><strong>Couche 1 (Physique)</strong> — Le câble est-il branché ? L'interface est-elle UP ? → <span class="badge-cmd">show interfaces</span></div>
+  </div>
+  <div class="methodo-step">
+    <div class="methodo-num">2</div>
+    <div><strong>Couche 2 (Liaison)</strong> — Les VLANs sont-ils bien configurés ? Le port trunk passe-t-il les bons VLANs ? → <span class="badge-cmd">show vlan brief</span>, <span class="badge-cmd">show interfaces trunk</span></div>
+  </div>
+  <div class="methodo-step">
+    <div class="methodo-num">3</div>
+    <div><strong>Couche 3 — Local</strong> — Le PC a-t-il la bonne IP et la bonne passerelle ? Peut-il pinguer sa propre passerelle ? → <span class="badge-cmd">ipconfig</span> (Windows) ou <span class="badge-cmd">ip a</span> (Linux)</div>
+  </div>
+  <div class="methodo-step">
+    <div class="methodo-num">4</div>
+    <div><strong>Couche 3 — Routeur source</strong> — Le routeur du site source a-t-il une route vers le réseau de destination ? → <span class="badge-cmd">show ip route</span></div>
+  </div>
+  <div class="methodo-step">
+    <div class="methodo-num">5</div>
+    <div><strong>Couche 3 — Routeur destination</strong> — Le routeur du site destination a-t-il une route de retour vers le réseau source ? → <span class="badge-cmd">show ip route</span> sur le routeur distant</div>
+  </div>
+  <div class="methodo-step">
+    <div class="methodo-num">6</div>
+    <div><strong>Traçage du chemin complet</strong> — Utiliser <span class="badge-cmd">traceroute</span> pour visualiser les sauts et identifier où la chaîne se coupe.</div>
+  </div>
+</div>
+
+<div class="attention">
+  <strong>⚠ Oubli classique — la route de retour !</strong> Une erreur très fréquente : on configure la route aller (Apt → Cucuron) mais on oublie la route retour (Cucuron → Apt). Le ping part mais ne revient pas → 0% de succès. <strong>Toujours vérifier les deux sens.</strong>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 4 — Troubleshooting Provence Évasion</div>
+  <label class="qlabel">Q4.1 — Un technicien d'Axentis constate qu'un PC de Saignon (192.168.31.15) ne peut pas pinguer un PC de Cucuron (192.168.41.12). Le PC de Saignon peut bien pinguer sa propre passerelle (192.168.31.1) et le site de Roussillon. Où cherchez-vous le problème en priorité ?</label>
+  <textarea class="rep rep-md" id="ex4-q1" placeholder="Je vérifie d'abord… sur le routeur de…  parce que…"></textarea>
+  <label class="qlabel">Q4.2 — Sur le routeur de Cucuron, vous tapez <code>show ip route 192.168.30.0</code> et obtenez : <code>% Network not in table</code>. Qu'est-ce que cela signifie et que faut-il faire ?</label>
+  <textarea class="rep rep-sm" id="ex4-q2" placeholder="Cela signifie que… Il faut ajouter la commande : ip route …"></textarea>
+  <label class="qlabel">Q4.3 — Proposez la commande complète à taper sur le routeur de Cucuron pour qu'il connaisse le réseau 192.168.30.0/22 de Saignon, sachant que l'adresse du routeur de Saignon côté WAN est 10.0.2.1.</label>
+  <textarea class="rep rep-xs" id="ex4-q3" placeholder="ip route …"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ PARTIE 5 ══ -->
+<h1>5. La route par défaut — ouvrir vers l'extérieur</h1>
+
+<h2>5.1 Pourquoi une route par défaut ?</h2>
+<p>Les routeurs de Provence Évasion connaissent les réseaux des 4 sites grâce aux routes statiques. Mais qu'en est-il d'Internet ? Il est impossible de mémoriser les centaines de milliers de réseaux Internet dans une table de routage manuelle. La solution : la <strong>route par défaut</strong>, qui dit au routeur "pour tout réseau que tu ne connais pas, envoie le paquet par ici".</p>
+
+<div class="cli">
+<span class="cm-titre">Configuration d'une route par défaut sur le routeur d'Apt</span>
+
+Routeur-Apt(config)# <span class="cm-val">ip route 0.0.0.0 0.0.0.0 203.0.113.1</span>   <span class="cm-com">← vers la passerelle Internet (FAI)</span>
+
+<span class="cm-com">Vérification :</span>
+Routeur-Apt# <span class="cm-val">show ip route</span>
+<span class="cm-out">S*   0.0.0.0/0 [1/0] via 203.0.113.1</span>   <span class="cm-com">← le * indique que c'est la candidate par défaut</span>
+</div>
+
+<h2>5.2 Propagation de la route par défaut vers les sites secondaires</h2>
+<p>Les routeurs des sites secondaires (Roussillon, Saignon, Cucuron) doivent eux aussi savoir comment atteindre Internet. La solution la plus simple : configurer une route par défaut qui pointe vers le routeur d'Apt, qui se charge ensuite de transmettre vers le FAI.</p>
+
+<div class="cli">
+<span class="cm-titre">Route par défaut sur les sites secondaires (exemple : Roussillon)</span>
+
+Routeur-Roussillon(config)# <span class="cm-val">ip route 0.0.0.0 0.0.0.0 10.0.0.1</span>   <span class="cm-com">← next-hop = routeur d'Apt côté WAN</span>
+</div>
+
+<div class="retenir">
+  <div class="retenir-titre">📌 Récapitulatif des liaisons WAN Provence Évasion</div>
+  <table class="data-table">
+    <tr><th>Liaison</th><th>Réseau WAN</th><th>IP côté Apt</th><th>IP côté site distant</th></tr>
+    <tr><td class="center"><span class="badge-site">Apt</span> ↔ <span class="badge-site">Roussillon</span></td><td class="center">10.0.0.0/30</td><td class="center">10.0.0.1</td><td class="center">10.0.0.2</td></tr>
+    <tr><td class="center"><span class="badge-site">Apt</span> ↔ <span class="badge-site">Saignon</span></td><td class="center">10.0.1.0/30</td><td class="center">10.0.1.1</td><td class="center">10.0.1.2</td></tr>
+    <tr><td class="center"><span class="badge-site">Apt</span> ↔ <span class="badge-site">Cucuron</span></td><td class="center">10.0.2.0/30</td><td class="center">10.0.2.1</td><td class="center">10.0.2.2</td></tr>
+  </table>
+</div>
+
+<div class="exercice">
+  <div class="exercice-titre">🧠 Exercice 5 — Routage complet des 4 sites</div>
+  <label class="qlabel">Q5.1 — Écrivez toutes les routes statiques à configurer sur le routeur d'Apt pour qu'il connaisse les réseaux de Roussillon (192.168.20.0/22), Saignon (192.168.30.0/22) et Cucuron (192.168.40.0/22).</label>
+  <textarea class="rep rep-md" id="ex5-q1" placeholder="ip route 192.168.20.0 255.255.252.0 …&#10;ip route 192.168.30.0 …&#10;ip route 192.168.40.0 …"></textarea>
+  <label class="qlabel">Q5.2 — Écrivez la route par défaut à configurer sur le routeur de Saignon pour qu'il puisse atteindre Internet via Apt.</label>
+  <textarea class="rep rep-xs" id="ex5-q2" placeholder="ip route …"></textarea>
+  <label class="qlabel">Q5.3 — Un PC de Roussillon pingue un PC de Cucuron. Listez, dans l'ordre, les routeurs traversés par le paquet aller.</label>
+  <textarea class="rep rep-sm" id="ex5-q3" placeholder="PC Roussillon → passerelle VLAN → Routeur Roussillon → … → Routeur Cucuron → PC Cucuron"></textarea>
+</div>
+
+<hr class="sep">
+
+<!-- ══ SYNTHÈSE ══ -->
+<div class="section-synth-titre">🎯 Synthèse de la séance</div>
+
+<div class="conclusion">
+  <p>La commande <input class="inline-field" id="synth-1" placeholder="..."> permet de lire la table de routage d'un routeur Cisco. Les routes directement connectées ont le code <input class="inline-field" id="synth-2" placeholder="..." style="width:30px">, les routes statiques ont le code <input class="inline-field" id="synth-3" placeholder="..." style="width:30px">.</p>
+  <p>Le principe du <input class="inline-field" id="synth-4" placeholder="..."> signifie que le routeur choisit toujours la route avec le masque le plus long (le plus précis).</p>
+  <p>Si une interface affiche <code>administratively down</code>, c'est qu'elle a été désactivée par la commande <code><input class="inline-field" id="synth-5" placeholder="..."></code>. Pour la réactiver, on tape <code><input class="inline-field" id="synth-6" placeholder="..."></code>.</p>
+  <p>La <input class="inline-field" id="synth-7" placeholder="..."> est l'adresse du routeur à laquelle un équipement terminal envoie les paquets destinés à d'autres réseaux. Une erreur sur cette configuration empêche toute communication <input class="inline-field" id="synth-8" placeholder="...">.</p>
+  <p>Un ping qui échoue peut venir d'un problème de route <input class="inline-field" id="synth-9" placeholder="..."> (aller) ou d'un problème de route <input class="inline-field" id="synth-10" placeholder="..."> (retour) : les deux sens doivent être vérifiés.</p>
+</div>
+
+<!-- AUTO-ÉVALUATION -->
+<div class="autoeval">
+  <div class="autoeval-title">🌟 Auto-évaluation</div>
+  <div class="ae-row ae-header">
+    <div>Critère</div>
+    <div style="text-align:center">★★★ Maîtrisé</div>
+    <div style="text-align:center">★★☆ En cours</div>
+    <div style="text-align:center">★☆☆ À revoir</div>
+    <div style="text-align:center">? Non traité</div>
+  </div>
+  <script>
+  const criteres = [
+    "Je sais lire et interpréter une table de routage Cisco (show ip route)",
+    "Je comprends la règle du longest prefix match",
+    "Je sais identifier une interface DOWN et la réactiver (no shutdown)",
+    "Je comprends le rôle de la passerelle par défaut sur un équipement terminal",
+    "Je sais rédiger une route statique inter-sites complète",
+    "Je sais configurer une route par défaut (0.0.0.0/0)",
+    "Je connais la méthodologie de troubleshooting par couches OSI",
+    "Je comprends qu'un ping échoué peut venir de l'absence de route retour"
+  ];
+  const niveaux = ['maitrise','en_cours','a_revoir','non_traite'];
+  const labels = ['★★★','★★☆','★☆☆','?'];
+  const cont = document.querySelector('.autoeval');
+  criteres.forEach((c,i) => {
+    const row = document.createElement('div');
+    row.className='ae-row';
+    let html=`<div>${c}</div>`;
+    niveaux.forEach((n,j)=>{
+      html+=`<div style="text-align:center"><label style="cursor:pointer"><input type="radio" name="ae-${i}" value="${n}" style="accent-color:var(--bleu);margin-right:4px">${labels[j]}</label></div>`;
+    });
+    row.innerHTML=html;
+    cont.appendChild(row);
+  });
+  </script>
+</div>
+
+</div><!-- /content -->
+
+<!-- PIED DE PAGE -->
+<div class="footer">
+  <div><strong style="color:var(--orange)">S6</strong> — Cours : Vérification et débogage d'une table de routage</div>
+  <div>Lycée Louis Lumière – Chelles · Bac Pro CIEL · 2025-2026</div>
+</div>
+
+<!-- BARRE STICKY -->
+<div class="send-bar">
+  <div class="send-info">Vérifiez que tous les champs sont remplis avant de générer le fichier.</div>
+  <button class="btn-send" onclick="genererJSON()">⬇ Télécharger mes réponses (.json)</button>
+</div>
+<div class="toast" id="toast">✅ Fichier téléchargé avec succès !</div>
+
+<script>
+document.getElementById('eleve-date').valueAsDate = new Date();
+
+function genererJSON(){
+  const nom = document.getElementById('eleve-nom').value;
+  const prenom = document.getElementById('eleve-prenom').value;
+  const v = id => { const el=document.getElementById(id); return el?el.value:''; };
+  const ae = {};
+  [
+    "Je sais lire et interpréter une table de routage Cisco (show ip route)",
+    "Je comprends la règle du longest prefix match",
+    "Je sais identifier une interface DOWN et la réactiver (no shutdown)",
+    "Je comprends le rôle de la passerelle par défaut sur un équipement terminal",
+    "Je sais rédiger une route statique inter-sites complète",
+    "Je sais configurer une route par défaut (0.0.0.0/0)",
+    "Je connais la méthodologie de troubleshooting par couches OSI",
+    "Je comprends qu'un ping échoué peut venir de l'absence de route retour"
+  ].forEach((c,i)=>{
+    const r=document.querySelector(`input[name="ae-${i}"]:checked`);
+    ae[`critere_${i+1}`]={critere:c,niveau:r?r.value:'non_traite'};
+  });
+  const data={
+    meta:{devoir:"S6 – Cours : Vérification et débogage d'une table de routage",eleve:{nom,prenom,classe:v('eleve-classe')},date:v('eleve-date'),genere_le:new Date().toISOString()},
+    partie1_table_routage:{q1:v('ex1-q1'),q2:v('ex1-q2'),q3:v('ex1-q3')},
+    partie2_commandes_diag:{q1:v('ex2-q1'),q2:v('ex2-q2'),q3:v('ex2-q3')},
+    partie3_passerelle:{q1:v('ex3-q1'),q2:v('ex3-q2'),q3:v('ex3-q3')},
+    partie4_troubleshooting:{q1:v('ex4-q1'),q2:v('ex4-q2'),q3:v('ex4-q3')},
+    partie5_route_defaut:{q1:v('ex5-q1'),q2:v('ex5-q2'),q3:v('ex5-q3')},
+    synthese:{s1:v('synth-1'),s2:v('synth-2'),s3:v('synth-3'),s4:v('synth-4'),s5:v('synth-5'),s6:v('synth-6'),s7:v('synth-7'),s8:v('synth-8'),s9:v('synth-9'),s10:v('synth-10')},
+    auto_evaluation:ae
+  };
+  const safeName=(nom+prenom).replace(/[^a-zA-Z0-9]/g,'')||'Eleve';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`${safeName}_S6Cours.json`;
+  a.click();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>
